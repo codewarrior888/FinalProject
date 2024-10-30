@@ -1,0 +1,141 @@
+@media screen and (min-width: 1200px) {
+  .header {
+    background-color: var(--main-beige);
+    height: 70px;
+    width: 100%;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .header__container {
+    max-width: 1200px;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header__logo {
+    img {
+      max-width: 150px;
+      width: 150px;
+      min-width: 150px;
+      height: auto;
+      display: block;
+    }
+  }
+
+  .header__text {
+    text-align: center;
+    span.contacts {
+      font-family: PT-Astra-Sans_Regular, sans-serif;
+      font-size: 14px;
+      opacity: 0.9;
+      display: block;
+    }
+
+    span.content {
+      font-family: PT-Astra-Sans_Bold, sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      opacity: 0.5;
+      display: block;
+      margin-top: 5px;
+    }
+  }
+
+  .header__button-place {
+    button {
+      height: 40px;
+    }
+  }
+
+  .m-header {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 431px) and (max-width: 1199px) {
+  .m-header {
+    background-color: var(--main-beige);
+    height: 90px;
+    width: 100%;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .m-header__container {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .m-header__leftside {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+  }
+
+  .m-header__logo {
+    img {
+      max-width: 150px;
+      width: 150px;
+      min-width: 150px;
+      height: auto;
+      display: block;
+    }
+  }
+
+  .m-contacts {
+    font-family: PT-Astra-Sans_Regular, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    display: block;
+    color: var(--main-blue);
+    margin-top: 20px;
+  }
+
+  .m-header__text {
+    text-align: center;
+    padding: 10px;
+    span.content {
+      font-family: PT-Astra-Sans_Bold, sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  }
+
+  .m-header__button-place {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 20px;
+
+    button {
+      height: 40px;
+      padding: 10px;
+    }
+  }
+
+  .header {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 431px) {
+}

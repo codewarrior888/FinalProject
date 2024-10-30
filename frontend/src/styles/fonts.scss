@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'Astra-Sans-Regular';
+    src: url('../assets/fonts/PT-Astra-Sans_Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Astra-Sans-Italic';
+    src: url('../assets/fonts/PT-Astra-Sans_Italic.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Astra-Sans-Bold';
+    src: url('../assets/fonts/PT-Astra-Sans_Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Astra-Sans-Bold-Italic';
+    src: url('../assets/fonts/PT-Astra-Sans_Bold-Italic.ttf') format('truetype');
+}
+
+$font-regular: 'Astra-Sans-Regular', Arial, sans-serif;
+$font-italic: 'Astra-Sans-Italic', Arial, sans-serif;
+$font-bold: 'Astra-Sans-Bold', Arial, sans-serif;
+$font-bold-italic: 'Astra-Sans-Bold-Italic', Arial, sans-serif;
