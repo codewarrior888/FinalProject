@@ -4,12 +4,14 @@ import { API_URL } from '../api';
 import '../../styles/MainGuest.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
+import EquipmentCard from './DetailCard';
 
 const MainGuest: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null); // Track expanded row
+  const [expandedCard, setExpandedCard] = useState<string | null>(null); // Track expanded card
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +33,6 @@ const MainGuest: React.FC = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim() === '') {
-      // Reset search if input is empty
       setFilteredData(equipmentData);
     } else {
       const results = equipmentData.filter((equipment: any) =>
@@ -43,20 +44,22 @@ const MainGuest: React.FC = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleSearch(); // Trigger search on Enter key
+      handleSearch();
     }
   };
 
   const handleFocus = () => {
     if (searchQuery.trim() === '') {
-      // Show all data when input is focused and empty
       setFilteredData(equipmentData);
     }
   };
 
   const handleRowClick = (equipment: any) => {
-    // Toggle row expansion
     setExpandedRow(expandedRow === equipment.equipment_serial ? null : equipment.equipment_serial);
+  };
+
+  const handleCardClick = (equipmentSerial: string) => {
+    setExpandedCard(expandedCard === equipmentSerial ? null : equipmentSerial);
   };
 
   return (
@@ -69,8 +72,8 @@ const MainGuest: React.FC = () => {
           placeholder="Заводской номер"
           value={searchQuery}
           onChange={handleSearchChange}
-          onKeyDown={handleKeyDown} // Add keydown event handler
-          onFocus={handleFocus} // Add focus event handler
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           className="main-guest__search-field"
         />
         <button onClick={handleSearch} className="main-guest__search-button">Поиск</button>
@@ -104,20 +107,50 @@ const MainGuest: React.FC = () => {
                 {expandedRow === equipment.equipment_serial && (
                   <tr>
                     <td colSpan={6}>
-                      <div className="detailsContainer">
+                      <div className="main-guest__details-container">
                         <h2>Детали</h2>
-                        <ul>
-                          <li>Модель техники: {equipment.equipment_model_name}</li>
-                          <li>Зав.№ техники: {equipment.equipment_serial}</li>
-                          <li>Модель двигателя: {equipment.engine_model_name}</li>
-                          <li>Зав.№ двигателя: {equipment.engine_serial}</li>
-                          <li>Модель трансмиссии: {equipment.transmission_model_name}</li>
-                          <li>Зав.№ трансмиссии: {equipment.transmission_serial}</li>
-                          <li>Модель ведущего моста: {equipment.drive_axle_model_name}</li>
-                          <li>Зав.№ ведущего моста: {equipment.drive_axle_serial}</li>
-                          <li>Модель управляемого моста: {equipment.steer_axle_model_name}</li>
-                          <li>Зав.№ управляемого моста: {equipment.steer_axle_serial}</li>
-                        </ul>
+                        <div className="main-guest__cards-container">
+                          <EquipmentCard
+                            header="Техника"
+                            model={equipment.equipment_model_name}
+                            serial={equipment.equipment_serial}
+                            description={equipment.equipment_model_description || "Описание отсутствует"} // Adjust as needed
+                            isExpanded={expandedCard === 'equipment-' + equipment.equipment_serial}
+                            onClick={() => handleCardClick('equipment-' + equipment.equipment_serial)}
+                          />
+                          <EquipmentCard
+                            header="Двигатель"
+                            model={equipment.engine_model_name}
+                            serial={equipment.engine_serial}
+                            description={equipment.engine_model_description || "Описание отсутствует"} // Adjust as needed
+                            isExpanded={expandedCard === 'engine-' + equipment.equipment_serial}
+                            onClick={() => handleCardClick('engine-' + equipment.equipment_serial)}
+                          />
+                          <EquipmentCard
+                            header="Трансмиссия"
+                            model={equipment.transmission_model_name}
+                            serial={equipment.transmission_serial}
+                            description={equipment.transmission_description || "Описание отсутствует"} // Adjust as needed
+                            isExpanded={expandedCard === 'transmission-' + equipment.equipment_serial}
+                            onClick={() => handleCardClick('transmission-' + equipment.equipment_serial)}
+                          />
+                          <EquipmentCard
+                            header="Ведущий мост"
+                            model={equipment.drive_axle_model_name}
+                            serial={equipment.drive_axle_serial}
+                            description={equipment.drive_axle_description || "Описание отсутствует"} // Adjust as needed
+                            isExpanded={expandedCard === 'drive-axle-' + equipment.equipment_serial}
+                            onClick={() => handleCardClick('drive-axle-' + equipment.equipment_serial)}
+                          />
+                          <EquipmentCard
+                            header="Управляемый мост"
+                            model={equipment.steer_axle_model_name}
+                            serial={equipment.steer_axle_serial}
+                            description={equipment.steer_axle_description || "Описание отсутствует"} // Adjust as needed
+                            isExpanded={expandedCard === 'steer-axle-' + equipment.equipment_serial}
+                            onClick={() => handleCardClick('steer-axle-' + equipment.equipment_serial)}
+                          />
+                        </div>
                       </div>
                     </td>
                   </tr>

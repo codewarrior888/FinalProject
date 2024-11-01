@@ -66,29 +66,34 @@
     
     /* Row highlighting on selection */
     .selectedRow {
-        background-color: #d0e4f2 !important;
+        background-color: #6ab4e9 !important;
     }
     
     /* Detail view styling */
-    .detailsContainer {
+    &__details-container {
         display: flex;
         flex-direction: column;
         justify-content: flex-start; // Ensures content starts from the top
         padding: 1.5rem;
         width: 100%;
         background-color: $main-color-white;
-
-        ul{
-          background-color: $secondary-color-light-gray;
-          width: 50%;
-          padding: 1rem 2.5rem;
-        }
-
-        li {
-          font-size: 1.6rem;
-          line-height: 2.5;
-          list-style-type: none;
-          text-align: left; // Ensures list items are left-aligned
-        }
       }
+}
+
+.main-guest__cards-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 20px;
+  width: 100%;
+}
+
+.main-guest__search {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.main-guest__search-field {
+  flex: 1;
+  margin-right: 8px;
 }

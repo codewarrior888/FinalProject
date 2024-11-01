@@ -15,7 +15,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
-    throw new Error("AuthContext is undefined");
+    throw new Error("AuthContext не определен");
   }
 
   const { login } = authContext;
@@ -28,7 +28,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       await login(username, password);
       onClose(); // Close modal on successful login
     } catch (err) {
-      setError("Incorrect login or password"); // Set error message on failure
+      setError("Неправильное имя пользователя или пароль"); // Set error message on failure
     }
   };
 
@@ -36,11 +36,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <button onClick={onClose} className="close-button">X</button>
+      <div className="modal-overlay__content">
+        <button onClick={onClose} className="modal-overlay__close-button">X</button>
         <h2>Авторизация</h2>
-        <form onSubmit={handleSubmit}>
-          <div>
+        <form className="modal-overlay__login-form" onSubmit={handleSubmit}>
+          <div className="modal-overlay__login-username">
             <label>Имя пользователя</label>
             <input
               type="text"
@@ -49,7 +49,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               required
             />
           </div>
-          <div>
+          <div className="modal-overlay__login-password">
             <label>Пароль</label>
             <input
               type="password"
@@ -59,7 +59,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
           {error && <p className="error-message">{error}</p>}
-          <button className="submit-button" type="submit">Вход</button>
+          <button className="modal-overlay__submit-button" type="submit">Вход</button>
         </form>
       </div>
     </div>
