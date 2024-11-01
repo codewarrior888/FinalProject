@@ -3,10 +3,12 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    GUEST = "gt"
     CLIENT = "cl"
     SERVICE_COMPANY = "sc"
     MANAGER = "mn"
     ROLE_CHOICES = [
+        (GUEST, "Гость"),
         (CLIENT, "Клиент"),
         (SERVICE_COMPANY, "Сервисная компания"),
         (MANAGER, "Менеджер"),

@@ -1,0 +1,138 @@
+@import 'colors';
+
+.responsive-button__open {
+  display: none;
+}
+
+@media all and (max-width: 850px) {
+  .responsive-button__open {
+    display: flex;
+    background-image: url(../assets/images/responsive-button-open.svg);
+    width: 28px;
+    height: 25px;
+  }
+
+  .responsive-button__close {
+    background-image: url(../assets/images/responsive-button-close.svg);
+    width: 25px;
+    height: 25px;
+    margin-right: 20px;
+    border: none;
+    background-color: transparent;
+  }
+
+  .responsive-menu {
+    padding: 0 20px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: $main-color-green;
+    z-index: 1;
+    transition: transform 0.3s ease;
+
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .menu-open .responsive-menu {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .responsive-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .responsive-logo {
+    width: 100px;
+    height: 100px;
+    margin-left: 15px;
+  }
+
+  .responsive-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+  }
+
+  .responsive-nav__link {
+    color: $main-color-white;
+    font-size: 16px;
+    line-height: 19px;
+    text-decoration: none;
+    margin-bottom: 26px;
+  }
+
+  .responsive__not-signed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  .responsive__sign-up {
+    text-decoration: none;
+    margin: 20px 0;
+    font-size: 16px;
+    line-height: 19px;
+    color: $main-color-white;
+    font-weight: 300;
+    opacity: 0.5;
+  }
+
+  .responsive__sign-in {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 24px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: $main-color-black;
+    background-color: $secondary-color-light-green;
+    width: 90%;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .responsive__user-info {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .responsive__user-avatar {
+    width: 64px;
+    height: 64px;
+    margin: 10px;
+    background-color: $secondary-color-light-green;
+    border-radius: 50%;
+  }
+
+  .responsive__username {
+    font-size: 22px;
+    color: $main-color-white;
+    letter-spacing: 0.08rem;
+  }
+
+  .responsive__logout {
+    font-size: 16px;
+    font-weight: 400;
+    border: none;
+    background: transparent;
+
+    & a {
+      text-decoration: none;
+      color: $main-color-white;
+    }
+  }
+}

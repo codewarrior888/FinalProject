@@ -17,6 +17,25 @@ class EquipmentSerializer(serializers.ModelSerializer):
             'consignee', 'delivery_address', 'model_options', 'client', 'service_company'
         ]
 
+
+class LimitedEquipmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Equipment
+        fields = [
+            "id",
+            "equipment_model", 
+            "equipment_serial", 
+            "engine_model", 
+            "engine_serial", 
+            "transmission_model", 
+            "transmission_serial", 
+            "drive_axle_model", 
+            "drive_axle_serial", 
+            "steer_axle_model", 
+            "steer_axle_serial"
+        ]
+        
+
 class MaintenanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Maintenance

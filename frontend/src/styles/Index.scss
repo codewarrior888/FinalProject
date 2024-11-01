@@ -1,0 +1,73 @@
+@import 'fonts';
+@import 'colors';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  font-family: $font-regular;
+  height: 100%;
+  max-width: 100vw;
+}
+
+html {
+  font-size: 10px;
+}
+
+:root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  --transition: all 0.3s ease;
+  --padding: 0.625rem 1.25rem;
+
+  .main-content {
+    flex: 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $font-bold;
+  }
+  p, li, ul, a {
+    font-family: $font-regular;
+  }
+
+  /* For 360x640 (Mobile Devices) */
+@media (min-width: 360px) and (max-width: 640px) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+/* For 1440x900 (Small Laptops) */
+@media (min-width: 1440px) and (max-width: 900px) {
+  html {
+    font-size: 1.6rem;
+  }
+}
+
+/* For 1536x864 (Medium Laptops) */
+@media (min-width: 1536px) and (max-width: 864px) {
+  html {
+    font-size: 1.6rem;
+  }
+}
+
+/* For 1366x768 (Standard Laptops) */
+@media (min-width: 1366px) and (max-width: 768px) {
+  html {
+    font-size: 1.7rem;
+  }
+}
+
+/* For 1920x1080 (Full HD Displays) */
+@media (min-width: 1920px) {
+  html {
+    font-size: 1.8rem;
+  }
+}
+}

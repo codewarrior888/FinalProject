@@ -1,0 +1,27 @@
+@import 'colors';
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  padding: 2rem 4rem;
+  color: $main-color-white;
+  background-color: $main-color-blue;
+
+  &-logo {
+    width: 22rem;
+    min-width: 15rem;
+  }
+
+  &-text {
+    &__contacts {
+      font-size: 1.6rem;
+    }
+  }
+
+  &__copyright {
+    font-size: 1.4rem;
+  }
+}

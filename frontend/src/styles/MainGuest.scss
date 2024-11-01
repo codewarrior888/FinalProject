@@ -1,0 +1,88 @@
+@import 'colors';
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Styling for the search field */
+  .searchField {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    width: 250px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Table styling */
+  .tableContainer {
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .table {
+    width: 800px;
+    min-width: 800px;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
+  
+  /* Row highlighting on selection */
+  .selectedRow {
+    background-color: #d0e4f2 !important;
+  }
+  
+  /* Detail view styling */
+  .detailsContainer {
+    margin-top: 20px;
+    padding: 15px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fafafa;
+  }
+  
+  .detailsRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+  
+  .detailsLabel {
+    font-weight: bold;
+  }
+  
+  .detailsValue {
+    color: #555;
+  }
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }

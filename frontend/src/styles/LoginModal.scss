@@ -1,0 +1,82 @@
+@import 'colors';
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: $background-overlay;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+    width: 30rem;
+    height: auto;
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    form {
+      text-align: left;
+    }
+  }
+
+  label {
+    display: flex;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: $main-color-black;
+  }
+
+  .submit-button {
+    background-color: $main-color-blue;
+    color: $main-color-white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1.5rem;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $button-hover-bg;
+    }
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid $main-color-black;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+
+    &:focus {
+      border-color: $main-color-blue;
+    }
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: $main-color-black;
+    cursor: pointer;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 1.2rem;
+  }

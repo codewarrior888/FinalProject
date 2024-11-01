@@ -1,12 +1,20 @@
-import { useAuth } from "../../hook/useAuth";
-import "./Main.css";
-import SharedInfo from "./SharedInfo/SharedInfo.jsx";
-import ClientInfo from "./ClientInfo/ClientInfo.jsx";
+// import { useContext } from "react";
+// import { AuthContext } from "../../components/Authenticate/AuthContext";
 
-const Main = ({ tabIndex, setTabIndex }) => {
+import { useAuth } from "../Authenticate/useAuth";
+import MainAuthenticated from "./MainAuthenticated";
+import MainGuest from "./MainGuest";
+
+import "../../styles/Main.scss";
+
+const Main = () => {
   const { isAuthenticated } = useAuth();
 
-  return <article>{!isAuthenticated ? <SharedInfo /> : <ClientInfo tabIndex={tabIndex} setTabIndex={setTabIndex} />}</article>;
+  return (
+    <div className="client-info">
+      {isAuthenticated ? <MainAuthenticated /> : <MainGuest />}
+    </div>
+  );
 };
 
 export default Main;
