@@ -8,31 +8,35 @@ class ReferenceSerializer(serializers.ModelSerializer):
         fields = [ 'id', 'category', 'name', 'description']
 
 class EquipmentSerializer(serializers.ModelSerializer):
+    equipment_model_name = serializers.CharField(source='equipment_model.name', read_only=True)
+    engine_model_name = serializers.CharField(source='engine_model.name', read_only=True)
+    transmission_model_name = serializers.CharField(source='transmission_model.name', read_only=True)
+    drive_axle_model_name = serializers.CharField(source='drive_axle_model.name', read_only=True)
+    steer_axle_model_name = serializers.CharField(source='steer_axle_model.name', read_only=True)
+
     class Meta:
         model = Equipment
         fields = [
-            'id', 'equipment_model', 'equipment_serial', 'engine_model', 'engine_serial',
-            'transmission_model', 'transmission_serial', 'drive_axle_model', 'drive_axle_serial',
-            'steer_axle_model', 'steer_axle_serial', 'contract', 'shipment_date',
+            'equipment_model_name', 'equipment_serial', 'engine_model_name', 'engine_serial',
+            'transmission_model_name', 'transmission_serial', 'drive_axle_model_name', 'drive_axle_serial',
+            'steer_axle_model_name', 'steer_axle_serial', 'contract', 'shipment_date',
             'consignee', 'delivery_address', 'model_options', 'client', 'service_company'
         ]
 
 
 class LimitedEquipmentSerializer(serializers.ModelSerializer):
+    equipment_model_name = serializers.CharField(source='equipment_model.name', read_only=True)
+    engine_model_name = serializers.CharField(source='engine_model.name', read_only=True)
+    transmission_model_name = serializers.CharField(source='transmission_model.name', read_only=True)
+    drive_axle_model_name = serializers.CharField(source='drive_axle_model.name', read_only=True)
+    steer_axle_model_name = serializers.CharField(source='steer_axle_model.name', read_only=True)
+
     class Meta:
         model = Equipment
         fields = [
-            "id",
-            "equipment_model", 
-            "equipment_serial", 
-            "engine_model", 
-            "engine_serial", 
-            "transmission_model", 
-            "transmission_serial", 
-            "drive_axle_model", 
-            "drive_axle_serial", 
-            "steer_axle_model", 
-            "steer_axle_serial"
+            'equipment_model_name', 'equipment_serial', 'engine_model_name', 'engine_serial',
+            'transmission_model_name', 'transmission_serial', 'drive_axle_model_name', 'drive_axle_serial',
+            'steer_axle_model_name', 'steer_axle_serial'
         ]
         
 

@@ -3,7 +3,6 @@ import axios from 'axios';
 import { API_URL } from '../api';
 import '../../styles/MainGuest.scss';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 const MainGuest: React.FC = () => {
@@ -18,6 +17,7 @@ const MainGuest: React.FC = () => {
         const response = await axios.get(`${API_URL}/api/equipment/public/`);
         setEquipmentData(response.data);
         setFilteredData(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -60,7 +60,7 @@ const MainGuest: React.FC = () => {
   };
 
   return (
-    <div className="main-guest__container">
+    <div className="main-guest">
       <h2>Информация о комплектации и <br />технических характеристиках Вашей техники</h2>
 
       <div className="main-guest__search">
@@ -71,9 +71,9 @@ const MainGuest: React.FC = () => {
           onChange={handleSearchChange}
           onKeyDown={handleKeyDown} // Add keydown event handler
           onFocus={handleFocus} // Add focus event handler
-          className="search-field"
+          className="main-guest__search-field"
         />
-        <Button onClick={handleSearch} variant="primary" className="search-button">Поиск</Button>
+        <button onClick={handleSearch} className="main-guest__search-button">Поиск</button>
       </div>
 
       <h3>{searchQuery ? 'Результат поиска:' : ''}</h3>
@@ -95,27 +95,27 @@ const MainGuest: React.FC = () => {
               <React.Fragment key={equipment.equipment_serial}>
                 <tr onClick={() => handleRowClick(equipment)}>
                   <th>Модель<br />Зав.№</th>
-                  <td>{equipment.equipment_model}<br />{equipment.equipment_serial}</td>
-                  <td>{equipment.engine_model}<br />{equipment.engine_serial}</td>
-                  <td>{equipment.transmission_model}<br />{equipment.transmission_serial}</td>
-                  <td>{equipment.drive_axle_model}<br />{equipment.drive_axle_serial}</td>
-                  <td>{equipment.steer_axle_model}<br />{equipment.steer_axle_serial}</td>
+                  <td>{equipment.equipment_model_name}<br />{equipment.equipment_serial}</td>
+                  <td>{equipment.engine_model_name}<br />{equipment.engine_serial}</td>
+                  <td>{equipment.transmission_model_name}<br />{equipment.transmission_serial}</td>
+                  <td>{equipment.drive_axle_model_name}<br />{equipment.drive_axle_serial}</td>
+                  <td>{equipment.steer_axle_model_name}<br />{equipment.steer_axle_serial}</td>
                 </tr>
                 {expandedRow === equipment.equipment_serial && (
                   <tr>
                     <td colSpan={6}>
                       <div className="detailsContainer">
-                        <h5>Детали</h5>
+                        <h2>Детали</h2>
                         <ul>
-                          <li>Модель техники: {equipment.equipment_model}</li>
+                          <li>Модель техники: {equipment.equipment_model_name}</li>
                           <li>Зав.№ техники: {equipment.equipment_serial}</li>
-                          <li>Модель двигателя: {equipment.engine_model}</li>
+                          <li>Модель двигателя: {equipment.engine_model_name}</li>
                           <li>Зав.№ двигателя: {equipment.engine_serial}</li>
-                          <li>Модель трансмиссии: {equipment.transmission_model}</li>
+                          <li>Модель трансмиссии: {equipment.transmission_model_name}</li>
                           <li>Зав.№ трансмиссии: {equipment.transmission_serial}</li>
-                          <li>Модель ведущего моста: {equipment.drive_axle_model}</li>
+                          <li>Модель ведущего моста: {equipment.drive_axle_model_name}</li>
                           <li>Зав.№ ведущего моста: {equipment.drive_axle_serial}</li>
-                          <li>Модель управляемого моста: {equipment.steer_axle_model}</li>
+                          <li>Модель управляемого моста: {equipment.steer_axle_model_name}</li>
                           <li>Зав.№ управляемого моста: {equipment.steer_axle_serial}</li>
                         </ul>
                       </div>

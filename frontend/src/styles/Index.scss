@@ -38,36 +38,26 @@ html {
 
   /* For 360x640 (Mobile Devices) */
 @media (min-width: 360px) and (max-width: 640px) {
-  html {
-    font-size: 1.4rem;
-  }
+
 }
 
 /* For 1440x900 (Small Laptops) */
 @media (min-width: 1440px) and (max-width: 900px) {
-  html {
-    font-size: 1.6rem;
-  }
+
 }
 
 /* For 1536x864 (Medium Laptops) */
 @media (min-width: 1536px) and (max-width: 864px) {
-  html {
-    font-size: 1.6rem;
-  }
+
 }
 
 /* For 1366x768 (Standard Laptops) */
 @media (min-width: 1366px) and (max-width: 768px) {
-  html {
-    font-size: 1.7rem;
-  }
+
 }
 
 /* For 1920x1080 (Full HD Displays) */
 @media (min-width: 1920px) {
-  html {
-    font-size: 1.8rem;
-  }
+
 }
 }

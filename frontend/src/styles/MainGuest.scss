@@ -1,88 +1,94 @@
 @import 'colors';
+@import 'fonts';
 
-.container {
+.main-guest {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
-  }
-  
-  /* Styling for the search field */
-  .searchField {
-    margin-bottom: 15px;
-    padding: 8px 12px;
-    width: 250px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  /* Table styling */
-  .tableContainer {
-    overflow-x: auto;
-    max-width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .table {
-    width: 800px;
-    min-width: 800px;
-    table-layout: fixed;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-  
-  th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
-  
-  tr:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
-  }
-  
-  /* Row highlighting on selection */
-  .selectedRow {
-    background-color: #d0e4f2 !important;
-  }
-  
-  /* Detail view styling */
-  .detailsContainer {
-    margin-top: 20px;
-    padding: 15px;
-    width: 100%;
-    max-width: 500px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fafafa;
-  }
-  
-  .detailsRow {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-  }
-  
-  .detailsLabel {
-    font-weight: bold;
-  }
-  
-  .detailsValue {
-    color: #555;
-  }
 
-  .search-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-  }
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+  
+    &__search {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        max-width: 52rem;
+        gap: 2rem;
+        margin-bottom: 2rem;
+
+        input {
+            font-size: 1.5rem;
+        }
+    }
+
+    &__search-button {
+        font-size: 1.5rem;
+        background-color: $main-color-red;
+        color: $main-color-white;
+        border: none;
+        border-radius: 2px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $button-hover-bg;
+        }
+    }
+    
+    .table {
+        width: 900px;
+        height: auto;
+        table-layout: fixed;
+        border-collapse: collapse;
+        font-size: 1.6rem;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+      }
+      
+      th, td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+        overflow: hidden;
+        white-space: normal;  // Allows text to wrap
+        word-break: break-word;  // Breaks long words if needed
+      }
+      
+      tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+      }
+    
+    /* Row highlighting on selection */
+    .selectedRow {
+        background-color: #d0e4f2 !important;
+    }
+    
+    /* Detail view styling */
+    .detailsContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; // Ensures content starts from the top
+        padding: 1.5rem;
+        width: 100%;
+        background-color: $main-color-white;
+
+        ul{
+          background-color: $secondary-color-light-gray;
+          width: 50%;
+          padding: 1rem 2.5rem;
+        }
+
+        li {
+          font-size: 1.6rem;
+          line-height: 2.5;
+          list-style-type: none;
+          text-align: left; // Ensures list items are left-aligned
+        }
+      }
+}

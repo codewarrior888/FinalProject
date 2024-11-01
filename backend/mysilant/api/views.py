@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -10,17 +10,8 @@ from .serializers import EquipmentSerializer, MaintenanceSerializer, ClaimSerial
 from .permissions import IsManager, IsServiceCompany, IsClient, IsGuest
 from .filters import EquipmentFilter, MaintenanceFilter, ClaimFilter
 
-class EquipmentPublicView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request, *args, **kwargs):
-        equipment = Equipment.objects.all()
-        serializer = LimitedEquipmentSerializer(equipment, many=True)
-        return Response(serializer.data)
-
 class EquipmentViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
-    queryset = Equipment.objects.all().order_by('shipment_date') #сортировка по умолчанию по дате отгрузки
+    queryset = Equipment.objects.all().order_by('shipment_date')
     serializer_class = EquipmentSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = EquipmentFilter
@@ -28,24 +19,25 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsGuest], url_path='public')
     def public(self, request):
-        # Filter to return only the limited information for unauthenticated users
-        limited_queryset = Equipment.objects.values(
-            'equipment_model', 'equipment_serial', 'engine_model', 
-            'engine_serial', 'transmission_model', 'transmission_serial',
-            'drive_axle_model', 'drive_axle_serial', 'steer_axle_model', 
-            'steer_axle_serial'
-        )
-        return Response(limited_queryset)
+        limited_queryset = Equipment.objects.all().order_by('equipment_model')
+        serializer = LimitedEquipmentSerializer(limited_queryset, many=True)
+        return Response(serializer.data)
 
     def get_permissions(self):
-        if self.request.user.is_authenticated:
-            if self.request.user.role == 'mn' or self.request.user.is_superuser:
-                return [IsManager()]
-            elif self.request.user.role == 'cl':
-                return [IsClient()]
-            elif self.request.user.role == 'sc':
-                return [IsServiceCompany()]
-        return [IsGuest()]  # Guest access for unauthenticated users
+        if not self.request.user.is_authenticated:
+            # Ensure only public endpoint is accessible by guests
+            if self.action == 'public':
+                return [IsGuest()]
+            # Otherwise, restrict access completely
+            return [IsAuthenticated()]
+        # Set permissions based on authenticated user role
+        if self.request.user.role == 'mn' or self.request.user.is_superuser:
+            return [IsManager()]
+        elif self.request.user.role == 'cl':
+            return [IsClient()]
+        elif self.request.user.role == 'sc':
+            return [IsServiceCompany()]
+        return [IsAuthenticated()]  # Default permission for authenticated users
 
 
 class MaintenanceViewSet(viewsets.ModelViewSet):
