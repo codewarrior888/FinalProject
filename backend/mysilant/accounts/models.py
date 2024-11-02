@@ -20,4 +20,5 @@ class User(AbstractUser):
     def __str__(self):
         if self.role in {self.CLIENT, self.SERVICE_COMPANY} and self.company_name:
             return self.company_name
-        return f"{self.first_name} {self.last_name}".strip() or "Неизвестный пользователь"
+        full_name = f"{self.first_name or ''} {self.last_name or ''}".strip()
+        return full_name or "Неизвестный пользователь"

@@ -30,12 +30,30 @@
       text-align: left;
     }
 
+    &__login-username,
+    &__login-password {
+      
+      & input {
+        width: 100%;
+        padding: 10px;
+        font-size: 1.5rem;
+        border: 1px solid $main-color-black;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    
+        &:focus {
+          border-color: $main-color-blue;
+        }
+      }
+    }
+
     &__submit-button {
       background-color: $main-color-blue;
       color: $main-color-white;
       border: none;
       border-radius: 4px;
-      padding: 0.5rem 1.5rem;
+      padding: 1rem 2.5rem;
+      width: 100%;
       margin-top: 1rem;
       font-size: 1.2rem;
       cursor: pointer;
@@ -63,18 +81,6 @@
     margin-bottom: 10px;
     font-size: 1.5rem;
     color: $main-color-black;
-  }
-  
-  input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid $main-color-black;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-
-    &:focus {
-      border-color: $main-color-blue;
-    }
   }
   
   .error-message {

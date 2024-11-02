@@ -1,13 +1,23 @@
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { useAuth } from "../Authenticate/useAuth";
 import "../../styles/MainAuthenticated.scss";
+import Equipment from "../Equipment/Equipment";
 
-const Main = () => {
-  const { isAuthenticated } = useAuth();
+const MainAuthenticated = () => {
+  const { userInfo } = useAuth();
+
+  const roleLabels = {
+    cl: "Клиент",
+    sc: "Сервисная компания",
+    mn: "Менеджер",
+  };
 
   return (
     <div className="client-info">
       <div className="client-info__container">
+        <h1>
+        Аккаунт: {userInfo?.company_name? `${userInfo?.company_name}` : `${userInfo?.first_name} ${userInfo?.last_name}` || "Неизвестный пользователь"} | {roleLabels[userInfo?.role]}
+        </h1>
         <Tabs>
           <TabList>
             <Tab>Общая информация</Tab>
@@ -17,7 +27,7 @@ const Main = () => {
 
           <TabPanel>
             <h3>Информация о комплектации и технических характеристиках Вашей техники</h3>
-            {/* <Common /> */}
+            <Equipment />
           </TabPanel>
           <TabPanel>
             <h3>Информация о проведенных ТО Вашей техники</h3>
@@ -33,4 +43,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default MainAuthenticated;

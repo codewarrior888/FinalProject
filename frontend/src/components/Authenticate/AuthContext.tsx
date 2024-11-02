@@ -7,6 +7,11 @@ import { API_URL } from "../api";
 interface User {
   id: number;
   username: string;
+  first_name: string;
+  last_name: string;
+  role: string; // Adjust this if you have an enum or constants for roles
+  company_name: string | null;
+  display_name: string;
 }
 
 // Define DecodedToken interface based on the token structure
@@ -44,21 +49,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Using useJwt to decode the token
   const { decodedToken, isExpired } = useJwt<DecodedToken>(token || "");
 
+  useEffect(() => {
+    // Check localStorage for existing user info on page load
+    const storedUserInfo = localStorage.getItem("userInfo");
+    if (storedUserInfo) {
+      setUserInfo(JSON.parse(storedUserInfo));
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const login = async (username: string, password: string) => {
     try {
       const response = await axios.post(`${API_URL}/auth/login/`, {
         username,
         password,
       });
-      const { access, user } = response.data; // Ensure this matches your response structure
+      const { access, user } = response.data;
 
       // Check if the access token is correctly obtained
       if (access) {
         localStorage.setItem("accessToken", access);
+        localStorage.setItem("userInfo", JSON.stringify(user));
         setIsAuthenticated(true);
         setUserInfo(user);
+        console.log("Авторизация прошла успешно");
       } else {
-        throw new Error("Access token not found in the response");
+        throw new Error("Токен не получен");
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -73,9 +89,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userInfo");
     setUserInfo(null);
     setIsAuthenticated(false);
-    console.log("Logout successful");
+    console.log("Вы вышли из системы");
   };
 
   return (

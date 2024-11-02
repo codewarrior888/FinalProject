@@ -1,0 +1,44 @@
+@import 'colors';
+
+.detail-card-equipment {
+  display: flex;
+  flex: 0 0 120px; /* Collapsed width */
+  height: auto;
+  min-height: 500px;
+  max-width: 600px;
+  transition: flex 0.5s ease;
+  cursor: pointer;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  text-align: left;
+  background-color: #f8f9fa;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  border-right: $main-color-light-gray solid 0.5rem;
+  
+  &.expanded {
+    flex: 0 0 300px; /* Expanded width */
+    border-right: $main-color-light-gray solid 0.1rem;
+    background-color: $main-color-white;
+  }
+  
+  .detail-card-equipment__details {
+    word-wrap: break-word;
+    hyphens: auto;
+    white-space: pre-wrap;
+  }
+}
+
+.detail-card-equipment__header {
+  font-size: 1.4rem; /* Adjust size as needed */
+  margin-bottom: 10px; /* Space between header and details */
+  
+
+  &.expanded {
+    font-size: 2rem;
+    writing-mode: horizontal-tb;
+    transform: rotate(0deg);
+  }
+}

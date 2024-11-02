@@ -4,7 +4,7 @@ import { API_URL } from '../api';
 import '../../styles/MainGuest.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
-import EquipmentCard from './DetailCard';
+import DetailCardGuest from '../DetailCard/DetailCardGuest';
 
 const MainGuest: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
@@ -19,9 +19,8 @@ const MainGuest: React.FC = () => {
         const response = await axios.get(`${API_URL}/api/equipment/public/`);
         setEquipmentData(response.data);
         setFilteredData(response.data);
-        console.log(response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Ошибка при получении данных:', error);
       }
     };
     fetchData();
@@ -110,7 +109,7 @@ const MainGuest: React.FC = () => {
                       <div className="main-guest__details-container">
                         <h2>Детали</h2>
                         <div className="main-guest__cards-container">
-                          <EquipmentCard
+                          <DetailCardGuest
                             header="Техника"
                             model={equipment.equipment_model_name}
                             serial={equipment.equipment_serial}
@@ -118,7 +117,7 @@ const MainGuest: React.FC = () => {
                             isExpanded={expandedCard === 'equipment-' + equipment.equipment_serial}
                             onClick={() => handleCardClick('equipment-' + equipment.equipment_serial)}
                           />
-                          <EquipmentCard
+                          <DetailCardGuest
                             header="Двигатель"
                             model={equipment.engine_model_name}
                             serial={equipment.engine_serial}
@@ -126,7 +125,7 @@ const MainGuest: React.FC = () => {
                             isExpanded={expandedCard === 'engine-' + equipment.equipment_serial}
                             onClick={() => handleCardClick('engine-' + equipment.equipment_serial)}
                           />
-                          <EquipmentCard
+                          <DetailCardGuest
                             header="Трансмиссия"
                             model={equipment.transmission_model_name}
                             serial={equipment.transmission_serial}
@@ -134,7 +133,7 @@ const MainGuest: React.FC = () => {
                             isExpanded={expandedCard === 'transmission-' + equipment.equipment_serial}
                             onClick={() => handleCardClick('transmission-' + equipment.equipment_serial)}
                           />
-                          <EquipmentCard
+                          <DetailCardGuest
                             header="Ведущий мост"
                             model={equipment.drive_axle_model_name}
                             serial={equipment.drive_axle_serial}
@@ -142,7 +141,7 @@ const MainGuest: React.FC = () => {
                             isExpanded={expandedCard === 'drive-axle-' + equipment.equipment_serial}
                             onClick={() => handleCardClick('drive-axle-' + equipment.equipment_serial)}
                           />
-                          <EquipmentCard
+                          <DetailCardGuest
                             header="Управляемый мост"
                             model={equipment.steer_axle_model_name}
                             serial={equipment.steer_axle_serial}

@@ -1,10 +1,9 @@
 import React from 'react';
-// import ReactMarkdown from 'react-markdown';
 import LineBreaks from '../LineBreaks';
-import '../../styles/DetailCard.scss';
+import '../../styles/DetailCardGuest.scss';
 
-interface DetailCardProps {
-  header: string; // Added header prop
+interface DetailCardGuestProps {
+  header: string;
   model: string;
   serial: string;
   description: string;
@@ -12,7 +11,7 @@ interface DetailCardProps {
   onClick: () => void;
 }
 
-const DetailCard: React.FC<DetailCardProps> = ({
+const DetailCardGuest: React.FC<DetailCardGuestProps> = ({
   header,
   model,
   serial,
@@ -36,4 +35,4 @@ const DetailCard: React.FC<DetailCardProps> = ({
   );
 };
 
-export default DetailCard;
+export default DetailCardGuest;

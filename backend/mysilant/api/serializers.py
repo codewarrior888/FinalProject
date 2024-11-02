@@ -18,6 +18,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
     drive_axle_model_description = serializers.CharField(source='drive_axle_model.description', read_only=True)
     steer_axle_model_name = serializers.CharField(source='steer_axle_model.name', read_only=True)
     steer_axle_model_description = serializers.CharField(source='steer_axle_model.description', read_only=True)
+    service_company_name = serializers.CharField(source='service_company.company_name', read_only=True)
 
     class Meta:
         model = Equipment
@@ -28,7 +29,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
             'drive_axle_model_name', 'drive_axle_model_description', 'drive_axle_serial',
             'steer_axle_model_name', 'steer_axle_model_description', 'steer_axle_serial',
             'contract', 'shipment_date', 'consignee', 'delivery_address', 'model_options',
-            'client', 'service_company'
+            'client', 'service_company_name'
         ]
 
 
