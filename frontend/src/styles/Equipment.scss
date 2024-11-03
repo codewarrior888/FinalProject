@@ -4,32 +4,31 @@
 .equipment {
     display: flex;
     flex-direction: column;
+    align-items: center;
     padding: 20px;
 
-    .equipment__table-container {
-        max-height: auto; // Set this to your desired height
-        overflow-y: auto; // Enables vertical scrolling
-        overflow-x: auto; // Enables horizontal scrolling
-        border: 1px solid #ccc; // Optional border around the table
+    &__table-container {
+        max-height: auto;
+        overflow-y: auto;
+        overflow-x: auto;
       }
       
-    .table-scroll {
-    max-width: 1000px; // Sets a minimum width for the table
-    overflow-x: auto; // Allows horizontal scrolling
+    &__table-scroll {
+    max-width: 1000px;
+    overflow-x: auto;
     }
 
-    h2 {
+    &__title {
       font-size: 2.5rem;
-      margin-bottom: 20px;
+      margin-bottom: 2.5rem;
     }
   
     &__search {
         display: flex;
         flex-direction: row;
         width: 100%;
-        max-width: 52rem;
+        max-width: 32rem;
         gap: 2rem;
-        margin-bottom: 2rem;
 
         input {
             font-size: 1.5rem;
@@ -38,7 +37,7 @@
 
     &__search-button {
         font-size: 1.5rem;
-        background-color: $main-color-red;
+        background-color: $main-color-blue;
         color: $main-color-white;
         border: none;
         border-radius: 2px;
@@ -57,29 +56,29 @@
         table-layout: fixed;
         border-collapse: collapse;
         font-size: 1.6rem;
-        margin-bottom: 2rem;
+        margin: 1rem 0 5rem;
         overflow-x: scroll;
       }
       
-      th, td {
-        padding: 12px 15px;
+      .table th {
+        padding: 12px 20px;
         border-bottom: 1px solid #ddd;
-        text-align: center;
+        text-align: left;
+        align-content: center;
         overflow: hidden;
         word-break: break-word;
       }
 
-      th {
-        white-space: nowrap;
+      .table th {
+        // white-space: nowrap;
+        word-break: keep-all;
       }
 
-      td {
+      .table td {
         white-space: wrap;
-        // overflow: hidden;
-        // text-overflow: ellipsis;
       }
       
-      tr:hover {
+      .table tr:hover {
         background-color: #f1f1f1;
         cursor: pointer;
       }

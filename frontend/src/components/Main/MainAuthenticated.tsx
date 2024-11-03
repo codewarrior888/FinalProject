@@ -2,22 +2,14 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { useAuth } from "../Authenticate/useAuth";
 import "../../styles/MainAuthenticated.scss";
 import Equipment from "../Equipment/Equipment";
+import Maintenance from "../Maintenance/Maintenance";
+import Claim from "../Claim/Claim";
+import RoleLabel from "../Authenticate/RoleLabel";
 
 const MainAuthenticated = () => {
-  const { userInfo } = useAuth();
-
-  const roleLabels = {
-    cl: "Клиент",
-    sc: "Сервисная компания",
-    mn: "Менеджер",
-  };
-
   return (
-    <div className="client-info">
-      <div className="client-info__container">
-        <h1>
-        Аккаунт: {userInfo?.company_name? `${userInfo?.company_name}` : `${userInfo?.first_name} ${userInfo?.last_name}` || "Неизвестный пользователь"} | {roleLabels[userInfo?.role]}
-        </h1>
+    <div className="main-authenticated">
+      <div className="main-authenticated__container">
         <Tabs>
           <TabList>
             <Tab>Общая информация</Tab>
@@ -26,16 +18,17 @@ const MainAuthenticated = () => {
           </TabList>
 
           <TabPanel>
-            <h3>Информация о комплектации и технических характеристиках Вашей техники</h3>
+            <RoleLabel />
             <Equipment />
           </TabPanel>
+
           <TabPanel>
-            <h3>Информация о проведенных ТО Вашей техники</h3>
-            {/* <Maintenance /> */}
+            <RoleLabel />
+            <Maintenance />
           </TabPanel>
           <TabPanel>
-            <h3>Информация о рекламациях Вашей техники</h3>
-            {/* <Claim /> */}
+            <RoleLabel />
+            <Claim />
           </TabPanel>
         </Tabs>
       </div>

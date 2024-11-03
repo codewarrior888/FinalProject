@@ -23,6 +23,7 @@ const Equipment: React.FC = () => {
         });
         setEquipmentData(response.data);
         setFilteredData(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error('Ошибка при получении данных:', error);
       }
@@ -67,7 +68,7 @@ const Equipment: React.FC = () => {
 
   return (
     <div className="equipment">
-      <h2>Информация о комплектации и <br />технических характеристиках Вашей техники</h2>
+      <h2 className="equipment__title">Информация о комплектации и технических характеристиках Вашей техники</h2>
 
       <div className="equipment__search">
         <Form.Control
@@ -86,7 +87,7 @@ const Equipment: React.FC = () => {
 
       {filteredData.length ? (
         <div className="equipment__table-container">
-          <div className="table-scroll">
+          <div className="equipment__table-scroll">
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
@@ -101,6 +102,7 @@ const Equipment: React.FC = () => {
                   <th>Грузополучатель</th>
                   <th>Адрес поставки</th>
                   <th>Комплектация</th>
+                  <th>Клиент</th>
                   <th>Сервисная компания</th>
                 </tr>
               </thead>
@@ -118,14 +120,14 @@ const Equipment: React.FC = () => {
                       <td>{equipment.shipment_date}</td>
                       <td>{equipment.consignee}</td>
                       <td>{equipment.delivery_address}</td>
-                      <td>{equipment.model_options}</td>
+                      <td>{equipment.model_options_preview}</td>
+                      <td>{equipment.client_name}</td>
                       <td>{equipment.service_company_name}</td>
                     </tr>
                     {expandedRow === equipment.equipment_serial && (
                       <tr>
                         <td colSpan={12}>
                           <div className="equipment__details-container">
-                            <h2>Детали</h2>
                             <div className="equipment__cards-container">
                               {["equipment", "engine", "transmission", "drive_axle", "steer_axle"].map((type) => (
                                 <DetailCardEquipment
@@ -133,15 +135,15 @@ const Equipment: React.FC = () => {
                                   header={type === "equipment" ? "Техника" : type === "engine" ? "Двигатель" : type === "transmission" ? "Трансмиссия" : type === "drive_axle" ? "Ведущий мост" : "Управляемый мост"}
                                   model={equipment[`${type}_model_name`]}
                                   serial={equipment[`${type}_serial`]}
-                                  description={equipment[`${type}_model_description`] || "Описание отсутствует"}
+                                  description={equipment[`${type}_model_description`] || "Отсутствует"}
                                   isExpanded={expandedCard === `${type}-${equipment.equipment_serial}`}
                                   onClick={() => handleCardClick(`${type}-${equipment.equipment_serial}`)}
                                 />
                               ))}
-                              {["contract", "shipment_date", "consignee", "delivery_address", "model_options", "service_company_name"].map((type) => (
+                              {["contract", "shipment_date", "consignee", "delivery_address", "model_options", "client_name", "service_company_name"].map((type) => (
                                 <DetailCardEquipment
                                   key={type}
-                                  header={type === "contract" ? "Договор" : type === "shipment_date" ? "Дата отгрузки" : type === "consignee" ? "Получатель" : type === "delivery_address" ? "Адрес доставки" : type === "model_options" ? "Опции модели" : "Сервисная компания"}
+                                  header={type === "contract" ? "Договор" : type === "shipment_date" ? "Дата отгрузки" : type === "consignee" ? "Получатель" : type === "delivery_address" ? "Адрес доставки" : type === "model_options" ? "Опции модели" : type === "client_name" ? "Клиент" : "Сервисная компания"}
                                   model={equipment[`${type}`]}
                                   serial={""} // не используется в данном случае
                                   description={""} // не используется в данном случае

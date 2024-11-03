@@ -28,50 +28,51 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
         <div className="detail-card-equipment__details">
           {header === "Техника" && (
             <>
-              <p>Модель: {model}</p>
-              <p>Зав.№: {serial}</p>
-              <LineBreaks text={description} />
+              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
+              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
+              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
             </>
           )}
           {header === "Двигатель" && (
             <>
-              <p>Модель: {model}</p>
-              <p>Зав.№: {serial}</p>
-              <LineBreaks text={description} />
+              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
+              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
+              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
             </>
           )}
           {header === "Трансмиссия" && (
             <>
-              <p>Модель: {model}</p>
-              <p>Зав.№: {serial}</p>
-              <LineBreaks text={description} />
+              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
+              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
+           <span className="detail-card-equipment__description">Описание:</span>   <div><LineBreaks text={description} /></div>
             </>
           )}
           {header === "Ведущий мост" && (
             <>
-              <p>Модель: {model}</p>
-              <p>Зав.№: {serial}</p>
-              <LineBreaks text={description} />
+              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
+              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
+              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
             </>
           )}
           {header === "Управляемый мост" && (
             <>
-              <p>Модель: {model}</p>
-              <p>Зав.№: {serial}</p>
-              <LineBreaks text={description} />
+              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
+              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
+              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
             </>
           )}
           {header === "Договор" && (
             <>
-              <p>{model}</p>
-              <LineBreaks text={description} />
+              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
+              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
             </>
           )}
-          {header === "Дата отгрузки" && <p>{model}</p>}
-          {header === "Получатель" && <p>{model}</p>}
-          {header === "Адрес доставки" && <p>{model}</p>}
-          {header === "Опции модели" && <p>{model}</p>}
-          {header === "Сервисная компания" && <p>{model}</p>}
+          {header === "Дата отгрузки" && <div>{model}</div>}
+          {header === "Получатель" && <div>{model}</div>}
+          {header === "Адрес доставки" && <div>{model}</div>}
+          {header === "Опции модели" && <div>{model}</div>}
+          {header === "Клиент" && <div>{model}</div>}
+          {header === "Сервисная компания" && <div>{model}</div>}
         </div>
       )}
     </div>

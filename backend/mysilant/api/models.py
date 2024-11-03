@@ -58,11 +58,14 @@ class Equipment(models.Model):
         verbose_name_plural = "Машины"
 
     def __str__(self):
-        return f'{self.equipment_serial} ({self.equipment_model})'
+        if self.model_options and len(self.model_options) > 25:
+            return f'{self.equipment_serial} ({self.equipment_model}) - {self.model_options[:22]}...'
+        else:
+            return f'{self.equipment_serial} ({self.equipment_model})'
 
 
 class Maintenance(models.Model):
-    equipment = models.ForeignKey(Equipment, on_delete=models.RESTRICT, related_name='maintenance_equipment', verbose_name="Зав. № машины")
+    equipment = models.ForeignKey(Equipment, on_delete=models.RESTRICT, related_name='maintenance_equipment', verbose_name="Модель техники")
     maintenance_type = models.ForeignKey(Reference, on_delete=models.RESTRICT, related_name='maintenance_type', limit_choices_to={'category': Reference.MAINTENANCE_TYPE}, verbose_name="Вид ТО")
     maintenance_date = models.DateField(verbose_name="Дата проведения ТО")
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
@@ -80,7 +83,7 @@ class Maintenance(models.Model):
     
 
 class Claim(models.Model):
-    equipment = models.ForeignKey(Equipment, on_delete=models.RESTRICT, related_name='claim_equipment', verbose_name="Машина")
+    equipment = models.ForeignKey(Equipment, on_delete=models.RESTRICT, related_name='claim_equipment', verbose_name="Модель техники")
     failure_date = models.DateField(verbose_name="Дата отказа")
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
     failure_node = models.ForeignKey(Reference, on_delete=models.RESTRICT, related_name='failure_node', limit_choices_to={'category': Reference.FAILURE_NODE}, verbose_name="Узел отказа")

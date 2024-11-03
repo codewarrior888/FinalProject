@@ -1,6 +1,6 @@
 @import 'colors';
 
-.client-info {
+.main-authenticated {
   width: 100%;
   height: calc(100% - 70px);
   display: flex;
@@ -8,7 +8,7 @@
   align-items: center;
 }
 
-.client-info__container {
+.main-authenticated__container {
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -24,7 +24,7 @@
     display: inline-block;
     position: relative;
     list-style: none;
-    width: 300px;
+    width: 310px;
     margin: 0 20px;
     padding: 10px 30px;
     background: $main-color-beige;
@@ -32,7 +32,7 @@
     border-radius: 0 0 5px 5px;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 1px 1px 5px rgba(0, 0, 0, 0.1);
   }
   
   &__tab-list {
@@ -49,7 +49,7 @@
     
     border-bottom: $main-color-red solid 0.3rem;
 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 4px 4px 5px rgba(0, 0, 0, 0.1);
   }
   
   &__tab-panel {

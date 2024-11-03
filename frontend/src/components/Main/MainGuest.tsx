@@ -5,6 +5,7 @@ import '../../styles/MainGuest.scss';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import DetailCardGuest from '../DetailCard/DetailCardGuest';
+import RoleLabel from '../Authenticate/RoleLabel';
 
 const MainGuest: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
@@ -63,7 +64,8 @@ const MainGuest: React.FC = () => {
 
   return (
     <div className="main-guest">
-      <h2>Информация о комплектации и <br />технических характеристиках Вашей техники</h2>
+      <RoleLabel />
+      <h2>Информация о комплектации и технических характеристиках техники</h2>
 
       <div className="main-guest__search">
         <Form.Control

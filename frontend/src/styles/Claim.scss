@@ -1,0 +1,119 @@
+@import 'colors';
+@import 'fonts';
+
+.claim {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+
+    &__table-container {
+        max-height: auto;
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+      
+    &__table-scroll {
+    max-width: 1000px;
+    overflow-x: auto;
+    }
+
+    &__title {
+      font-size: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+  
+    &__search {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        max-width: 32rem;
+        gap: 2rem;
+
+        input {
+            font-size: 1.5rem;
+        }
+    }
+
+    &__search-button {
+        font-size: 1.5rem;
+        background-color: $main-color-blue;
+        color: $main-color-white;
+        border: none;
+        border-radius: 2px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $button-hover-bg;
+        }
+    }
+    
+    .table {
+        width: auto;
+        height: auto;
+        table-layout: fixed;
+        border-collapse: collapse;
+        font-size: 1.6rem;
+        margin: 1rem 0 5rem;
+        overflow-x: scroll;
+      }
+      
+      .table th {
+        padding: 12px 20px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+        align-content: center;
+        overflow: hidden;
+        word-break: break-word;
+      }
+
+      .table th {
+        // white-space: nowrap;
+        word-break: keep-all;
+      }
+
+      .table td {
+        white-space: wrap;
+      }
+      
+      .table tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+      }
+    
+    /* Row highlighting on selection */
+    .selectedRow {
+        background-color: #6ab4e9 !important;
+    }
+    
+    /* Detail view styling */
+    &__details-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 1.5rem;
+        width: 100%;
+        background-color: $main-color-white;
+      }
+    
+        &__cards-container {
+        display: flex;
+        justify-content: flex-start;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 20px;
+        width: 100%;
+        }
+
+    &__search {
+        display: flex;
+        margin-bottom: 20px;
+      }
+      
+        &__search-field {
+        flex: 1;
+        margin-right: 8px;
+        }
+}

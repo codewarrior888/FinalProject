@@ -16,7 +16,7 @@
         display: flex;
         flex-direction: row;
         width: 100%;
-        max-width: 52rem;
+        max-width: 32rem;
         gap: 2rem;
         margin-bottom: 2rem;
 
@@ -27,7 +27,7 @@
 
     &__search-button {
         font-size: 1.5rem;
-        background-color: $main-color-red;
+        background-color: $main-color-blue;
         color: $main-color-white;
         border: none;
         border-radius: 2px;

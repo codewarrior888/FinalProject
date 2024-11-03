@@ -26,8 +26,8 @@ const DetailCardGuest: React.FC<DetailCardGuestProps> = ({
       </div>
       {isExpanded && (
         <div className="detail-card__details">
-          <p>Модель: {model}</p>
-          <p>Зав.№: {serial}</p>
+          <div>Модель: {model}</div>
+          <div>Зав.№: {serial}</div>
           <LineBreaks text={description} />
         </div>
       )}
