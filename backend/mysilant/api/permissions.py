@@ -2,16 +2,16 @@ from rest_framework import permissions
 
 class IsGuest(permissions.BasePermission):
     """
-    Permission for Guest users to only access limited Equipment information.
+    Ограниченный доступ для неавторизованных пользователей
     """
     def has_permission(self, request, view):
         return request.user.is_anonymous or request.user.role == 'gt'
 
 class IsClient(permissions.BasePermission):
     """
-    Permission for Client users to:
-    - Read Equipment and Claim information
-    - Read and edit (add or delete) Maintenance information
+    Доступ только для клиентов
+    - Просмотр информации о Технике и Рекламациях
+    - Просмотр и редактирование ТО
     """
     def has_permission(self, request, view):
         if request.user.role == 'cl':
@@ -23,9 +23,9 @@ class IsClient(permissions.BasePermission):
 
 class IsServiceCompany(permissions.BasePermission):
     """
-    Permission for Service Company users to:
-    - Read Equipment information
-    - Read and edit (add or delete) Maintenance and Claim information
+    Доступ только для сервисных компаний
+    - Просмотр информации о Технике
+    - Просмотр и редактирование ТО и Рекламаций
     """
     def has_permission(self, request, view):
         if request.user.role == 'sc':
@@ -37,7 +37,8 @@ class IsServiceCompany(permissions.BasePermission):
 
 class IsManager(permissions.BasePermission):
     """
-    Permission for Manager users and superuser (admin) to read and edit all information.
+    Доступ для менеджеров и суперпользователя
+    - Просмотр и редактирование любой информации в Технике, ТО и Рекламациях
     """
     def has_permission(self, request, view):
         return request.user.is_superuser or request.user.role == 'mn'

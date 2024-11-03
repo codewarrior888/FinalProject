@@ -4,8 +4,8 @@ from .views import EquipmentViewSet, MaintenanceViewSet, ClaimViewSet
 
 router = DefaultRouter()
 router.register(r'equipment', EquipmentViewSet, basename='equipment')
-router.register(r'maintenance', MaintenanceViewSet)
-router.register(r'claims', ClaimViewSet)
+router.register(r'maintenance', MaintenanceViewSet, basename='maintenance')
+router.register(r'claims', ClaimViewSet, basename='claims')
 
 urlpatterns = [
     path('', include(router.urls)),

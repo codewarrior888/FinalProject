@@ -2,16 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../api';
 import Table from 'react-bootstrap/Table';
-import Form from 'react-bootstrap/Form';
 import DetailCardMaintenance from '../DetailCard/DetailCardMaintenance';
+import MaintenanceFilter from '../Filters/MaintenanceFilter';
 import '../../styles/Maintenance.scss';
 
 const Maintenance: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filterOptions, setFilterOptions] = useState({
+    maintenance_type_name: [],
+    service_company_name: [],
+    equipment_serial: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,9 +25,18 @@ const Maintenance: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
-        setEquipmentData(response.data);
-        setFilteredData(response.data);
-        console.log(response.data);
+        const data = response.data;
+        setEquipmentData(data);
+        setFilteredData(data);
+
+        // Calculate unique filter options
+        const options = {
+          maintenance_type_name: Array.from(new Set(data.map(item => item.maintenance_type_name))),
+          service_company_name: Array.from(new Set(data.map(item => item.service_company_name))),
+          equipment_serial: Array.from(new Set(data.map(item => item.equipment_serial))),
+        };
+        setFilterOptions(options);
+        
       } catch (error) {
         console.error('Ошибка при получении данных:', error);
       }
@@ -31,31 +44,18 @@ const Maintenance: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  // Handle filter changes
+  const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
+    let updatedData = equipmentData;
 
-  const handleSearch = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(equipmentData);
-    } else {
-      const results = equipmentData.filter((equipment: any) =>
-        equipment.equipment_serial.includes(searchQuery)
-      );
-      setFilteredData(results.length ? results : []);
-    }
-  };
+    Object.keys(selectedFilters).forEach((filterKey) => {
+      const filterValue = selectedFilters[filterKey];
+      if (filterValue && filterValue !== 'all') {
+        updatedData = updatedData.filter((item) => item[filterKey] === filterValue);
+      }
+    });
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleFocus = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(equipmentData);
-    }
+    setFilteredData(updatedData);
   };
 
   const handleRowClick = (equipment: any) => {
@@ -70,20 +70,7 @@ const Maintenance: React.FC = () => {
     <div className="maintenance">
       <h2 className="maintenance__title">Информация о проведенных ТО Вашей техники</h2>
 
-      <div className="maintenance__search">
-        <Form.Control
-          type="text"
-          placeholder="Заводской номер"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          className="maintenance__search-field"
-        />
-        <button onClick={handleSearch} className="maintenance__search-button">Поиск</button>
-      </div>
-
-      <h3>{searchQuery ? 'Результат поиска:' : ''}</h3>
+      <MaintenanceFilter onFilterChange={handleFilterChange} filterOptions={filterOptions} />
 
       {filteredData.length ? (
         <div className="maintenance__table-container">

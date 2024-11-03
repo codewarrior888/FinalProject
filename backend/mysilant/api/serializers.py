@@ -24,13 +24,13 @@ class EquipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Equipment
         fields = [
-            'equipment_model_name', 'equipment_model_description', 'equipment_serial',
+            'id','equipment_model_name', 'equipment_model_description', 'equipment_serial',
             'engine_model_name', 'engine_model_description', 'engine_serial',
             'transmission_model_name', 'transmission_model_description', 'transmission_serial',
             'drive_axle_model_name', 'drive_axle_model_description', 'drive_axle_serial',
             'steer_axle_model_name', 'steer_axle_model_description', 'steer_axle_serial',
             'contract', 'shipment_date', 'consignee', 'delivery_address', 'model_options',
-            'model_options_preview', 'client_name', 'service_company_name'
+            'model_options_preview', 'client', 'client_name', 'service_company_name'
         ]
     
     def get_model_options_preview(self, obj):

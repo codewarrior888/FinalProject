@@ -3,15 +3,21 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../api';
 import Table from 'react-bootstrap/Table';
-import Form from 'react-bootstrap/Form';
 import DetailCardEquipment from '../DetailCard/DetailCardEquipment';
+import EquipmentFilter from '../Filters/EquipmentFilter';
 
 const Equipment: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filterOptions, setFilterOptions] = useState({
+    equipment_model_name: [],
+    engine_model_name: [],
+    transmission_model_name: [],
+    drive_axle_model_name: [],
+    steer_axle_model_name: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,41 +27,39 @@ const Equipment: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
-        setEquipmentData(response.data);
-        setFilteredData(response.data);
-        console.log(response.data);
+        const data = response.data;
+        setEquipmentData(data);
+        setFilteredData(data);
+
+        // Calculate unique filter options
+        const options = {
+          equipment_model_name: Array.from(new Set(data.map(item => item.equipment_model_name))),
+          engine_model_name: Array.from(new Set(data.map(item => item.engine_model_name))),
+          transmission_model_name: Array.from(new Set(data.map(item => item.transmission_model_name))),
+          drive_axle_model_name: Array.from(new Set(data.map(item => item.drive_axle_model_name))),
+          steer_axle_model_name: Array.from(new Set(data.map(item => item.steer_axle_model_name))),
+        };
+        setFilterOptions(options);
+
       } catch (error) {
-        console.error('Ошибка при получении данных:', error);
+        console.error('Error fetching equipment data:', error);
       }
     };
     fetchData();
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  // Handle filter changes
+  const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
+    let updatedData = equipmentData;
 
-  const handleSearch = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(equipmentData);
-    } else {
-      const results = equipmentData.filter((equipment: any) =>
-        equipment.equipment_serial.includes(searchQuery)
-      );
-      setFilteredData(results.length ? results : []);
-    }
-  };
+    Object.keys(selectedFilters).forEach((filterKey) => {
+      const filterValue = selectedFilters[filterKey];
+      if (filterValue && filterValue !== 'all') {
+        updatedData = updatedData.filter((item) => item[filterKey] === filterValue);
+      }
+    });
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleFocus = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(equipmentData);
-    }
+    setFilteredData(updatedData);
   };
 
   const handleRowClick = (equipment: any) => {
@@ -70,20 +74,8 @@ const Equipment: React.FC = () => {
     <div className="equipment">
       <h2 className="equipment__title">Информация о комплектации и технических характеристиках Вашей техники</h2>
 
-      <div className="equipment__search">
-        <Form.Control
-          type="text"
-          placeholder="Заводской номер"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          className="equipment__search-field"
-        />
-        <button onClick={handleSearch} className="equipment__search-button">Поиск</button>
-      </div>
+      <EquipmentFilter onFilterChange={handleFilterChange} filterOptions={filterOptions} />
 
-      <h3>{searchQuery ? 'Результат поиска:' : ''}</h3>
 
       {filteredData.length ? (
         <div className="equipment__table-container">
@@ -163,7 +155,7 @@ const Equipment: React.FC = () => {
           </div>
         </div>
       ) : (
-        <p>No equipment found.</p>
+        <p>База данных пуста</p>
       )}
     </div>
   );

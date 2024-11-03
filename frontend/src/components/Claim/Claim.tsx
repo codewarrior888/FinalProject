@@ -1,19 +1,22 @@
-import '../../styles/Claim.scss';
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../api';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import DetailCardClaim from '../DetailCard/DetailCardClaim';
+import ClaimFilter from '../Filters/ClaimFilter';
 import '../../styles/Claim.scss';
 
 const Claim: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filterOptions, setFilterOptions] = useState({
+    failure_node_name: [],
+    repair_method_name: [],
+    service_company_name: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,9 +26,18 @@ const Claim: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
-        setEquipmentData(response.data);
-        setFilteredData(response.data);
-        console.log(response.data);
+        const data = response.data;
+        setEquipmentData(data);
+        setFilteredData(data);
+
+        // Calculate unique filter options
+        const options = {
+          failure_node_name: Array.from(new Set(data.map(item => item.failure_node_name))),
+          repair_method_name: Array.from(new Set(data.map(item => item.repair_method_name))),
+          service_company_name: Array.from(new Set(data.map(item => item.service_company_name))),
+        };
+        setFilterOptions(options);
+        
       } catch (error) {
         console.error('Ошибка при получении данных:', error);
       }
@@ -33,31 +45,18 @@ const Claim: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  // Handle filter changes
+  const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
+    let updatedData = equipmentData;
 
-  const handleSearch = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(equipmentData);
-    } else {
-      const results = equipmentData.filter((equipment: any) =>
-        equipment.equipment_serial.includes(searchQuery)
-      );
-      setFilteredData(results.length ? results : []);
-    }
-  };
+    Object.keys(selectedFilters).forEach((filterKey) => {
+      const filterValue = selectedFilters[filterKey];
+      if (filterValue && filterValue !== 'all') {
+        updatedData = updatedData.filter((item) => item[filterKey] === filterValue);
+      }
+    });
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleFocus = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(equipmentData);
-    }
+    setFilteredData(updatedData);
   };
 
   const handleRowClick = (equipment: any) => {
@@ -72,20 +71,7 @@ const Claim: React.FC = () => {
     <div className="claim">
       <h2 className="claim__title">Информация о рекламациях Вашей техники</h2>
 
-      <div className="claim__search">
-        <Form.Control
-          type="text"
-          placeholder="Заводской номер"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          className="claim__search-field"
-        />
-        <button onClick={handleSearch} className="claim__search-button">Поиск</button>
-      </div>
-
-      <h3>{searchQuery ? 'Результат поиска:' : ''}</h3>
+      <ClaimFilter onFilterChange={handleFilterChange} filterOptions={filterOptions} />
 
       {filteredData.length ? (
         <div className="claim__table-container">
@@ -120,7 +106,7 @@ const Claim: React.FC = () => {
                       <td>{claim.spare_parts}</td>
                       <td>{claim.repair_date}</td>
                       <td>{claim.downtime}</td>
-                      <td>{claim.service_company_name}</td>
+                      <td>{claim.service_company_name_name}</td>
                     </tr>
                     {expandedRow === claim.equipment_serial && (
                       <tr>
@@ -138,7 +124,7 @@ const Claim: React.FC = () => {
                                   onClick={() => handleCardClick(`${type}-${claim.equipment_serial}`)}
                                 />
                               ))}
-                              {["failure_date", "engine_hours", "failure_node_name", "failure_description", "repair_method_name", "spare_parts", "repair_date", "downtime", "service_company_name"].map((type) => (
+                              {["failure_date", "engine_hours", "failure_node_name", "failure_description", "repair_method_name", "spare_parts", "repair_date", "downtime", "service_company_name_name"].map((type) => (
                                 <DetailCardClaim
                                   key={type}
                                   header={type === "failure_date" ? "Дата отказа" : type === "engine_hours" ? "Наработка, м/час" : type === "failure_node_name" ? "Узел отказа" : type === "failure_description" ? "Описание отказа" : type === "repair_method_name" ? "Способ восстановления" : type === "spare_parts" ? "Используемые запчасти" : type === "repair_date" ? "Дата восстановления" : type === "downtime" ? "Время простоя техники"  : "Сервисная компания"}

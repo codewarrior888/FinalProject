@@ -1,0 +1,13 @@
+@import 'colors';
+
+.equipment-filter{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+label {
+    font-size: 1.4rem;
+}
