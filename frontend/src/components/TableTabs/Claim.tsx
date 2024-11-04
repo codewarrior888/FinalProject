@@ -10,9 +10,9 @@ import '../../styles/Claim.scss';
 const Claim: React.FC = () => {
   const { userInfo } = useAuth();
   const [equipmentData, setEquipmentData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     failure_node_name: [],
     repair_method_name: [],
@@ -87,7 +87,7 @@ const Claim: React.FC = () => {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Техника</th>
+                  <th>Модель / Зав.№ техники</th>
                   <th>Дата отказа</th>
                   <th>Наработка, м/час</th>
                   <th>Узел отказа</th>

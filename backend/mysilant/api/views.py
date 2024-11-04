@@ -11,26 +11,17 @@ from .permissions import IsManager, IsServiceCompany, IsClient, IsGuest
 from .filters import EquipmentFilter, MaintenanceFilter, ClaimFilter
 
 class EquipmentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated | IsGuest | IsClient | IsServiceCompany | IsManager]
     queryset = Equipment.objects.all().order_by('shipment_date')
     serializer_class = EquipmentSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = EquipmentFilter
-    # ordering_fields = ['shipment_date']
-    
-    def get_permissions(self):
-        # Public access for unauthenticated users
-        if self.action == 'public':
-            return [IsGuest()]
-        # Role-based permissions for authenticated users
-        user = self.request.user
-        if user.is_authenticated:
-            if user.role == 'mn' or user.is_superuser:
-                return [IsManager()]
-            elif user.role == 'cl':
-                return [IsClient()]
-            elif user.role == 'sc':
-                return [IsServiceCompany()]
-        return [IsAuthenticated()]
+    lookup_field = 'equipment_serial'
+
+    # Ensure that 'equipment_serial' is used in all lookup-based actions
+    def get_object(self):
+        lookup_value = self.kwargs[self.lookup_field]
+        return Equipment.objects.get(equipment_serial=lookup_value)
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny], url_path='public')
     def public(self, request):
@@ -40,37 +31,17 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 
 
 class MaintenanceViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated | IsClient | IsServiceCompany | IsManager]
     queryset = Maintenance.objects.all().order_by('maintenance_date') #сортировка по умолчанию по дате ТО
     serializer_class = MaintenanceSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = MaintenanceFilter
     # ordering_fields = ['maintenance_date']
 
-    def get_permissions(self):
-        if self.request.user.is_authenticated:
-            if self.request.user.role == 'mn' or self.request.user.is_superuser:
-                return [IsManager()]
-            elif self.request.user.role == 'cl':
-                return [IsClient()]
-            elif self.request.user.role == 'sc':
-                return [IsServiceCompany()]
-        return [IsGuest()]  # Guest access for unauthenticated users
-
 class ClaimViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated | IsClient | IsServiceCompany | IsManager]
     queryset = Claim.objects.all().order_by('failure_date') #сортировка по умолчанию по дате отказа
     serializer_class = ClaimSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = ClaimFilter
     # ordering_fields = ['failure_date']
-
-    def get_permissions(self):
-        if self.request.user.is_authenticated:
-            if self.request.user.role == 'mn' or self.request.user.is_superuser:
-                return [IsManager()]
-            elif self.request.user.role == 'cl':
-                return [IsClient()]
-            elif self.request.user.role == 'sc':
-                return [IsServiceCompany()]
-        return [IsGuest()]  # Guest access for unauthenticated users

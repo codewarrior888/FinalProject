@@ -5,7 +5,9 @@ class IsGuest(permissions.BasePermission):
     Ограниченный доступ для неавторизованных пользователей
     """
     def has_permission(self, request, view):
-        return request.user.is_anonymous or request.user.role == 'gt'
+        return (
+            request.user.is_anonymous or request.user.role == 'gt'
+        ) and view.basename == 'equipment' and request.method in permissions.SAFE_METHODS
 
 class IsClient(permissions.BasePermission):
     """
@@ -15,10 +17,10 @@ class IsClient(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         if request.user.role == 'cl':
-            if view.basename == 'equipment' or view.basename == 'claims':
-                return request.method in permissions.SAFE_METHODS  # Only read access
+            if view.basename in ['equipment', 'claims']:
+                return request.method in permissions.SAFE_METHODS  # Read-only access
             elif view.basename == 'maintenance':
-                return True  # Read and write access
+                return True  # Full access (read and write)
         return False
 
 class IsServiceCompany(permissions.BasePermission):
@@ -30,9 +32,9 @@ class IsServiceCompany(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.role == 'sc':
             if view.basename == 'equipment':
-                return request.method in permissions.SAFE_METHODS  # Only read access
+                return request.method in permissions.SAFE_METHODS  # Read-only access
             elif view.basename in ['maintenance', 'claims']:
-                return True  # Read and write access
+                return True  # Full access (read and write)
         return False
 
 class IsManager(permissions.BasePermission):

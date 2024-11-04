@@ -10,9 +10,9 @@ import '../../styles/Maintenance.scss';
 const Maintenance: React.FC = () => {
   const { userInfo } = useAuth();
   const [equipmentData, setEquipmentData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     maintenance_type_name: [],
     service_company_name: [],
@@ -88,7 +88,7 @@ useEffect(() => {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Техника</th>
+                  <th>Модель / Зав.№ техники</th>
                   <th>Вид ТО</th>
                   <th>Дата проведения ТО</th>
                   <th>Наработка, м/час</th>

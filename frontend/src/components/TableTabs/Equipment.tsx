@@ -10,9 +10,9 @@ import EquipmentFilter from '../Filters/EquipmentFilter';
 const Equipment: React.FC = () => {
   const { userInfo } = useAuth();
   const [equipmentData, setEquipmentData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     equipment_model_name: [],
     engine_model_name: [],
@@ -20,6 +20,10 @@ const Equipment: React.FC = () => {
     drive_axle_model_name: [],
     steer_axle_model_name: [],
   });
+
+  // Additional state to track edited values
+  const [editMode, setEditMode] = useState<{ [key: string]: boolean }>({});
+  const [editValues, setEditValues] = useState<{ [key: string]: any }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,6 +93,36 @@ const Equipment: React.FC = () => {
     setExpandedCard(expandedCard === equipmentSerial ? null : equipmentSerial);
   };
 
+  // Handle edit actions
+  const handleEditClick = (serial: string) => {
+    setEditMode((prev) => ({ ...prev, [serial]: !prev[serial] }));
+    setEditValues((prev) => ({ ...prev, [serial]: { ...equipmentData.find(item => item.equipment_serial === serial) } }));
+  };
+
+  const handleSaveClick = async (serial: string) => {
+    try {
+      // Save changes via API call
+      await axios.put(`${API_URL}/api/equipment/${serial}/`, editValues[serial], {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+      setEditMode((prev) => ({ ...prev, [serial]: false }));
+    } catch (error) {
+      console.error("Ошибка при сохранении изменений:", error);
+    }
+  };
+
+  const handleDeleteClick = async (equipmentSerial: string) => {
+    try {
+      await axios.delete(`${API_URL}/api/equipment/${equipmentSerial}/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+      setEquipmentData((prev) => prev.filter((item) => item.equipment_serial !== equipmentSerial));
+      setFilteredData((prev) => prev.filter((item) => item.equipment_serial !== equipmentSerial));
+    } catch (error) {
+      console.error("Ошибка при удалении:", error);
+    }
+  };
+
   return (
     <div className="equipment">
       <h2 className="equipment__title">Информация о комплектации и технических характеристиках Вашей техники</h2>
@@ -103,7 +137,7 @@ const Equipment: React.FC = () => {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Техника</th>
+                  <th>Модель / Зав.№ техники</th>
                   <th>Двигатель</th>
                   <th>Трансмиссия</th>
                   <th>Ведущий мост</th>
@@ -121,19 +155,301 @@ const Equipment: React.FC = () => {
                 {filteredData.map((equipment) => (
                   <React.Fragment key={equipment.equipment_serial}>
                     <tr onClick={() => handleRowClick(equipment)}>
-                      <th>Модель<br />Зав.№</th>
-                      <td>{equipment.equipment_model_name}<br />{equipment.equipment_serial}</td>
-                      <td>{equipment.engine_model_name}<br />{equipment.engine_serial}</td>
-                      <td>{equipment.transmission_model_name}<br />{equipment.transmission_serial}</td>
-                      <td>{equipment.drive_axle_model_name}<br />{equipment.drive_axle_serial}</td>
-                      <td>{equipment.steer_axle_model_name}<br />{equipment.steer_axle_serial}</td>
-                      <td>{equipment.contract}</td>
-                      <td>{equipment.shipment_date}</td>
-                      <td>{equipment.consignee}</td>
-                      <td>{equipment.delivery_address}</td>
-                      <td>{equipment.model_options_preview}</td>
-                      <td>{equipment.client_name}</td>
-                      <td>{equipment.service_company_name}</td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <button onClick={() => handleSaveClick(equipment.equipment_serial)}>Save</button>
+                        ) : (
+                          <button onClick={() => handleEditClick(equipment.equipment_serial)}>Edit</button>
+                        )}
+                        <button onClick={() => handleDeleteClick(equipment.equipment_serial)}>Delete</button>
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <>
+                            <input
+                              value={editValues[equipment.equipment_serial]?.equipment_model_name || equipment.equipment_model_name}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    equipment_model_name: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                            <input
+                              value={editValues[equipment.equipment_serial]?.equipment_serial || equipment.equipment_serial}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    equipment_serial: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </>
+                        ) : (
+                          `${equipment.equipment_model_name} / ${equipment.equipment_serial}`
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <>
+                            <input
+                              value={editValues[equipment.equipment_serial]?.engine_model_name || equipment.engine_model_name}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    engine_model_name: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                            <input
+                              value={editValues[equipment.equipment_serial]?.engine_serial || equipment.engine_serial}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    engine_serial: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </>
+                        ) : (
+                          `${equipment.engine_model_name} / ${equipment.engine_serial}`
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <>
+                            <input
+                              value={editValues[equipment.equipment_serial]?.transmission_model_name || equipment.transmission_model_name}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    transmission_model_name: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                            <input
+                              value={editValues[equipment.equipment_serial]?.engine_serial || equipment.transmission_serial}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    engine_serial: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </>
+                        ) : (
+                          `${equipment.transmission_model_name} / ${equipment.transmission_serial}`
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <>
+                            <input
+                              value={editValues[equipment.equipment_serial]?.drive_axle_model_name || equipment.drive_axle_model_name}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    drive_axle_model_name: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                            <input
+                              value={editValues[equipment.equipment_serial]?.drive_axle_serial || equipment.drive_axle_serial}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    drive_axle_serial: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </>
+                        ) : (
+                          `${equipment.drive_axle_model_name} / ${equipment.drive_axle_serial}`
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <>
+                            <input
+                              value={editValues[equipment.equipment_serial]?.steer_axle_model_name || equipment.steer_axle_model_name}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    steer_axle_model_name: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                            <input
+                              value={editValues[equipment.equipment_serial]?.steer_axle_serial || equipment.steer_axle_serial}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [equipment.equipment_serial]: {
+                                    ...prev[equipment.equipment_serial],
+                                    steer_axle_serial: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+                          </>
+                        ) : (
+                          `${equipment.steer_axle_model_name} / ${equipment.steer_axle_serial}`
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.contract || equipment.contract}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  contract: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.contract
+                        )}
+                      </td>
+
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.shipment_date || equipment.shipment_date}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  shipment_date: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.shipment_date
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.consignee || equipment.consignee}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  consignee: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.consignee
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.delivery_address || equipment.delivery_address}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  delivery_address: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.delivery_address
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.model_options_preview || equipment.model_options_preview}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  model_options_preview: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.model_options_preview
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.client_name || equipment.client_name}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  client_name: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.client_name
+                        )}
+                      </td>
+                      <td>
+                        {editMode[equipment.equipment_serial] ? (
+                          <input
+                            value={editValues[equipment.equipment_serial]?.service_company_name || equipment.service_company_name}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [equipment.equipment_serial]: {
+                                  ...prev[equipment.equipment_serial],
+                                  service_company_name: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        ) : (
+                          equipment.service_company_name
+                        )}
+                      </td>
                     </tr>
                     {expandedRow === equipment.equipment_serial && (
                       <tr>
