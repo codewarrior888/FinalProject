@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../api';
+import { useAuth } from '../Authenticate/useAuth';
 import Table from 'react-bootstrap/Table';
-import Form from 'react-bootstrap/Form';
 import DetailCardClaim from '../DetailCard/DetailCardClaim';
 import ClaimFilter from '../Filters/ClaimFilter';
 import '../../styles/Claim.scss';
 
 const Claim: React.FC = () => {
+  const { userInfo } = useAuth();
   const [equipmentData, setEquipmentData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -26,7 +27,13 @@ const Claim: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
-        const data = response.data;
+        let data = response.data;
+
+        const equipmentSerials = JSON.parse(localStorage.getItem('equipmentSerials') || '[]');
+
+        // Filter maintenance data based on equipment_serials
+        data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
+
         setEquipmentData(data);
         setFilteredData(data);
 
@@ -43,7 +50,7 @@ const Claim: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [userInfo]);
 
   // Handle filter changes
   const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
@@ -106,7 +113,7 @@ const Claim: React.FC = () => {
                       <td>{claim.spare_parts}</td>
                       <td>{claim.repair_date}</td>
                       <td>{claim.downtime}</td>
-                      <td>{claim.service_company_name_name}</td>
+                      <td>{claim.service_company_name}</td>
                     </tr>
                     {expandedRow === claim.equipment_serial && (
                       <tr>
@@ -124,13 +131,19 @@ const Claim: React.FC = () => {
                                   onClick={() => handleCardClick(`${type}-${claim.equipment_serial}`)}
                                 />
                               ))}
-                              {["failure_date", "engine_hours", "failure_node_name", "failure_description", "repair_method_name", "spare_parts", "repair_date", "downtime", "service_company_name_name"].map((type) => (
+                              {["failure_date", "engine_hours", "failure_node_name", "failure_description", "repair_method_name", 
+                              "spare_parts", "repair_date", "downtime", "service_company_name_name"].map((type) => (
                                 <DetailCardClaim
                                   key={type}
-                                  header={type === "failure_date" ? "Дата отказа" : type === "engine_hours" ? "Наработка, м/час" : type === "failure_node_name" ? "Узел отказа" : type === "failure_description" ? "Описание отказа" : type === "repair_method_name" ? "Способ восстановления" : type === "spare_parts" ? "Используемые запчасти" : type === "repair_date" ? "Дата восстановления" : type === "downtime" ? "Время простоя техники"  : "Сервисная компания"}
+                                  header={
+                                    type === "failure_date" ? "Дата отказа" : type === "engine_hours" ? "Наработка, м/час" : 
+                                    type === "failure_node_name" ? "Узел отказа" : type === "failure_description" ? "Описание отказа" : 
+                                    type === "repair_method_name" ? "Способ восстановления" : type === "spare_parts" ? "Используемые запчасти" : 
+                                    type === "repair_date" ? "Дата восстановления" : type === "downtime" ? "Время простоя техники"  : "Сервисная компания"
+                                  }
                                   model={claim[`${type}`]}
-                                  serial={""} // не используется в данном случае
-                                  description={""} // не используется в данном случае
+                                  serial={""} // не используется в данном контексте
+                                  description={""} // не используется в данном контексте
                                   isExpanded={expandedCard === `${type}-${claim.equipment_serial}`}
                                   onClick={() => handleCardClick(`${type}-${claim.equipment_serial}`)}
                                 />

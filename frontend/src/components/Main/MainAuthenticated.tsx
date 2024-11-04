@@ -1,9 +1,9 @@
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { useAuth } from "../Authenticate/useAuth";
 import "../../styles/MainAuthenticated.scss";
-import Equipment from "../Equipment/Equipment";
-import Maintenance from "../Maintenance/Maintenance";
-import Claim from "../Claim/Claim";
+import Equipment from "../TableTabs/Equipment";
+import Maintenance from "../TableTabs/Maintenance";
+import Claim from "../TableTabs/Claim";
 import RoleLabel from "../Authenticate/RoleLabel";
 
 const MainAuthenticated = () => {

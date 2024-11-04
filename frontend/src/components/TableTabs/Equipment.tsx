@@ -1,12 +1,14 @@
 import '../../styles/Equipment.scss';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../Authenticate/useAuth';
 import { API_URL } from '../api';
 import Table from 'react-bootstrap/Table';
 import DetailCardEquipment from '../DetailCard/DetailCardEquipment';
 import EquipmentFilter from '../Filters/EquipmentFilter';
 
 const Equipment: React.FC = () => {
+  const { userInfo } = useAuth();
   const [equipmentData, setEquipmentData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -27,7 +29,20 @@ const Equipment: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
-        const data = response.data;
+
+        let data = response.data;
+
+        // Apply role-based filtering if the user's role is "client"
+        if (userInfo?.role === 'cl') {
+          data = data.filter(
+            (item) => item.client === userInfo.id || item.client_name === userInfo.company_name
+          );
+        } else if (userInfo?.role === 'sc') {
+          data = data.filter(
+            (item) => item.service_company === userInfo.id || item.service_company_name === userInfo.company_name
+          );
+        }
+
         setEquipmentData(data);
         setFilteredData(data);
 
@@ -41,12 +56,16 @@ const Equipment: React.FC = () => {
         };
         setFilterOptions(options);
 
+        // Extract and store equipment_serial values in localStorage
+        const equipmentSerials = data.map((item) => item.equipment_serial);
+        localStorage.setItem('equipmentSerials', JSON.stringify(equipmentSerials));
+
       } catch (error) {
-        console.error('Error fetching equipment data:', error);
+        console.error('Ошибка при получении данных:', error);
       }
     };
     fetchData();
-  }, []);
+  }, [userInfo]);
 
   // Handle filter changes
   const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
@@ -124,7 +143,9 @@ const Equipment: React.FC = () => {
                               {["equipment", "engine", "transmission", "drive_axle", "steer_axle"].map((type) => (
                                 <DetailCardEquipment
                                   key={type}
-                                  header={type === "equipment" ? "Техника" : type === "engine" ? "Двигатель" : type === "transmission" ? "Трансмиссия" : type === "drive_axle" ? "Ведущий мост" : "Управляемый мост"}
+                                  header={
+                                    type === "equipment" ? "Техника" : type === "engine" ? "Двигатель" : 
+                                    type === "transmission" ? "Трансмиссия" : type === "drive_axle" ? "Ведущий мост" : "Управляемый мост"}
                                   model={equipment[`${type}_model_name`]}
                                   serial={equipment[`${type}_serial`]}
                                   description={equipment[`${type}_model_description`] || "Отсутствует"}
@@ -132,13 +153,18 @@ const Equipment: React.FC = () => {
                                   onClick={() => handleCardClick(`${type}-${equipment.equipment_serial}`)}
                                 />
                               ))}
-                              {["contract", "shipment_date", "consignee", "delivery_address", "model_options", "client_name", "service_company_name"].map((type) => (
+                              {["contract", "shipment_date", "consignee", "delivery_address", 
+                              "model_options", "client_name", "service_company_name"].map((type) => (
                                 <DetailCardEquipment
                                   key={type}
-                                  header={type === "contract" ? "Договор" : type === "shipment_date" ? "Дата отгрузки" : type === "consignee" ? "Получатель" : type === "delivery_address" ? "Адрес доставки" : type === "model_options" ? "Опции модели" : type === "client_name" ? "Клиент" : "Сервисная компания"}
+                                  header={
+                                    type === "contract" ? "Договор" : type === "shipment_date" ? "Дата отгрузки" : 
+                                    type === "consignee" ? "Получатель" : type === "delivery_address" ? "Адрес доставки" : 
+                                    type === "model_options" ? "Опции модели" : type === "client_name" ? "Клиент" : "Сервисная компания"
+                                  }
                                   model={equipment[`${type}`]}
-                                  serial={""} // не используется в данном случае
-                                  description={""} // не используется в данном случае
+                                  serial={""} // не используется в данном контексте
+                                  description={""} // не используется в данном контексте
                                   isExpanded={expandedCard === `${type}-${equipment.equipment_serial}`}
                                   onClick={() => handleCardClick(`${type}-${equipment.equipment_serial}`)}
                                 />

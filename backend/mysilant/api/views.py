@@ -16,28 +16,6 @@ class EquipmentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = EquipmentFilter
     # ordering_fields = ['shipment_date']
-
-    # @action(detail=False, methods=['get'], permission_classes=[IsGuest], url_path='public')
-    # def public(self, request):
-    #     limited_queryset = Equipment.objects.all().order_by('equipment_model')
-    #     serializer = LimitedEquipmentSerializer(limited_queryset, many=True)
-    #     return Response(serializer.data)
-
-    # def get_permissions(self):
-    #     if not self.request.user.is_authenticated:
-    #         # Ensure only public endpoint is accessible by guests
-    #         if self.action == 'public':
-    #             return [IsGuest()]
-    #         # Otherwise, restrict access completely
-    #         return [IsAuthenticated()]
-    #     # Set permissions based on authenticated user role
-    #     if self.request.user.role == 'mn' or self.request.user.is_superuser:
-    #         return [IsManager()]
-    #     elif self.request.user.role == 'cl':
-    #         return [IsClient()]
-    #     elif self.request.user.role == 'sc':
-    #         return [IsServiceCompany()]
-    #     return [IsAuthenticated()]  # Default permission for authenticated users
     
     def get_permissions(self):
         # Public access for unauthenticated users

@@ -15,7 +15,7 @@ class IsClient(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         if request.user.role == 'cl':
-            if view.basename == 'equipment' or view.basename == 'claim':
+            if view.basename == 'equipment' or view.basename == 'claims':
                 return request.method in permissions.SAFE_METHODS  # Only read access
             elif view.basename == 'maintenance':
                 return True  # Read and write access
@@ -31,7 +31,7 @@ class IsServiceCompany(permissions.BasePermission):
         if request.user.role == 'sc':
             if view.basename == 'equipment':
                 return request.method in permissions.SAFE_METHODS  # Only read access
-            elif view.basename in ['maintenance', 'claim']:
+            elif view.basename in ['maintenance', 'claims']:
                 return True  # Read and write access
         return False
 

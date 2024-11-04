@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../api';
+import { useAuth } from '../Authenticate/useAuth';
 import Table from 'react-bootstrap/Table';
 import DetailCardMaintenance from '../DetailCard/DetailCardMaintenance';
 import MaintenanceFilter from '../Filters/MaintenanceFilter';
 import '../../styles/Maintenance.scss';
 
 const Maintenance: React.FC = () => {
+  const { userInfo } = useAuth();
   const [equipmentData, setEquipmentData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -17,17 +19,24 @@ const Maintenance: React.FC = () => {
     equipment_serial: [],
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/maintenance/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        });
-        const data = response.data;
-        setEquipmentData(data);
-        setFilteredData(data);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Fetch maintenance data
+      const response = await axios.get(`${API_URL}/api/maintenance/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      let data = response.data;
+
+      const equipmentSerials = JSON.parse(localStorage.getItem('equipmentSerials') || '[]');
+
+      // Filter maintenance data based on equipment_serials
+      data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
+
+      setEquipmentData(data);
+      setFilteredData(data);
 
         // Calculate unique filter options
         const options = {
@@ -42,7 +51,7 @@ const Maintenance: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [userInfo]);
 
   // Handle filter changes
   const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
@@ -85,7 +94,7 @@ const Maintenance: React.FC = () => {
                   <th>Наработка, м/час</th>
                   <th>№ заказ-наряда</th>
                   <th>Дата заказ-наряда</th>
-                  <th>Сервисная компания</th>
+                  <th>Сервисная компания, проводившая ТО</th>
                 </tr>
               </thead>
               <tbody>
