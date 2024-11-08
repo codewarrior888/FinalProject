@@ -20,6 +20,8 @@ const Equipment: React.FC = () => {
     transmission_model_name: [],
     drive_axle_model_name: [],
     steer_axle_model_name: [],
+    client_name: [],
+    service_company_name: []
   });
 
   // Additional state to track edited values
@@ -51,6 +53,7 @@ const Equipment: React.FC = () => {
 
         setEquipmentData(data);
         setFilteredData(data);
+        console.log('Fetched equipment data:', data);
 
         // Calculate unique filter options
         const options = {
@@ -59,6 +62,8 @@ const Equipment: React.FC = () => {
           transmission_model_name: Array.from(new Set(data.map(item => item.transmission_model_name))),
           drive_axle_model_name: Array.from(new Set(data.map(item => item.drive_axle_model_name))),
           steer_axle_model_name: Array.from(new Set(data.map(item => item.steer_axle_model_name))),
+          client_name: Array.from(new Set(data.map(item => item.client_name))),
+          service_company_name: Array.from(new Set(data.map(item => item.service_company_name))),
         };
         setFilterOptions(options);
 
@@ -87,6 +92,7 @@ const Equipment: React.FC = () => {
     });
 
     setFilteredData(updatedData);
+    console.log('Filtered data:', updatedData);
   };
 
   const handleRowClick = (equipment: any) => {
@@ -100,6 +106,7 @@ const Equipment: React.FC = () => {
     // Handle edit actions
     const handleEditClick = (serial: string) => {
       const selectedItem = filteredData.find(item => item.equipment_serial === serial);
+      console.log('Selected item:', selectedItem);
     
       if (selectedItem) {
         setEditValues(prev => ({
@@ -543,7 +550,7 @@ const Equipment: React.FC = () => {
                       </td>
                       <td>
                         {editMode[equipment.equipment_serial] ? (
-                          <input
+                          <select
                             value={editValues[equipment.equipment_serial]?.client_name || equipment.client_name}
                             onChange={(e) =>
                               setEditValues((prev) => ({
@@ -554,14 +561,20 @@ const Equipment: React.FC = () => {
                                 },
                               }))
                             }
-                          />
+                          >
+                            {filterOptions.engine_model_name.map((modelName) => (
+                              <option key={modelName} value={modelName}>
+                                {modelName}
+                              </option>
+                            ))}
+                          </select>
                         ) : (
                           equipment.client_name
                         )}
                       </td>
                       <td>
                         {editMode[equipment.equipment_serial] ? (
-                          <input
+                          <select
                             value={editValues[equipment.equipment_serial]?.service_company_name || equipment.service_company_name}
                             onChange={(e) =>
                               setEditValues((prev) => ({
@@ -572,7 +585,13 @@ const Equipment: React.FC = () => {
                                 },
                               }))
                             }
-                          />
+                          >
+                          {filterOptions.engine_model_name.map((modelName) => (
+                            <option key={modelName} value={modelName}>
+                              {modelName}
+                            </option>
+                          ))}
+                        </select>
                         ) : (
                           equipment.service_company_name
                         )}
