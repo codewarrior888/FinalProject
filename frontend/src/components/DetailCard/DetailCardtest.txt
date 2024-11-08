@@ -1,0 +1,88 @@
+import React, { useState } from 'react';
+import LineBreaks from '../LineBreaks';
+import '../../styles/DetailCardEquipment.scss';
+
+interface DetailCardEquipmentProps {
+  header: string;
+  model: string;
+  serial: string;
+  description: string;
+  isExpanded: boolean;
+  onClick: () => void;
+  isEditable: boolean; // New prop to control editability
+  onEdit: () => void; // New prop for edit action
+  onSave: () => void; // New prop for save action
+  onDelete: () => void; // New prop for delete action
+  onCancel: () => void; // New prop for cancel action
+}
+
+const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
+  header,
+  model,
+  serial,
+  description,
+  isExpanded,
+  onClick,
+  isEditable,
+  onEdit,
+  onSave,
+  onDelete,
+  onCancel,
+}) => {
+  return (
+    <div className={`detail-card-equipment ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
+      <div className={`detail-card-equipment__header ${isExpanded ? 'expanded' : ''}`}>
+        {header}
+      </div>
+      {isExpanded && (
+        <div className="detail-card-equipment__details">
+        {/* Render model and serial details */}
+        <span className="detail-card-equipment__model">Модель:</span>
+        {isEditable ? (
+          <input 
+            type="text" 
+            defaultValue={model} 
+            onClick={(e) => e.stopPropagation()} // Prevent propagation when clicking on the input
+          />
+        ) : (
+          <div>{model}</div>
+        )}
+        <span className="detail-card-equipment__serial">Зав.№:</span>
+        {isEditable ? (
+          <input 
+            type="text" 
+            defaultValue={serial} 
+            onClick={(e) => e.stopPropagation()} // Prevent propagation when clicking on the input
+          />
+        ) : (
+          <div>{serial}</div>
+        )}
+        <span className="detail-card-equipment__description">Описание:</span>
+        {isEditable ? (
+          <textarea 
+            defaultValue={description} 
+            onClick={(e) => e.stopPropagation()} // Prevent propagation when clicking on the textarea
+          ></textarea>
+        ) : (
+          <div><LineBreaks text={description} /></div>
+        )}
+
+
+          {isEditable ? (
+            <div className="detail-card-equipment__actions">
+              <button onClick={(e) => { e.stopPropagation(); onSave(); }}>Сохранить</button>
+              <button onClick={(e) => { e.stopPropagation(); onCancel(); }}>Отменить</button>
+            </div>
+          ) : (
+            <div className="detail-card-equipment__actions">
+              <button onClick={(e) => { e.stopPropagation(); onEdit(); }}>Изменить</button>
+              <button onClick={(e) => { e.stopPropagation(); onDelete(); }}>Удалить</button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DetailCardEquipment;

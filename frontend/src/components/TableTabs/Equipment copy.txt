@@ -1,0 +1,294 @@
+import '../../styles/Equipment.scss';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useAuth } from '../Authenticate/useAuth';
+import { API_URL } from '../api';
+import Table from 'react-bootstrap/Table';
+import DetailCardEquipment from '../DetailCard/DetailCardEquipment';
+import EquipmentFilter from '../Filters/EquipmentFilter';
+import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+
+const Equipment: React.FC = () => {
+  const { userInfo } = useAuth();
+  const [equipmentData, setEquipmentData] = useState([]);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({
+    equipment_model_name: [],
+    engine_model_name: [],
+    transmission_model_name: [],
+    drive_axle_model_name: [],
+    steer_axle_model_name: [],
+  });
+
+  // Additional state to track edited values
+  const [editMode, setEditMode] = useState<{ [key: string]: boolean }>({});
+  const [editValues, setEditValues] = useState<{ [key: string]: any }>({});
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteSerial, setDeleteSerial] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/equipment/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+
+        let data = response.data;
+
+        // Apply role-based filtering if the user's role is "client"
+        if (userInfo?.role === 'cl') {
+          data = data.filter(
+            (item) => item.client === userInfo.id || item.client_name === userInfo.company_name
+          );
+        } else if (userInfo?.role === 'sc') {
+          data = data.filter(
+            (item) => item.service_company === userInfo.id || item.service_company_name === userInfo.company_name
+          );
+        }
+
+        setEquipmentData(data);
+        setFilteredData(data);
+
+        // Calculate unique filter options
+        const options = {
+          equipment_model_name: Array.from(new Set(data.map(item => item.equipment_model_name))),
+          engine_model_name: Array.from(new Set(data.map(item => item.engine_model_name))),
+          transmission_model_name: Array.from(new Set(data.map(item => item.transmission_model_name))),
+          drive_axle_model_name: Array.from(new Set(data.map(item => item.drive_axle_model_name))),
+          steer_axle_model_name: Array.from(new Set(data.map(item => item.steer_axle_model_name))),
+        };
+        setFilterOptions(options);
+
+        // Extract and store equipment_serial values in localStorage
+        const equipmentSerials = data.map((item) => item.equipment_serial);
+        localStorage.setItem('equipmentSerials', JSON.stringify(equipmentSerials));
+
+      } catch (error) {
+        console.error('Ошибка при получении данных:', error);
+      }
+    };
+    fetchData();
+  }, [userInfo]);
+
+  // Handle filter changes
+  const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
+    let updatedData = equipmentData;
+
+    Object.keys(selectedFilters).forEach((filterKey) => {
+      const filterValue = selectedFilters[filterKey];
+      if (filterValue && filterValue !== 'all') {
+        updatedData = updatedData.filter((item) => item[filterKey] === filterValue);
+      }
+    });
+
+    setFilteredData(updatedData);
+  };
+
+  const handleRowClick = (equipment: any) => {
+    setExpandedRow(expandedRow === equipment.equipment_serial ? null : equipment.equipment_serial);
+  };
+
+  const handleCardClick = (equipmentSerial: string) => {
+    setExpandedCard(expandedCard === equipmentSerial ? null : equipmentSerial);
+  };
+
+  // Handle edit actions
+  const handleEditClick = (serial: string) => {
+    const equipmentItem = equipmentData.find((item) => item.equipment_serial === serial);
+    if (equipmentItem) {
+      setEditMode((prev) => ({ ...prev, [serial]: true }));
+      setEditValues((prev) => ({
+        ...prev,
+        [serial]: {
+          ...equipmentItem,
+          equipment_model_name: equipmentItem.equipment_model_name,
+          engine_model_name: equipmentItem.engine_model_name,
+          transmission_model_name: equipmentItem.transmission_model_name,
+          drive_axle_model_name: equipmentItem.drive_axle_model_name,
+          steer_axle_model_name: equipmentItem.steer_axle_model_name,
+        },
+      }));
+    }
+  };
+
+  const handleCancelClick = (serial: string) => {
+    setEditMode((prev) => ({ ...prev, [serial]: false }));
+  };
+
+  const handleSaveClick = async (serial: string) => {
+    try {
+      // Prepare updated values directly from editValues
+      console.log(`Edit values before update:`, editValues[serial]);
+      const updatedValues = { ...editValues[serial] };
+  
+      // Send PUT request with updated values
+      const response = await axios.put(`${API_URL}/api/equipment/${serial}/`, updatedValues, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+      });
+  
+      console.log(`Response from server:`, response.data);
+  
+      // Update the filtered data in the component's state
+      setFilteredData((prevData) =>
+        prevData.map((item) =>
+          item.equipment_serial === serial ? { ...item, ...response.data } : item
+        )
+      );
+  
+      // Reset edit mode and clear edit values for this serial
+      setEditMode((prev) => ({ ...prev, [serial]: false }));
+      setEditValues((prev) => {
+        const updated = { ...prev };
+        delete updated[serial];
+        return updated;
+      });
+    } catch (error) {
+      console.error("Error saving changes:", error);
+    }
+  };
+
+  const handleDeleteClick = (equipmentSerial: string) => {
+    console.log(`Delete clicked for serial: ${equipmentSerial}`);
+    setDeleteSerial(equipmentSerial);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteSerial) {
+      try {
+        await axios.delete(`${API_URL}/api/equipment/${deleteSerial}/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+        });
+        setEquipmentData((prev) => prev.filter((item) => item.equipment_serial !== deleteSerial));
+        setFilteredData((prev) => prev.filter((item) => item.equipment_serial !== deleteSerial));
+      } catch (error) {
+        console.error("Error during deletion:", error);
+      } finally {
+        setShowConfirm(false);
+        setDeleteSerial(null);
+      }
+    }
+  };
+
+  return (
+    <div className="equipment">
+      <h2 className="equipment__title">Информация о комплектации и технических характеристиках Вашей техники</h2>
+
+      <EquipmentFilter onFilterChange={handleFilterChange} filterOptions={filterOptions} />
+
+
+      {filteredData.length ? (
+        <div className="equipment__table-container">
+          <div className="equipment__table-scroll">
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Техника</th>
+                  <th>Двигатель</th>
+                  <th>Трансмиссия</th>
+                  <th>Ведущий мост</th>
+                  <th>Управляемый мост</th>
+                  <th>Договор поставки №, дата</th>
+                  <th>Дата отгрузки</th>
+                  <th>Грузополучатель</th>
+                  <th>Адрес поставки</th>
+                  <th>Комплектация</th>
+                  <th>Клиент</th>
+                  <th>Сервисная компания</th>
+                </tr>
+              </thead>
+              <tbody>
+              {filteredData.map((equipment) => (
+                  <React.Fragment key={equipment.equipment_serial}>
+                    <tr onClick={() => handleRowClick(equipment)}>
+                      <th>Модель / Зав.№</th>
+                      <td>{equipment.equipment_model_name} /<br />{equipment.equipment_serial}</td>
+                      <td>{equipment.engine_model_name} /<br />{equipment.engine_serial}</td>
+                      <td>{equipment.transmission_model_name} /<br />{equipment.transmission_serial}</td>
+                      <td>{equipment.drive_axle_model_name} /<br />{equipment.drive_axle_serial}</td>
+                      <td>{equipment.steer_axle_model_name} /<br />{equipment.steer_axle_serial}</td>
+                      <td>{equipment.contract}</td>
+                      <td>{equipment.shipment_date}</td>
+                      <td>{equipment.consignee}</td>
+                      <td>{equipment.delivery_address}</td>
+                      <td>{equipment.model_options_preview}</td>
+                      <td>{equipment.client_name}</td>
+                      <td>{equipment.service_company_name}</td>
+                    </tr>
+                    {expandedRow === equipment.equipment_serial && (
+                      <tr>
+                        <td colSpan={12}>
+                          <div className="equipment__details-container">
+                            <div className="equipment__cards-container">
+                              {["equipment", "engine", "transmission", "drive_axle", "steer_axle"].map((type) => (
+                                <DetailCardEquipment
+                                  key={type}
+                                  header={type === "equipment" ? "Техника" : type === "engine" ? "Двигатель" : 
+                                        type === "transmission" ? "Трансмиссия" : type === "drive_axle" ? "Ведущий мост" : "Управляемый мост"}
+                                  model={equipment[`${type}_model_name`]}
+                                  serial={equipment[`${type}_serial`]}
+                                  description={equipment[`${type}_model_description`] || "Отсутствует"}
+                                  isExpanded={expandedCard === `${type}-${equipment.equipment_serial}`}
+                                  onClick={() => handleCardClick(`${type}-${equipment.equipment_serial}`)}
+                                  isEditable={editMode[equipment.equipment_serial] || (userInfo?.role === 'manager' || userInfo?.role === 'superuser')}
+                                  onEdit={() => handleEditClick(equipment.equipment_serial)}
+                                  onSave={() => handleSaveClick(equipment.equipment_serial)}
+                                  onDelete={() => handleDeleteClick(equipment.equipment_serial)}
+                                  onCancel={() => setEditMode((prev) => ({ ...prev, [equipment.equipment_serial]: false }))}
+                                />
+                              ))}
+                              {["contract", "shipment_date", "consignee", "delivery_address", 
+                              "model_options", "client_name", "service_company_name"].map((type) => (
+                                <DetailCardEquipment
+                                  key={type}
+                                  header={
+                                    type === "contract" ? "Договор поставки №, дата" : type === "shipment_date" ? "Дата отгрузки" : 
+                                    type === "consignee" ? "Грузополучатель" : type === "delivery_address" ? "Адрес доставки" : 
+                                    type === "model_options" ? "Комплектация" : type === "client_name" ? "Клиент" : "Сервисная компания"
+                                  }
+                                  model={equipment[`${type}`]}
+                                  serial={""} // не используется в данном контексте
+                                  description={""} // не используется в данном контексте
+                                  isExpanded={expandedCard === `${type}-${equipment.equipment_serial}`}
+                                  onClick={() => handleCardClick(`${type}-${equipment.equipment_serial}`)}
+                                  isEditable={editMode[equipment.equipment_serial] || (userInfo?.role === 'manager' || userInfo?.role === 'superuser')}
+                                  onEdit={() => handleEditClick(equipment.equipment_serial)}
+                                  onSave={() => handleSaveClick(equipment.equipment_serial)}
+                                  onDelete={() => handleDeleteClick(equipment.equipment_serial)}
+                                  onCancel={() => setEditMode((prev) => ({ ...prev, [equipment.equipment_serial]: false }))}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </Table>
+            {showConfirm && (
+              <ConfirmationDialog
+                message={`Вы уверены, что хотите удалить модель ${deleteSerial} и все связанные с ней данные?`}
+                onConfirm={confirmDelete}
+                onCancel={() => {
+                  console.log("Удаление отменено");
+                  setShowConfirm(false);
+                }}
+              />
+            )}
+          </div>
+        </div>
+      ) : (
+        <p>База данных пуста</p>
+      )}
+    </div>
+  );
+};
+
+export default Equipment;

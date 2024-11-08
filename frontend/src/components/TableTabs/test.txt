@@ -28,7 +28,8 @@ const Equipment: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteSerial, setDeleteSerial] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/equipment/`, {
           headers: {
@@ -70,8 +71,6 @@ const Equipment: React.FC = () => {
         console.error('Ошибка при получении данных:', error);
       }
     };
-
-  useEffect(() => {
     fetchData();
   }, [userInfo]);
 
@@ -121,46 +120,85 @@ const Equipment: React.FC = () => {
       }
     };
   
-    const handleSaveClick = async (serial: string) => {
+    const handleSaveClick = async (serial: string, columnName: string) => {
       try {
-        const editedData = editValues[serial];
-        if (!editedData) return;
-  
-        // Separate fields for Reference and Equipment models
-        const referenceFields = ['equipment_model', 'engine_model', 'transmission_model', 'drive_axle', 'steer_axle', 'client', 'service_company'];
-        const equipmentFields = ['contract', 'shipment_date', 'consignee', 'delivery_address', 'model_options'];
-  
-        // Prepare Reference model updates
-        for (const field of referenceFields) {
-          if (editedData[field]) {
-            const referenceId = editedData[`${field}_id`];
-            await axios.put(
-              `${API_URL}/api/references/${referenceId}/`,
-              { name: editedData[field] },
-              { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
-            );
+        const selectedItem = filteredData.find(item => item.equipment_serial === serial);
+    
+        if (selectedItem) {
+          // Dynamically set the category based on the column name
+          let category = "";
+          let referenceId = ""; // We will determine the reference ID dynamically
+    
+          switch (columnName) {
+            case "equipment_model_name":
+              category = "eq";
+              referenceId = selectedItem.equipment_model_id;
+              break;
+            case "engine_model_name":
+              category = "en";
+              referenceId = selectedItem.engine_model_id;
+              break;
+            case "transmission_model_name":
+              category = "tr";
+              referenceId = selectedItem.transmission_model_id;
+              break;
+            case "drive_axle_model_name":
+              category = "da";
+              referenceId = selectedItem.drive_axle_model_id;
+              break;
+            case "steer_axle_model_name":
+              category = "sa";
+              referenceId = selectedItem.steer_axle_model_id;
+              break;
+            // Add more cases as needed for other fields
+            default:
+              category = "UNKNOWN";
+              referenceId = selectedItem.equipment_model_id; // Default to equipment if not found
           }
-        }
-  
-        // Prepare Equipment model updates
-        const equipmentUpdates = {};
-        for (const field of equipmentFields) {
-          if (editedData[field]) equipmentUpdates[field] = editedData[field];
-        }
-        if (Object.keys(equipmentUpdates).length > 0) {
-          await axios.put(
-            `${API_URL}/api/equipment/${serial}/`,
-            equipmentUpdates,
-            { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
+    
+          // Log to check if referenceId is being set correctly
+          console.log("Updating Reference ID:", referenceId);
+    
+          if (!referenceId) {
+            throw new Error("Reference ID is not defined for the column");
+          }
+    
+          const updatedData = {
+            category: category,  // Dynamically set category based on column
+            name: editValues[serial]?.[columnName] || selectedItem[columnName],
+            description: selectedItem[`${columnName}_description`] || "",  // Dynamically map description
+          };
+    
+          // Send the updated data to the API
+          const response = await axios.put(
+            `${API_URL}/api/references/${referenceId}/`,  // Make sure the ID is valid
+            updatedData,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+              },
+            }
           );
+    
+          console.log("Response from server:", response.data);
+    
+          // Update the filtered data with the new name
+          setFilteredData(prevData =>
+            prevData.map(item =>
+              item.equipment_serial === serial ? { ...item, [columnName]: updatedData.name } : item
+            )
+          );
+    
+          // Reset edit mode and values
+          setEditMode(prev => ({ ...prev, [serial]: false }));
+          setEditValues(prev => {
+            const updatedValues = { ...prev };
+            delete updatedValues[serial];
+            return updatedValues;
+          });
         }
-  
-        setEditMode((prev) => ({ ...prev, [serial]: false }));
-        setEditValues((prev) => ({ ...prev, [serial]: null }));
-        // Refresh data after saving
-        fetchData();
       } catch (error) {
-        console.error("Error saving changes:", error);
+        console.error("Error saving changes:", error.response || error);
       }
     };
   
@@ -232,7 +270,7 @@ const Equipment: React.FC = () => {
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSaveClick(equipment.equipment_serial);
+                              handleSaveClick(equipment.equipment_serial, 'equipment_model_name');
                             }}
                           >Save</button>
 
@@ -263,6 +301,7 @@ const Equipment: React.FC = () => {
                       <td>
                         {editMode[equipment.equipment_serial] ? (
                           <>
+                            {/* Dropdown for equipment_model_name */}
                             <select
                               value={editValues[equipment.equipment_serial]?.equipment_model_name || equipment.equipment_model_name}
                               onChange={(e) =>
@@ -606,8 +645,8 @@ const Equipment: React.FC = () => {
                                     type === "model_options" ? "Опции модели" : type === "client_name" ? "Клиент" : "Сервисная компания"
                                   }
                                   model={equipment[`${type}`]}
-                                  serial={""}
-                                  description={""}
+                                  serial={""} // не используется в данном контексте
+                                  description={""} // не используется в данном контексте
                                   isExpanded={expandedCard === `${type}-${equipment.equipment_serial}`}
                                   onClick={() => handleCardClick(`${type}-${equipment.equipment_serial}`)}
                                 />

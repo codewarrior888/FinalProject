@@ -1,0 +1,60 @@
+const handleSaveClick = async (serial: string) => {
+  const editedData = editValues[serial];
+  const originalData = equipmentData.find((item) => item.equipment_serial === serial);
+
+  try {
+    if (editedData.equipment_model_id !== originalData?.equipment_model_id) {
+      // Update model in Reference endpoint
+      await axios.put(
+        `${API_URL}/api/references/${editedData.equipment_model_id}/`,
+        {
+          category: "eq",
+          name: editedData.equipment_model_name, // or whatever name field represents the model name
+          description: editedData.description,
+        },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
+      );
+    } else {
+      // Update other fields in Equipment endpoint
+      const response = await axios.put(
+        `${API_URL}/api/equipment/${serial}/`,
+        {
+          equipment_model: editedData.equipment_model_id,
+          equipment_serial: editedData.equipment_serial,
+          engine_model: editedData.engine_model_id,
+          engine_serial: editedData.engine_serial,
+          transmission_model: editedData.transmission_model_id,
+          transmission_serial: editedData.transmission_serial,
+          drive_axle_model: editedData.drive_axle_model_id,
+          drive_axle_serial: editedData.drive_axle_serial,
+          steer_axle_model: editedData.steer_axle_model_id,
+          steer_axle_serial: editedData.steer_axle_serial,
+          contract: editedData.contract,
+          shipment_date: editedData.shipment_date,
+          consignee: editedData.consignee,
+          delivery_address: editedData.delivery_address,
+          model_options: editedData.model_options,
+          client: editedData.client,
+          service_company: editedData.service_company,
+        },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
+      );
+      
+      setFilteredData((prevData) =>
+        prevData.map((item) =>
+          item.equipment_serial === serial ? { ...item, ...response.data } : item
+        )
+      );
+    }
+
+    setEditMode((prev) => ({ ...prev, [serial]: false }));
+    setEditValues((prev) => {
+      const updatedValues = { ...prev };
+      delete updatedValues[serial];
+      return updatedValues;
+    });
+
+  } catch (error) {
+    console.error("Error saving changes:", error);
+  }
+};

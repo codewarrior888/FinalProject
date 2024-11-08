@@ -4,6 +4,7 @@ from .models import (Reference, Equipment, Maintenance, Claim)
 
 
 class ReferenceAdmin(admin.ModelAdmin):
+    model = Reference
     list_display = ('description_with_breaks',)
 
     def description_with_breaks(self, obj):

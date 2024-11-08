@@ -1,0 +1,79 @@
+@import 'colors';
+
+.confirmation-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: $background-overlay;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__content {
+      background: $main-color-white;
+      padding: 20px;
+      border-radius: 8px;
+      position: relative;
+      width: 30rem;
+      height: auto;
+  
+      h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-size: 2rem;
+      }
+    }
+
+    &__submit-button {
+      background-color: $main-color-red;
+      color: $main-color-white;
+      border: none;
+      border-radius: 4px;
+      padding: 1rem 2.5rem;
+      width: 100%;
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+  
+      &:hover {
+        background-color: $button-hover-bg;
+      }
+    }
+
+    &__cancel-button {
+      background-color: $main-color-light-gray;
+      color: $main-color-blue;
+      border: none;
+      border-radius: 4px;
+      padding: 1rem 2.5rem;
+      width: 100%;
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+  
+      &:hover {
+        color: $main-color-white;
+        background-color: $main-color-blue;
+      }
+    }
+  }
+
+  label {
+    display: flex;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: $main-color-black;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 1.2rem;
+  }

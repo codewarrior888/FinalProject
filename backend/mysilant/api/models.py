@@ -65,13 +65,13 @@ class Equipment(models.Model):
 
 
 class Maintenance(models.Model):
-    equipment = models.ForeignKey(Equipment, on_delete=models.RESTRICT, related_name='maintenance_equipment', verbose_name="Модель техники")
-    maintenance_type = models.ForeignKey(Reference, on_delete=models.RESTRICT, related_name='maintenance_type', limit_choices_to={'category': Reference.MAINTENANCE_TYPE}, verbose_name="Вид ТО")
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, related_name='maintenance_equipment', verbose_name="Модель техники")
+    maintenance_type = models.ForeignKey(Reference, on_delete=models.CASCADE, related_name='maintenance_type', limit_choices_to={'category': Reference.MAINTENANCE_TYPE}, verbose_name="Вид ТО")
     maintenance_date = models.DateField(verbose_name="Дата проведения ТО")
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
     order_number = models.CharField(max_length=100, null=True, blank=True, verbose_name="№ заказ-наряда")
     order_date = models.DateField(null=True, blank=True, verbose_name="Дата заказ-наряда")
-    service_company = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='maintenance_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания", null=True, blank=True)
+    service_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания", null=True, blank=True)
 
 
     class Meta:
@@ -83,16 +83,16 @@ class Maintenance(models.Model):
     
 
 class Claim(models.Model):
-    equipment = models.ForeignKey(Equipment, on_delete=models.RESTRICT, related_name='claim_equipment', verbose_name="Модель техники")
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, related_name='claim_equipment', verbose_name="Модель техники")
     failure_date = models.DateField(verbose_name="Дата отказа")
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
-    failure_node = models.ForeignKey(Reference, on_delete=models.RESTRICT, related_name='failure_node', limit_choices_to={'category': Reference.FAILURE_NODE}, verbose_name="Узел отказа")
+    failure_node = models.ForeignKey(Reference, on_delete=models.CASCADE, related_name='failure_node', limit_choices_to={'category': Reference.FAILURE_NODE}, verbose_name="Узел отказа")
     failure_description = models.TextField(null=True, blank=True, verbose_name="Описание отказа")
-    repair_method = models.ForeignKey(Reference, on_delete=models.RESTRICT, related_name='repair_method', limit_choices_to={'category': Reference.REPAIR_METHOD}, verbose_name="Способ восстановления")
+    repair_method = models.ForeignKey(Reference, on_delete=models.CASCADE, related_name='repair_method', limit_choices_to={'category': Reference.REPAIR_METHOD}, verbose_name="Способ восстановления")
     spare_parts = models.TextField(null=True, blank=True, verbose_name="Используемые запасные части")
     repair_date = models.DateField(null=True, blank=True, verbose_name="Дата восстановления")
     downtime = models.IntegerField(editable=False, verbose_name="Время простоя техники")
-    service_company = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='claim_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания")
+    service_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='claim_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания")
 
     class Meta:
         verbose_name = 'Рекламация'
