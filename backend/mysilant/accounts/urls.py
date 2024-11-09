@@ -5,5 +5,5 @@ from . import views
 urlpatterns = [
     path('login/', views.LoginAPIView.as_view(), name='login'),
     path('logout/', views.LogoutAPIView.as_view(), name='logout'),
-    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

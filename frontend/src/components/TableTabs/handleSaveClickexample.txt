@@ -58,3 +58,54 @@ const handleSaveClick = async (serial: string) => {
     console.error("Error saving changes:", error);
   }
 };
+
+
+working example for /api/equipment/
+
+const handleSaveClick = async (serial: string) => {
+      try {
+        const editedData = editValues[serial];
+        console.log('Edited data:', editedData);
+        if (!editedData) return;
+  
+        // Separate fields for Reference and Equipment models
+        const referenceFields = ['equipment_model', 'engine_model', 'transmission_model', 'drive_axle_model', 'steer_axle_model', 'client', 'service_company'];
+        const equipmentFields = ['equipment_model', 'engine_model', 'transmission_model', 'drive_axle_model', 'steer_axle_model', 'client', 'service_company', 'equipment_serial', 'engine_serial', 'transmission_serial', 'drive_axle_serial', 'steer_axle_serial', 'contract', 'shipment_date', 'consignee', 'delivery_address', 'model_options'];
+  
+        // Prepare Reference model updates
+        for (const field of referenceFields) {
+          if (editedData[field]) {
+            const referenceId = editedData[`${field}`];
+            console.log('Reference ID:', referenceId);
+            await axios.put(
+              `${API_URL}/api/references/${referenceId}/`,
+              { name: editedData[field] },
+              { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
+            );
+          }
+        }
+  
+        // Prepare Equipment model updates
+        const equipmentUpdates = {};
+        for (const field of equipmentFields) {
+          if (editedData[field]) 
+            equipmentUpdates[field] = editedData[field];
+          else
+            equipmentUpdates[field] = null;
+        }
+        if (Object.keys(equipmentUpdates).length > 0) {
+          await axios.put(
+            `${API_URL}/api/equipment/${serial}/`,
+            equipmentUpdates,
+            { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
+          );
+        }
+  
+        setEditMode((prev) => ({ ...prev, [serial]: false }));
+        setEditValues((prev) => ({ ...prev, [serial]: null }));
+        // Refresh data after saving
+        fetchData();
+      } catch (error) {
+        console.error("Error saving changes:", error);
+      }
+    };

@@ -105,23 +105,23 @@ const Equipment: React.FC = () => {
 
     // Handle edit actions
     const handleEditClick = (serial: string) => {
-      const selectedItem = filteredData.find(item => item.equipment_serial === serial);
+      const selectedItem = filteredData.find((item) => item.equipment_serial === serial);
       console.log('Selected item:', selectedItem);
     
       if (selectedItem) {
-        setEditValues(prev => ({
+        setEditValues((prev) => ({
           ...prev,
           [serial]: {
-            ...selectedItem, 
-            equipment_model_id: selectedItem.equipment_model_id, // Ensure model IDs are added
-            engine_model_id: selectedItem.engine_model_id,
-            transmission_model_id: selectedItem.transmission_model_id,
-            drive_axle_model_id: selectedItem.drive_axle_model_id,
-            steer_axle_model_id: selectedItem.steer_axle_model_id
+            ...selectedItem,
+            equipment_model_id: selectedItem.equipment_model, // Ensure IDs for reference models are stored
+            engine_model_id: selectedItem.engine_model,
+            transmission_model_id: selectedItem.transmission_model,
+            drive_axle_model_id: selectedItem.drive_axle_model,
+            steer_axle_model_id: selectedItem.steer_axle_model,
           },
         }));
-  
-        setEditMode(prev => ({
+    
+        setEditMode((prev) => ({
           ...prev,
           [serial]: true,
         }));
@@ -132,39 +132,49 @@ const Equipment: React.FC = () => {
       try {
         const editedData = editValues[serial];
         if (!editedData) return;
-  
-        // Separate fields for Reference and Equipment models
-        const referenceFields = ['equipment_model', 'engine_model', 'transmission_model', 'drive_axle', 'steer_axle', 'client', 'service_company'];
-        const equipmentFields = ['contract', 'shipment_date', 'consignee', 'delivery_address', 'model_options'];
-  
-        // Prepare Reference model updates
-        for (const field of referenceFields) {
-          if (editedData[field]) {
-            const referenceId = editedData[`${field}_id`];
-            await axios.put(
-              `${API_URL}/api/references/${referenceId}/`,
-              { name: editedData[field] },
-              { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
-            );
+    
+        const referenceFieldMapping = {
+          equipment_model_name: { category: "eq", idField: "equipment_model_id" },
+          engine_model_name: { category: "en", idField: "engine_model_id" },
+          transmission_model_name: { category: "tr", idField: "transmission_model_id" },
+          drive_axle_model_name: { category: "da", idField: "drive_axle_model_id" },
+          steer_axle_model_name: { category: "sa", idField: "steer_axle_model_id" },
+        };
+    
+        // Update Reference model fields if applicable
+        for (const [field, { category, idField }] of Object.entries(referenceFieldMapping)) {
+          if (field in editedData) {
+            const referenceName = editedData[field]; // Selected model name
+            const referenceId = editedData[idField]; // Corresponding ID
+    
+            if (referenceId && referenceName !== filteredData.find((item) => item.equipment_serial === serial)[field]) {
+              await axios.put(
+                `${API_URL}/api/references/${referenceId}/`,
+                { category, name: referenceName },
+                { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } }
+              );
+            }
           }
         }
-  
-        // Prepare Equipment model updates
+    
+        // Prepare data for Equipment update
         const equipmentUpdates = {};
-        for (const field of equipmentFields) {
-          if (editedData[field]) equipmentUpdates[field] = editedData[field];
+        for (const field in editedData) {
+          if (!Object.keys(referenceFieldMapping).includes(field)) {
+            equipmentUpdates[field] = editedData[field];
+          }
         }
+    
         if (Object.keys(equipmentUpdates).length > 0) {
           await axios.put(
             `${API_URL}/api/equipment/${serial}/`,
             equipmentUpdates,
-            { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
+            { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } }
           );
         }
-  
+    
         setEditMode((prev) => ({ ...prev, [serial]: false }));
         setEditValues((prev) => ({ ...prev, [serial]: null }));
-        // Refresh data after saving
         fetchData();
       } catch (error) {
         console.error("Error saving changes:", error);
@@ -232,7 +242,6 @@ const Equipment: React.FC = () => {
                 {filteredData.map((equipment) => (
                   <React.Fragment key={equipment.equipment_serial}>
                     <tr onClick={() => handleRowClick(equipment)}>
-                      
                       <td>
                         {editMode[equipment.equipment_serial] ? (
                           <>
@@ -304,7 +313,7 @@ const Equipment: React.FC = () => {
                         ) : (
                           `${equipment.equipment_model_name} / ${equipment.equipment_serial}`
                         )}
-                      </td>
+                        </td>
                       <td>
                         {editMode[equipment.equipment_serial] ? (
                           <>
@@ -562,7 +571,7 @@ const Equipment: React.FC = () => {
                               }))
                             }
                           >
-                            {filterOptions.engine_model_name.map((modelName) => (
+                            {filterOptions.client_name.map((modelName) => (
                               <option key={modelName} value={modelName}>
                                 {modelName}
                               </option>
@@ -586,7 +595,7 @@ const Equipment: React.FC = () => {
                               }))
                             }
                           >
-                          {filterOptions.engine_model_name.map((modelName) => (
+                          {filterOptions.service_company_name.map((modelName) => (
                             <option key={modelName} value={modelName}>
                               {modelName}
                             </option>
