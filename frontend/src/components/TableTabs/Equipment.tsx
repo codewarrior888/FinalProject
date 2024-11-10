@@ -53,7 +53,6 @@ const Equipment: React.FC = () => {
 
         setEquipmentData(data);
         setFilteredData(data);
-        console.log('Fetched equipment data:', data);
 
         // Calculate unique filter options
         const options = {
@@ -62,8 +61,8 @@ const Equipment: React.FC = () => {
           transmission_model_name: Array.from(new Set(data.map(item => item.transmission_model_name))),
           drive_axle_model_name: Array.from(new Set(data.map(item => item.drive_axle_model_name))),
           steer_axle_model_name: Array.from(new Set(data.map(item => item.steer_axle_model_name))),
-          client_name: Array.from(new Set(data.map(item => item.client_name))),
-          service_company_name: Array.from(new Set(data.map(item => item.service_company_name))),
+          client_name: Array.from(new Map(data.map(item => [item.client, { id: item.client, name: item.client_name }])).values()),
+          service_company_name: Array.from(new Map(data.map(item => [item.service_company, { id: item.service_company, name: item.service_company_name }])).values()),
         };
         setFilterOptions(options);
 
@@ -92,7 +91,6 @@ const Equipment: React.FC = () => {
     });
 
     setFilteredData(updatedData);
-    console.log('Filtered data:', updatedData);
   };
 
   const handleRowClick = (equipment: any) => {
@@ -106,7 +104,6 @@ const Equipment: React.FC = () => {
     // Handle edit actions
     const handleEditClick = (serial: string) => {
       const selectedItem = filteredData.find((item) => item.equipment_serial === serial);
-      console.log('Selected item:', selectedItem);
     
       if (selectedItem) {
         setEditValues((prev) => ({
@@ -157,22 +154,26 @@ const Equipment: React.FC = () => {
           }
         }
     
-        // Prepare data for Equipment update
-        const equipmentUpdates = {};
-        for (const field in editedData) {
-          if (!Object.keys(referenceFieldMapping).includes(field)) {
-            equipmentUpdates[field] = editedData[field];
-          }
-        }
-    
-        if (Object.keys(equipmentUpdates).length > 0) {
-          await axios.put(
-            `${API_URL}/api/equipment/${serial}/`,
-            equipmentUpdates,
-            { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } }
-          );
-        }
-    
+        // Fetch correct IDs for client and service_company based on names
+        const selectedClientName = editValues[serial].client_name;
+        const selectedServiceCompanyName = editValues[serial].service_company_name;
+
+        const client = filterOptions.client_name.find(option => option.name === selectedClientName)?.id;
+        const service_company = filterOptions.service_company_name.find(option => option.name === selectedServiceCompanyName)?.id;
+
+        const equipmentUpdates = {
+          ...editedData,
+          client: client ?? equipmentData.find((item) => item.equipment_serial === serial)?.client,
+          service_company: service_company ?? equipmentData.find((item) => item.equipment_serial === serial)?.service_company,
+        };
+
+        // PUT request to update equipment data
+        await axios.put(
+          `${API_URL}/api/equipment/${serial}/`,
+          equipmentUpdates,
+          { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } }
+        );
+        // Exit edit mode, clear values, and refresh data
         setEditMode((prev) => ({ ...prev, [serial]: false }));
         setEditValues((prev) => ({ ...prev, [serial]: null }));
         fetchData();
@@ -186,21 +187,18 @@ const Equipment: React.FC = () => {
     };
   
     const handleDeleteClick = (equipmentSerial: string) => {
-      console.log(`Delete clicked for serial: ${equipmentSerial}`);
       setDeleteSerial(equipmentSerial);
       setShowConfirm(true);
     };
     
     const confirmDelete = async () => {
       if (deleteSerial) {
-        console.log(`Confirmed deletion for serial: ${deleteSerial}`);
         try {
           await axios.delete(`${API_URL}/api/equipment/${deleteSerial}/`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
           });
           setEquipmentData((prev) => prev.filter((item) => item.equipment_serial !== deleteSerial));
           setFilteredData((prev) => prev.filter((item) => item.equipment_serial !== deleteSerial));
-          console.log(`Deleted serial: ${deleteSerial}`);
         } catch (error) {
           console.error("Error during deletion:", error);
         } finally {
@@ -281,6 +279,7 @@ const Equipment: React.FC = () => {
                           <>
                             <select
                               value={editValues[equipment.equipment_serial]?.equipment_model_name || equipment.equipment_model_name}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -299,6 +298,7 @@ const Equipment: React.FC = () => {
                             </select>
                             <input
                               value={editValues[equipment.equipment_serial]?.equipment_serial || equipment.equipment_serial}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -319,6 +319,7 @@ const Equipment: React.FC = () => {
                           <>
                             <select
                               value={editValues[equipment.equipment_serial]?.engine_model_name || equipment.engine_model_name}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -337,6 +338,7 @@ const Equipment: React.FC = () => {
                             </select>
                             <input
                               value={editValues[equipment.equipment_serial]?.engine_serial || equipment.engine_serial}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -357,6 +359,7 @@ const Equipment: React.FC = () => {
                           <>
                             <select
                               value={editValues[equipment.equipment_serial]?.transmission_model_name || equipment.transmission_model_name}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -375,6 +378,7 @@ const Equipment: React.FC = () => {
                             </select>
                             <input
                               value={editValues[equipment.equipment_serial]?.transmission_serial || equipment.transmission_serial}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -395,6 +399,7 @@ const Equipment: React.FC = () => {
                           <>
                             <select
                               value={editValues[equipment.equipment_serial]?.drive_axle_model_name || equipment.drive_axle_model_name}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -413,6 +418,7 @@ const Equipment: React.FC = () => {
                             </select>
                             <input
                               value={editValues[equipment.equipment_serial]?.drive_axle_serial || equipment.drive_axle_serial}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -433,6 +439,7 @@ const Equipment: React.FC = () => {
                           <>
                             <select
                               value={editValues[equipment.equipment_serial]?.steer_axle_model_name || equipment.steer_axle_model_name}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -451,6 +458,7 @@ const Equipment: React.FC = () => {
                             </select>
                             <input
                               value={editValues[equipment.equipment_serial]?.steer_axle_serial || equipment.steer_axle_serial}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) =>
                                 setEditValues((prev) => ({
                                   ...prev,
@@ -470,6 +478,7 @@ const Equipment: React.FC = () => {
                         {editMode[equipment.equipment_serial] ? (
                           <input
                             value={editValues[equipment.equipment_serial]?.contract || equipment.contract}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) =>
                               setEditValues((prev) => ({
                                 ...prev,
@@ -489,6 +498,7 @@ const Equipment: React.FC = () => {
                         {editMode[equipment.equipment_serial] ? (
                           <input
                             value={editValues[equipment.equipment_serial]?.shipment_date || equipment.shipment_date}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) =>
                               setEditValues((prev) => ({
                                 ...prev,
@@ -507,6 +517,7 @@ const Equipment: React.FC = () => {
                         {editMode[equipment.equipment_serial] ? (
                           <input
                             value={editValues[equipment.equipment_serial]?.consignee || equipment.consignee}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) =>
                               setEditValues((prev) => ({
                                 ...prev,
@@ -525,6 +536,7 @@ const Equipment: React.FC = () => {
                         {editMode[equipment.equipment_serial] ? (
                           <input
                             value={editValues[equipment.equipment_serial]?.delivery_address || equipment.delivery_address}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) =>
                               setEditValues((prev) => ({
                                 ...prev,
@@ -543,6 +555,7 @@ const Equipment: React.FC = () => {
                         {editMode[equipment.equipment_serial] ? (
                           <input
                             value={editValues[equipment.equipment_serial]?.model_options_preview || equipment.model_options_preview}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) =>
                               setEditValues((prev) => ({
                                 ...prev,
@@ -561,7 +574,7 @@ const Equipment: React.FC = () => {
                         {editMode[equipment.equipment_serial] ? (
                           <select
                             value={editValues[equipment.equipment_serial]?.client_name || equipment.client_name}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setEditValues((prev) => ({
                                 ...prev,
                                 [equipment.equipment_serial]: {
@@ -569,11 +582,11 @@ const Equipment: React.FC = () => {
                                   client_name: e.target.value,
                                 },
                               }))
-                            }
+                            }}
                           >
-                            {filterOptions.client_name.map((modelName) => (
-                              <option key={modelName} value={modelName}>
-                                {modelName}
+                            {filterOptions.client_name.map((option) => (
+                              <option key={option.id} value={option.name}>
+                                {option.name}
                               </option>
                             ))}
                           </select>
@@ -595,9 +608,9 @@ const Equipment: React.FC = () => {
                               }))
                             }
                           >
-                          {filterOptions.service_company_name.map((modelName) => (
-                            <option key={modelName} value={modelName}>
-                              {modelName}
+                          {filterOptions.service_company_name.map((option) => (
+                            <option key={option.id} value={option.name}> {/* Use option.name as the value */}
+                              {option.name} {/* Display the name */}
                             </option>
                           ))}
                         </select>
@@ -654,7 +667,6 @@ const Equipment: React.FC = () => {
                 message={`Вы уверены, что хотите удалить модель ${deleteSerial} и все связанные с ней данные?`}
                 onConfirm={confirmDelete}
                 onCancel={() => {
-                  console.log("Удаление отменено");
                   setShowConfirm(false);
                 }}
               />
