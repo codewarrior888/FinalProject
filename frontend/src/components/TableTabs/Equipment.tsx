@@ -141,8 +141,8 @@ const Equipment: React.FC = () => {
         // Update Reference model fields if applicable
         for (const [field, { category, idField }] of Object.entries(referenceFieldMapping)) {
           if (field in editedData) {
-            const referenceName = editedData[field]; // Selected model name
-            const referenceId = editedData[idField]; // Corresponding ID
+            const referenceName = editedData[field];
+            const referenceId = editedData[idField];
     
             if (referenceId && referenceName !== filteredData.find((item) => item.equipment_serial === serial)[field]) {
               await axios.put(
