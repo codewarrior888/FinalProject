@@ -250,7 +250,7 @@ const Equipment: React.FC = () => {
       setEditValues((prev) => ({ ...prev, [serial]: null }));
       fetchData();
     } catch (error) {
-      console.error("Error saving changes:", error);
+      console.error("Ошибка при сохранении изменений:", error);
     }
   };
 
@@ -278,7 +278,7 @@ const Equipment: React.FC = () => {
           prev.filter((item) => item.equipment_serial !== deleteSerial)
         );
       } catch (error) {
-        console.error("Error during deletion:", error);
+        console.error("Ошибка при удалении:", error);
       } finally {
         setShowConfirm(false);
         setDeleteSerial(null);

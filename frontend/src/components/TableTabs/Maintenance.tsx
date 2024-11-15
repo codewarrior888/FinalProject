@@ -19,7 +19,9 @@ const Maintenance: React.FC = () => {
     service_company_name: [],
     equipment_serial: [],
   });
-
+  const [referenceOptions, setReferenceOptions] = useState({
+    maintenance_type_name: [],
+  })
   const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
   const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
   const [showConfirm, setShowConfirm] = useState(false);
@@ -62,8 +64,30 @@ const Maintenance: React.FC = () => {
     }
   };
 
+  const fetchReferences = async () => {
+    try {
+      const referenceResponse = await axios.get(`${API_URL}/api/references/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+  
+      const maintenanceTypeOptions = referenceResponse.data
+        .filter((item) => item.category === "mt")
+        .map((item) => item.name);
+  
+      setReferenceOptions({
+        maintenance_type_name: maintenanceTypeOptions,
+      });
+  
+    } catch (error) {
+      console.error("Error fetching references:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchReferences();
   }, [userInfo]);
 
   // Handle filter changes
@@ -151,7 +175,7 @@ const Maintenance: React.FC = () => {
       setEditValues((prev) => ({ ...prev, [id]: null }));
       fetchData();
     } catch (error) {
-      console.error("Error saving changes:", error);
+      console.error("Ошибка при сохранении изменений:", error);
     }
   };
 
@@ -183,7 +207,7 @@ const Maintenance: React.FC = () => {
           prev.filter((item) => item.id !== deleteMaintenanceId)
         );
       } catch (error) {
-        console.error("Error during deletion:", error);
+        console.error("Ошибка при удалении:", error);
       } finally {
         setShowConfirm(false);
         setDeleteMaintenanceId(null);
@@ -313,10 +337,10 @@ const Maintenance: React.FC = () => {
                               }))
                             }
                           >
-                            {filterOptions.maintenance_type_name.map(
-                              (modelName) => (
-                                <option key={modelName} value={modelName}>
-                                  {modelName}
+                            {referenceOptions.maintenance_type_name.map(
+                              (maintenanceTypeName) => (
+                                <option key={maintenanceTypeName} value={maintenanceTypeName}>
+                                  {maintenanceTypeName}
                                 </option>
                               )
                             )}

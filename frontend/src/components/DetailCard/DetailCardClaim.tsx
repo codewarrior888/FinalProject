@@ -1,5 +1,4 @@
 import React from 'react';
-import LineBreaks from '../LineBreaks';
 import '../../styles/DetailCardClaim.scss';
 
 interface DetailCardClaimProps {
@@ -15,7 +14,6 @@ const DetailCardClaim: React.FC<DetailCardClaimProps> = ({
   header,
   model,
   serial,
-  description,
   isExpanded,
   onClick,
 }) => {
@@ -26,11 +24,10 @@ const DetailCardClaim: React.FC<DetailCardClaimProps> = ({
       </div>
       {isExpanded && (
         <div className="detail-card-claim__details">
-          {header === "Техника" && (
+          {serial && (
             <>
-              <span className="detail-card-claim__model">Модель:</span><div>{model}</div>
-              <span className="detail-card-claim__serial">Зав.№:</span><div>{serial}</div>
-              <span className="detail-card-claim__description">Описание:</span><div><LineBreaks text={description} /></div>
+              <span className="detail-card-claim__serial">Зав.№:</span>
+              <div>{serial}</div>
             </>
           )}
           {header === "Дата отказа" && <div>{model}</div>}
