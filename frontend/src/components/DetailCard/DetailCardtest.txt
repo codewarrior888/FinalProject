@@ -9,11 +9,11 @@ interface DetailCardEquipmentProps {
   description: string;
   isExpanded: boolean;
   onClick: () => void;
-  isEditable: boolean; // New prop to control editability
-  onEdit: () => void; // New prop for edit action
-  onSave: () => void; // New prop for save action
-  onDelete: () => void; // New prop for delete action
-  onCancel: () => void; // New prop for cancel action
+  isEditable: boolean;
+  onEdit: () => void;
+  onSave: () => void;
+  onDelete: () => void;
+  onCancel: () => void;
 }
 
 const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({

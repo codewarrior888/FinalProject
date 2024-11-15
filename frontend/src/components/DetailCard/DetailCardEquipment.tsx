@@ -1,6 +1,6 @@
-import React from 'react';
-import LineBreaks from '../LineBreaks';
-import '../../styles/DetailCardEquipment.scss';
+import React from "react";
+import LineBreaks from "../LineBreaks";
+import "../../styles/DetailCardEquipment.scss";
 
 interface DetailCardEquipmentProps {
   header: string;
@@ -11,6 +11,26 @@ interface DetailCardEquipmentProps {
   onClick: () => void;
 }
 
+// Configuration object for card types
+const CARD_CONFIGS = {
+  EQUIPMENT_TYPE: [
+    "Техника",
+    "Двигатель",
+    "Трансмиссия",
+    "Ведущий мост",
+    "Управляемый мост",
+  ],
+  INFO_TYPE: [
+    "Договор поставки №, дата",
+    "Дата отгрузки",
+    "Грузополучатель",
+    "Адрес поставки",
+    "Комплектация",
+    "Клиент",
+    "Сервисная компания",
+  ],
+};
+
 const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
   header,
   model,
@@ -19,57 +39,42 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
   isExpanded,
   onClick,
 }) => {
+  const isEquipmentType = CARD_CONFIGS.EQUIPMENT_TYPE.includes(header);
+
+  const renderContent = () => {
+    if (!isExpanded) return null;
+
+    if (isEquipmentType) {
+      return (
+        <>
+          <span className="detail-card-equipment__model">Модель:</span>
+          <div>{model}</div>
+          <span className="detail-card-equipment__serial">Зав.№:</span>
+          <div>{serial}</div>
+          <span className="detail-card-equipment__description">Описание:</span>
+          <div>
+            <LineBreaks text={description} />
+          </div>
+        </>
+      );
+    }
+
+    return <div>{model}</div>;
+  };
+
   return (
-    <div className={`detail-card-equipment ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
-      <div className={`detail-card-equipment__header ${isExpanded ? 'expanded' : ''}`}>
+    <div
+      className={`detail-card-equipment ${isExpanded ? "expanded" : ""}`}
+      onClick={onClick}
+    >
+      <div
+        className={`detail-card-equipment__header ${
+          isExpanded ? "expanded" : ""
+        }`}
+      >
         {header}
       </div>
-      {isExpanded && (
-        <div className="detail-card-equipment__details">
-          {header === "Техника" && (
-            <>
-              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
-              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
-              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
-            </>
-          )}
-          {header === "Двигатель" && (
-            <>
-              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
-              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
-              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
-            </>
-          )}
-          {header === "Трансмиссия" && (
-            <>
-              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
-              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
-           <span className="detail-card-equipment__description">Описание:</span>   <div><LineBreaks text={description} /></div>
-            </>
-          )}
-          {header === "Ведущий мост" && (
-            <>
-              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
-              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
-              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
-            </>
-          )}
-          {header === "Управляемый мост" && (
-            <>
-              <span className="detail-card-equipment__model">Модель:</span><div>{model}</div>
-              <span className="detail-card-equipment__serial">Зав.№:</span><div>{serial}</div>
-              <span className="detail-card-equipment__description">Описание:</span><div><LineBreaks text={description} /></div>
-            </>
-          )}
-          {header === "Договор" && <div>{model}</div>}
-          {header === "Дата отгрузки" && <div>{model}</div>}
-          {header === "Получатель" && <div>{model}</div>}
-          {header === "Адрес доставки" && <div>{model}</div>}
-          {header === "Опции модели" && <div>{model}</div>}
-          {header === "Клиент" && <div>{model}</div>}
-          {header === "Сервисная компания" && <div>{model}</div>}
-        </div>
-      )}
+      <div className="detail-card-equipment__details">{renderContent()}</div>
     </div>
   );
 };

@@ -70,7 +70,7 @@ class MaintenanceViewSet(viewsets.ModelViewSet):
     serializer_class = MaintenanceSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = MaintenanceFilter
-    # ordering_fields = ['maintenance_date']
+
 
 class ClaimViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated | IsClient | IsServiceCompany | IsManager]
@@ -78,4 +78,3 @@ class ClaimViewSet(viewsets.ModelViewSet):
     serializer_class = ClaimSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = ClaimFilter
-    # ordering_fields = ['failure_date']

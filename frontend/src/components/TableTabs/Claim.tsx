@@ -5,56 +5,63 @@ import { useAuth } from '../Authenticate/useAuth';
 import Table from 'react-bootstrap/Table';
 import DetailCardClaim from '../DetailCard/DetailCardClaim';
 import ClaimFilter from '../Filters/ClaimFilter';
+import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import '../../styles/Claim.scss';
 
 const Claim: React.FC = () => {
   const { userInfo } = useAuth();
-  const [equipmentData, setEquipmentData] = useState([]);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [claimData, setClaimData] = useState([]);
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     failure_node_name: [],
     repair_method_name: [],
     service_company_name: [],
+    equipment_serial: [],
   });
 
+  const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
+  const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteClaimId, setDeleteClaimId] = useState<number | null>(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/claims/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      let data = response.data;
+
+      setClaimData(data);
+      setFilteredData(data);
+
+      // Calculate unique filter options
+      const options = {
+        failure_node_name: Array.from(new Set(data.map(item => item.failure_node_name))),
+        repair_method_name: Array.from(new Set(data.map(item => item.repair_method_name))),
+        service_company_name: Array.from(new Set(data.map(item => item.service_company_name))),
+        equipment_serial: Array.from(new Set(data.map(item => item.equipment_serial))),
+      };
+      setFilterOptions(options);
+
+      const claimIds = data.map((item) => item.id);
+      localStorage.setItem("claimIds", JSON.stringify(claimIds));
+      
+    } catch (error) {
+      console.error('Ошибка при получении данных:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/claims/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        });
-        let data = response.data;
-
-        const equipmentSerials = JSON.parse(localStorage.getItem('equipmentSerials') || '[]');
-
-        // Filter maintenance data based on equipment_serials
-        data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
-
-        setEquipmentData(data);
-        setFilteredData(data);
-
-        // Calculate unique filter options
-        const options = {
-          failure_node_name: Array.from(new Set(data.map(item => item.failure_node_name))),
-          repair_method_name: Array.from(new Set(data.map(item => item.repair_method_name))),
-          service_company_name: Array.from(new Set(data.map(item => item.service_company_name))),
-        };
-        setFilterOptions(options);
-        
-      } catch (error) {
-        console.error('Ошибка при получении данных:', error);
-      }
-    };
     fetchData();
   }, [userInfo]);
 
   // Handle filter changes
   const handleFilterChange = (selectedFilters: { [key: string]: string | number | null }) => {
-    let updatedData = equipmentData;
+    let updatedData = claimData;
 
     Object.keys(selectedFilters).forEach((filterKey) => {
       const filterValue = selectedFilters[filterKey];
@@ -66,12 +73,120 @@ const Claim: React.FC = () => {
     setFilteredData(updatedData);
   };
 
-  const handleRowClick = (equipment: any) => {
-    setExpandedRow(expandedRow === equipment.equipment_serial ? null : equipment.equipment_serial);
+  const handleRowClick = (claim: any) => {
+    setExpandedRow(expandedRow === claim.equipment_serial ? null : claim.equipment_serial);
   };
 
-  const handleCardClick = (equipmentSerial: string) => {
-    setExpandedCard(expandedCard === equipmentSerial ? null : equipmentSerial);
+  const handleCardClick = (claimId: number) => {
+    setExpandedCard(expandedCard === claimId ? null : claimId);
+  };
+
+  const handleEditClick = (id: number) => {
+    const selectedItem = filteredData.find(
+      (item) => item.id === id
+    );
+    if (selectedItem) {
+      setEditValues((prev) => ({
+        ...prev,
+        [id]: {
+          ...selectedItem,
+          maintenance_type: selectedItem.maintenance_type,
+          service_company: selectedItem.service_company,
+        },
+      }));
+      setEditMode((prev) => ({ ...prev, [id]: true }));
+    }
+  };
+
+  const handleSaveClick = async (id: number) => {
+    try {
+      const editedData = editValues[id];
+      if (!editedData) return;
+
+      const selectedServiceCompanyName = editValues[id].service_company_name;
+      const selectEquipmentSerial = editValues[id].equipment_serial;
+      const selectedRepairMethodName = editValues[id].repair_method_name;
+      const selectedFailureNodeName = editValues[id].failure_node_name;
+
+      const service_company = claimData.find(
+        (item) => item.service_company_name === selectedServiceCompanyName
+      )?.service_company;
+
+      const equipment_serial = claimData.find(
+        (item) => item.equipment_serial === selectEquipmentSerial
+      )?.equipment_serial;
+
+      const repair_method = claimData.find(
+        (item) => item.repair_method_name === selectedRepairMethodName
+      )?.repair_method;
+
+      const failure_node = claimData.find(
+        (item) => item.failure_node_name === selectedFailureNodeName
+      )?.failure_node;
+
+      const claimUpdates = {
+        ...editedData,
+        service_company,
+        service_company_name: selectedServiceCompanyName,
+        equipment_serial,
+        repair_method,
+        repair_method_name: selectedRepairMethodName,
+        failure_node,
+        failure_node_name: selectedFailureNodeName,
+      };
+
+      await axios.put(
+        `${API_URL}/api/claims/${id}/`,
+        claimUpdates,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      setEditMode((prev) => ({ ...prev, [id]: false }));
+      setEditValues((prev) => ({ ...prev, [id]: null }));
+      fetchData();
+    } catch (error) {
+      console.error("Error saving changes:", error);
+    }
+  };
+
+  const handleCancelClick = (id: number) => {
+    setEditMode((prev) => ({ ...prev, [id]: false }));
+    setEditValues((prev) => ({ ...prev, [id]: null }));
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setDeleteClaimId(id);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteClaimId) {
+      try {
+        await axios.delete(
+          `${API_URL}/api/claims/${deleteClaimId}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        setClaimData((prev) =>
+          prev.filter((item) => item.id !== deleteClaimId)
+        );
+        setFilteredData((prev) =>
+          prev.filter((item) => item.id !== deleteClaimId)
+        );
+      } catch (error) {
+        console.error("Error during deletion:", error);
+      } finally {
+        setShowConfirm(false);
+        setDeleteClaimId(null);
+      }
+    }
   };
 
   return (
@@ -83,38 +198,298 @@ const Claim: React.FC = () => {
       {filteredData.length ? (
         <div className="claim__table-container">
           <div className="claim__table-scroll">
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Модель / Зав.№ техники</th>
-                  <th>Дата отказа</th>
-                  <th>Наработка, м/час</th>
-                  <th>Узел отказа</th>
-                  <th>Описание отказа</th>
-                  <th>Способ восстановления</th>
-                  <th>Используемые запчасти</th>
-                  <th>Дата восстановления</th>
-                  <th>Время простоя техники</th>
-                  <th>Сервисная компания</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((claim) => (
-                  <React.Fragment key={claim.id}>
-                    <tr onClick={() => handleRowClick(claim)}>
-                      <th>Модель<br />Зав.№</th>
-                      <td>{claim.equipment_model_name}<br />{claim.equipment_serial}</td>
-                      <td>{claim.failure_date}</td>
-                      <td>{claim.engine_hours}</td>
-                      <td>{claim.failure_node_name}</td>
-                      <td>{claim.failure_description}</td>
-                      <td>{claim.repair_method_name}</td>
-                      <td>{claim.spare_parts}</td>
-                      <td>{claim.repair_date}</td>
-                      <td>{claim.downtime}</td>
-                      <td>{claim.service_company_name}</td>
-                    </tr>
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Зав.№ техники</th>
+                <th>Дата отказа</th>
+                <th>Наработка, м/час</th>
+                <th>Узел отказа</th>
+                <th>Описание отказа</th>
+                <th>Способ восстановления</th>
+                <th>Используемые запчасти</th>
+                <th>Дата восстановления</th>
+                <th>Время простоя техники</th>
+                <th>Сервисная компания</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((claim) => (
+                <React.Fragment key={claim.id}>
+                  <tr onClick={() => handleRowClick(claim)}>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSaveClick(claim.id);
+                            }}
+                            hidden={userInfo?.role === "cl"}
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelClick(claim.id);
+                            }}
+                            hidden={userInfo?.role === "cl"}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditClick(claim.id);
+                            }}
+                            hidden={userInfo?.role === "cl"}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(claim.id);
+                            }}
+                            hidden={userInfo?.role === "cl"}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <select
+                          value={
+                            editValues[claim.id]?.equipment_serial ||
+                            claim.equipment_serial
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                equipment_serial: e.target.value,
+                              },
+                            }))
+                          }
+                        >
+                          {filterOptions.equipment_serial.map((serial) => (
+                            <option key={serial} value={serial}>
+                              {serial}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <>
+                          {claim.equipment_serial}
+                        </>
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <input
+                          type="date"
+                          value={
+                            editValues[claim.id]?.failure_date ||
+                            claim.failure_date
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                failure_date: e.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      ) : (
+                        claim.failure_date
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <input
+                          value={
+                            editValues[claim.id]?.engine_hours || claim.engine_hours
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                engine_hours: e.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      ) : (
+                        claim.engine_hours
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <select
+                          value={
+                            editValues[claim.id]?.failure_node_name ||
+                            claim.failure_node_name
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                failure_node_name: e.target.value,
+                              },
+                            }))
+                          }
+                        >
+                          {filterOptions.failure_node_name.map((node) => (
+                            <option key={node} value={node}>
+                              {node}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        claim.failure_node_name
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <input
+                          value={
+                            editValues[claim.id]?.failure_description ||
+                            claim.failure_description
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                failure_description: e.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      ) : (
+                        claim.failure_description
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <select
+                          value={
+                            editValues[claim.id]?.repair_method_name ||
+                            claim.repair_method_name
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                repair_method_name: e.target.value,
+                              },
+                            }))
+                          }
+                        >
+                          {filterOptions.repair_method_name.map((method) => (
+                            <option key={method} value={method}>
+                              {method}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        claim.repair_method_name
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <input
+                          value={
+                            editValues[claim.id]?.spare_parts || claim.spare_parts
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                spare_parts: e.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      ) : (
+                        claim.spare_parts
+                      )}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <input
+                          type="date"
+                          value={
+                            editValues[claim.id]?.repair_date || claim.repair_date
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                repair_date: e.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      ) : (
+                        claim.repair_date
+                      )}
+                    </td>
+                    <td>
+                      {claim.downtime} {/* рассчитывается автоматически */}
+                    </td>
+                    <td>
+                      {editMode[claim.id] ? (
+                        <select
+                          value={
+                            editValues[claim.id]?.service_company_name ||
+                            claim.service_company_name
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [claim.id]: {
+                                ...prev[claim.id],
+                                service_company_name: e.target.value,
+                              },
+                            }))
+                          }
+                        >
+                          {filterOptions.service_company_name.map((company) => (
+                            <option key={company} value={company}>
+                              {company}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        claim.service_company_name
+                      )}
+                    </td>
+                  </tr>
                     {expandedRow === claim.equipment_serial && (
                       <tr>
                         <td colSpan={12}>
@@ -127,8 +502,8 @@ const Claim: React.FC = () => {
                                   model={claim[`${type}_model_name`]}
                                   serial={claim[`${type}_serial`]}
                                   description={claim[`${type}_model_description`] || "Отсутствует"}
-                                  isExpanded={expandedCard === `${type}-${claim.equipment_serial}`}
-                                  onClick={() => handleCardClick(`${type}-${claim.equipment_serial}`)}
+                                  isExpanded={expandedCard === claim.id}
+                                  onClick={() => handleCardClick(claim.id)}
                                 />
                               ))}
                               {["failure_date", "engine_hours", "failure_node_name", "failure_description", "repair_method_name", 
@@ -144,8 +519,8 @@ const Claim: React.FC = () => {
                                   model={claim[`${type}`]}
                                   serial={""} // не используется в данном контексте
                                   description={""} // не используется в данном контексте
-                                  isExpanded={expandedCard === `${type}-${claim.equipment_serial}`}
-                                  onClick={() => handleCardClick(`${type}-${claim.equipment_serial}`)}
+                                  isExpanded={expandedCard === claim.id}
+                                  onClick={() => handleCardClick(claim.id)}
                                 />
                               ))}
                             </div>
@@ -157,10 +532,19 @@ const Claim: React.FC = () => {
                 ))}
               </tbody>
             </Table>
+            {showConfirm && (
+              <ConfirmationDialog
+                message={`Вы уверены, что хотите удалить Рекламацию ${deleteClaimId} и все связанные с ней данные?`}
+                onConfirm={confirmDelete}
+                onCancel={() => {
+                  setShowConfirm(false);
+                }}
+              />
+            )}
           </div>
         </div>
       ) : (
-        <p>No equipment found.</p>
+        <p>База данных пуста</p>
       )}
     </div>
   );

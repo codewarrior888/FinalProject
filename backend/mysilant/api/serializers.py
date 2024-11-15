@@ -71,17 +71,18 @@ class LimitedEquipmentSerializer(serializers.ModelSerializer):
         
 
 class MaintenanceSerializer(serializers.ModelSerializer):
-    equipment_model_name = serializers.CharField(source='equipment.equipment_model.name', read_only=True)
-    equipment_serial = serializers.CharField(source='equipment.equipment_serial', read_only=True)  # Add this if you need the serial
+    equipment_serial = serializers.CharField(source='equipment.equipment_serial', read_only=True)
+    maintenance_type = serializers.PrimaryKeyRelatedField(queryset=Reference.objects.filter(category=Reference.MAINTENANCE_TYPE))
     maintenance_type_name = serializers.CharField(source='maintenance_type.name', read_only=True)
+    service_company = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=User.SERVICE_COMPANY))
     service_company_name = serializers.CharField(source='service_company.company_name', read_only=True)
 
     class Meta:
         model = Maintenance
         fields = [
-            'id', 'equipment_id', 'equipment_model_name', 'equipment_serial', 'maintenance_type_id','maintenance_type', 
-            'maintenance_type_name', 'maintenance_date', 'engine_hours', 'order_number', 
-            'order_date', 'service_company_id', 'service_company', 'service_company_name'
+            'id', 'equipment_serial', 'maintenance_type', 'maintenance_type_name',
+             'maintenance_date', 'engine_hours', 'order_number', 
+            'order_date', 'service_company', 'service_company_name'
         ]
 
 class ClaimSerializer(serializers.ModelSerializer):
