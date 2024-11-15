@@ -21,6 +21,7 @@ const Maintenance: React.FC = () => {
   });
   const [referenceOptions, setReferenceOptions] = useState({
     maintenance_type_name: [],
+    maintenance_company_name: [],
   })
   const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
   const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
@@ -86,9 +87,14 @@ const Maintenance: React.FC = () => {
       const maintenanceTypeOptions = referenceResponse.data
         .filter((item) => item.category === "mt")
         .map((item) => item.name);
+      
+      const maintenanceCompanyOptions = referenceResponse.data
+        .filter((item) => item.category === "mtc")
+        .map((item) => item.name);
   
       setReferenceOptions({
         maintenance_type_name: maintenanceTypeOptions,
+        maintenance_company_name: maintenanceCompanyOptions
       });
   
     } catch (error) {
@@ -251,7 +257,8 @@ const Maintenance: React.FC = () => {
                   <th>Наработка, м/час</th>
                   <th>№ заказ-наряда</th>
                   <th>Дата заказ-наряда</th>
-                  <th>Сервисная компания, проводившая ТО</th>
+                  <th>Орг-ция, проводившая ТО</th>
+                  <th>Сервисная компания</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,6 +273,7 @@ const Maintenance: React.FC = () => {
                                 e.stopPropagation();
                                 handleSaveClick(maintenance.id);
                               }}
+                              className="save-button"
                             >
                               Save
                             </button>
@@ -274,6 +282,7 @@ const Maintenance: React.FC = () => {
                                 e.stopPropagation();
                                 handleCancelClick(maintenance.id);
                               }}
+                              className="cancel-button"
                             >
                               Cancel
                             </button>
@@ -285,6 +294,7 @@ const Maintenance: React.FC = () => {
                                 e.stopPropagation();
                                 handleEditClick(maintenance.id);
                               }}
+                              className="edit-button"
                             >
                               Edit
                             </button>
@@ -293,6 +303,7 @@ const Maintenance: React.FC = () => {
                                 e.stopPropagation();
                                 handleDeleteClick(maintenance.id);
                               }}
+                              className="delete-button"
                             >
                               Delete
                             </button>
@@ -457,6 +468,37 @@ const Maintenance: React.FC = () => {
                           <select
                             value={
                               editValues[maintenance.id]
+                                ?.maintenance_company_name ||
+                              maintenance.maintenance_company_name
+                            }
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [maintenance.id]: {
+                                  ...prev[maintenance.id],
+                                  maintenance_company_name: e.target.value,
+                                },
+                              }))
+                            }
+                          >
+                            {referenceOptions.maintenance_company_name.map(
+                              (modelName) => (
+                                <option key={modelName} value={modelName}>
+                                  {modelName}
+                                </option>
+                              )
+                            )}
+                          </select>
+                        ) : (
+                          maintenance.maintenance_company_name
+                        )}
+                      </td>
+                      <td>
+                        {editMode[maintenance.id] ? (
+                          <select
+                            value={
+                              editValues[maintenance.id]
                                 ?.service_company_name ||
                               maintenance.service_company_name
                             }
@@ -514,6 +556,7 @@ const Maintenance: React.FC = () => {
                                 "engine_hours",
                                 "order_number",
                                 "order_date",
+                                "maintenance_company_name",
                                 "service_company_name",
                               ].map((type) => (
                                 <DetailCardMaintenance

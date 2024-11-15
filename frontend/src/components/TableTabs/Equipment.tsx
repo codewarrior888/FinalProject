@@ -332,6 +332,7 @@ const Equipment: React.FC = () => {
                                 handleSaveClick(equipment.equipment_serial);
                               }}
                               hidden={userInfo?.role === "cl" || userInfo?.role  === "sc"}
+                              className="save-button"
                             >
                               Save
                             </button>
@@ -342,6 +343,7 @@ const Equipment: React.FC = () => {
                                 handleCancelClick(equipment.equipment_serial);
                               }}
                               hidden={userInfo?.role  === "cl" || userInfo?.role  === "sc"}
+                              className="cancel-button"
                             >
                               Cancel
                             </button>
@@ -354,6 +356,7 @@ const Equipment: React.FC = () => {
                                 handleEditClick(equipment.equipment_serial);
                               }}
                               hidden={userInfo?.role  === "cl" || userInfo?.role  === "sc"}
+                              className="edit-button"
                             >
                               Edit
                             </button>
@@ -363,6 +366,7 @@ const Equipment: React.FC = () => {
                                 handleDeleteClick(equipment.equipment_serial);
                               }}
                               hidden={userInfo?.role  === "cl" || userInfo?.role  === "sc"}
+                              className="delete-button"
                             >
                               Delete
                             </button>

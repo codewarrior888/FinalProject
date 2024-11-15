@@ -36,6 +36,80 @@ html {
     font-family: $font-regular;
   }
 
+  .save-button {
+    border: none;
+    border-radius: 0.5rem;
+    color: $main-color-black;
+    background-color: $main-color-white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+
+    &:hover {
+      cursor: pointer;
+      color: $main-color-white;
+      background-color: green;
+    }
+  }
+
+  .delete-button {
+    border: none;
+    border-radius: 0.5rem;
+    color: $main-color-black;
+    background-color: $main-color-white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+
+    &:hover {
+      cursor: pointer;
+      color: $main-color-white;
+      background-color: $main-color-red;
+    }
+  }
+
+  .edit-button {
+    border: none;
+    background: none;
+    border-radius: 0.5rem;
+    color: $main-color-black;
+    background-color: $main-color-white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+
+    &:hover {
+      cursor: pointer;
+      color: $main-color-white;
+      background-color: $main-color-blue;
+    }
+  }
+
+  .cancel-button {
+    border: none;
+    background: none;
+    border-radius: 0.5rem;
+    color: $main-color-black;
+    background-color: $main-color-white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+
+    &:hover {
+      cursor: pointer;
+      color: $main-color-white;
+      background-color: $main-color-blue;
+    }
+  }
+
   /* For 360x640 (Mobile Devices) */
 @media (min-width: 360px) and (max-width: 640px) {
 

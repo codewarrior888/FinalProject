@@ -71,8 +71,8 @@ class Maintenance(models.Model):
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
     order_number = models.CharField(max_length=100, null=True, blank=True, verbose_name="№ заказ-наряда")
     order_date = models.DateField(null=True, blank=True, verbose_name="Дата заказ-наряда")
+    maintenance_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="ТО компания", null=True, blank=True)
     service_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания", null=True, blank=True)
-
 
     class Meta:
         verbose_name = "ТО"
@@ -81,6 +81,10 @@ class Maintenance(models.Model):
     def __str__(self):
         return f'{self.equipment} | {self.maintenance_type} | Клиент: {self.equipment.client} | СО: {self.service_company if self.service_company else 'самостоятельно'}'
     
+    def save(self, *args, **kwargs):
+        if not self.service_company and self.equipment:
+            self.service_company = self.equipment.service_company
+        super().save(*args, **kwargs)
 
 class Claim(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, related_name='claim_equipment', verbose_name="Модель техники")

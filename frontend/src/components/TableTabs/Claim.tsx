@@ -275,6 +275,7 @@ const Claim: React.FC = () => {
                                 handleSaveClick(claim.id);
                               }}
                               hidden={userInfo?.role === "cl"}
+                              className="save-button"
                             >
                               Save
                             </button>
@@ -284,6 +285,7 @@ const Claim: React.FC = () => {
                                 handleCancelClick(claim.id);
                               }}
                               hidden={userInfo?.role === "cl"}
+                              className="cancel-button"
                             >
                               Cancel
                             </button>
@@ -296,6 +298,7 @@ const Claim: React.FC = () => {
                                 handleEditClick(claim.id);
                               }}
                               hidden={userInfo?.role === "cl"}
+                              className="edit-button"
                             >
                               Edit
                             </button>
@@ -305,6 +308,7 @@ const Claim: React.FC = () => {
                                 handleDeleteClick(claim.id);
                               }}
                               hidden={userInfo?.role === "cl"}
+                              className="delete-button"
                             >
                               Delete
                             </button>
