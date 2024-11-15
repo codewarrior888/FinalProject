@@ -43,19 +43,19 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         lookup_value = self.kwargs[self.lookup_field]
         return Equipment.objects.get(equipment_serial=lookup_value)
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    # def update(self, request, *args, **kwargs):
+    #     partial = kwargs.pop('partial', False)
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
         
-        # Add logging to inspect validated data
-        if serializer.is_valid():
-            logger.debug(f"Validated data for update: {serializer.validated_data}")
-            self.perform_update(serializer)
-            return Response(serializer.data)
-        else:
-            logger.error(f"Validation errors: {serializer.errors}")
-            return Response(serializer.errors, status=400)
+    #     # Add logging to inspect validated data
+    #     if serializer.is_valid():
+    #         logger.debug(f"Validated data for update: {serializer.validated_data}")
+    #         self.perform_update(serializer)
+    #         return Response(serializer.data)
+    #     else:
+    #         logger.error(f"Validation errors: {serializer.errors}")
+    #         return Response(serializer.errors, status=400)
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny], url_path='public')
     def public(self, request):

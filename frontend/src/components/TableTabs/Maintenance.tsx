@@ -38,9 +38,20 @@ const Maintenance: React.FC = () => {
         },
       });
       let data = response.data;
+      
+      const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
+
+        // Apply filtering based on the user's role
+      if (userInfo?.role === "cl") {
+        data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
+      } else if (userInfo?.role === "sc") {
+        // Optionally filter for service company if needed
+        data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
+      }
 
       setMaintenanceData(data);
       setFilteredData(data);
+      console.log('Maintenance data:', data);
 
       // Calculate unique filter options
       const options = {
@@ -86,6 +97,7 @@ const Maintenance: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log("userInfo in Maintenance:", userInfo);
     fetchData();
     fetchReferences();
   }, [userInfo]);

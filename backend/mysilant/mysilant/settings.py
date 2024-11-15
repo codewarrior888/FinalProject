@@ -154,8 +154,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DATE_INPUT_FORMATS': ['%d/%m/%Y'],
-    'DATE_FORMAT': '%d/%m/%Y',
+    'DATE_INPUT_FORMATS': ['%d/%m/%Y', '%d-%m-%Y'],
+    'DATE_FORMAT': '%d-%m-%Y',
 }
 
 SIMPLE_JWT = {
@@ -175,3 +175,7 @@ SPECTACULAR_SETTINGS = {
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+DATE_FORMAT = 'd-m-Y'
+DATETIME_FORMAT = 'd-m-Y H:i'
+USE_L10N = False

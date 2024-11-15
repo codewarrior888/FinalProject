@@ -38,20 +38,20 @@ const Equipment: React.FC = () => {
 
       let data = response.data;
 
-      // // Apply role-based filtering if the user's role is "client"
-      // if (userInfo?.role === "cl") {
-      //   data = data.filter(
-      //     (item) =>
-      //       item.client === userInfo.id ||
-      //       item.client_name === userInfo.company_name
-      //   );
-      // } else if (userInfo?.role === "sc") {
-      //   data = data.filter(
-      //     (item) =>
-      //       item.service_company === userInfo.id ||
-      //       item.service_company_name === userInfo.company_name
-      //   );
-      // }
+      // Apply role-based filtering if the user's role is "client"
+      if (userInfo?.role === "cl") {
+        data = data.filter(
+          (item) =>
+            item.client === userInfo.id ||
+            item.client_name === userInfo.company_name
+        );
+      } else if (userInfo?.role === "sc") {
+        data = data.filter(
+          (item) =>
+            item.service_company === userInfo.id ||
+            item.service_company_name === userInfo.company_name
+        );
+      }
 
       setEquipmentData(data);
       setFilteredData(data);
@@ -104,6 +104,7 @@ const Equipment: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log("userInfo in Equipment:", userInfo);
     fetchData();
   }, [userInfo]);
 
@@ -643,6 +644,7 @@ const Equipment: React.FC = () => {
                       <td>
                         {editMode[equipment.equipment_serial] ? (
                           <input
+                            type="date"
                             value={
                               editValues[equipment.equipment_serial]
                                 ?.shipment_date || equipment.shipment_date
