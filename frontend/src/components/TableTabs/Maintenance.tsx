@@ -479,7 +479,7 @@ const Maintenance: React.FC = () => {
                                 <DetailCardMaintenance
                                   key={type}
                                   header={
-                                    type === "equipment" ? "Техника" : ""
+                                    type === "equipment" ? "Техника" : "Вид ТО"
                                   }
                                   model={maintenance[`${type}_model_name`]}
                                   serial={maintenance[`${type}_serial`]}
@@ -502,10 +502,10 @@ const Maintenance: React.FC = () => {
                                 <DetailCardMaintenance
                                   key={type}
                                   header={
-                                    type === "maintenance_type_name" ? "Вид ТО" : ""
+                                    type === "maintenance_type" ? "Вид ТО" : ""
                                   }
                                   model={maintenance[`${type}_name`]}
-                                  serial={""}
+                                  serial={maintenance[`${type}_serial`]}
                                   description={
                                     maintenance[`${type}_description`] ||
                                     "Отсутствует"
@@ -522,7 +522,6 @@ const Maintenance: React.FC = () => {
                                 />
                               ))}
                               {[
-                                "maintenance_type_name",
                                 "maintenance_date",
                                 "engine_hours",
                                 "order_number",
