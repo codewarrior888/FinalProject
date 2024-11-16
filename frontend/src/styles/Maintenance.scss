@@ -54,7 +54,8 @@
         vertical-align: middle;
         position: sticky;
         left: 0;
-        background: none;
+        background-color: $fixed-column-color;
+        // background: none;
         z-index: 1;
       }
       

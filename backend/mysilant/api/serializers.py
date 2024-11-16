@@ -98,6 +98,7 @@ class ClaimSerializer(serializers.ModelSerializer):
     repair_method = serializers.PrimaryKeyRelatedField(queryset=Reference.objects.filter(category=Reference.REPAIR_METHOD))
     repair_method_name = serializers.CharField(source='repair_method.name', read_only=True)
     repair_method_description = serializers.CharField(source='repair_method.description', read_only=True)
+    
 
     class Meta:
         model = Claim

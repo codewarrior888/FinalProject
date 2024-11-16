@@ -153,6 +153,11 @@ const Claim: React.FC = () => {
     }
   };
 
+  const formatDateForAPI = (dateString: string) => {
+    const [year, month, day] = dateString.split("-");
+    return `${month}/${day}/${year}`;
+  };
+
   const handleSaveClick = async (id: number) => {
     try {
       const editedData = editValues[id];
@@ -189,6 +194,16 @@ const Claim: React.FC = () => {
         failure_node,
         failure_node_name: selectedFailureNodeName,
       };
+
+      const failureDate = editValues[id].failure_date;
+      const repairDate = editValues[id].repair_date;
+
+      if (failureDate) {
+        claimUpdates.failure_date = formatDateForAPI(failureDate);
+      }
+      if (repairDate) {
+        claimUpdates.repair_date = formatDateForAPI(repairDate);
+      }
 
       await axios.put(`${API_URL}/api/claims/${id}/`, claimUpdates, {
         headers: {

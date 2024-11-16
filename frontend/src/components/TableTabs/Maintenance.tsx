@@ -17,6 +17,7 @@ const Maintenance: React.FC = () => {
   const [filterOptions, setFilterOptions] = useState({
     maintenance_type_name: [],
     service_company_name: [],
+    maintenance_company_name: [],
     equipment_serial: [],
   });
   const [referenceOptions, setReferenceOptions] = useState({
@@ -64,6 +65,9 @@ const Maintenance: React.FC = () => {
         ),
         service_company_name: Array.from(
           new Set(data.map((item) => item.service_company_name))
+        ),
+        maintenance_company_name: Array.from(
+          new Set(data.map((item) => item.maintenance_company_name))
         ),
       };
       setFilterOptions(options);
@@ -155,6 +159,11 @@ const Maintenance: React.FC = () => {
     }
   };
 
+  const formatDateForAPI = (dateString: string) => {
+    const [year, month, day] = dateString.split("-");
+    return `${month}/${day}/${year}`;
+};
+
   const handleSaveClick = async (id: number) => {
     try {
       const editedData = editValues[id];
@@ -178,6 +187,16 @@ const Maintenance: React.FC = () => {
         maintenance_type,
         maintenance_type_name: selectedMaintenanceTypeName,
       };
+
+      const maintenanceDate = editValues[id].maintenance_date;
+      const orderDate = editValues[id].order_date;
+
+      if (maintenanceDate) {
+        maintenanceUpdates.maintenance_date = formatDateForAPI(maintenanceDate);
+      }
+      if (orderDate) {
+        maintenanceUpdates.order_date = formatDateForAPI(orderDate);
+      }
 
       await axios.put(
         `${API_URL}/api/maintenance/${id}/`,
@@ -454,7 +473,7 @@ const Maintenance: React.FC = () => {
                               }))
                             }
                           >
-                            {referenceOptions.maintenance_company_name.map(
+                            {filterOptions.maintenance_company_name.map(
                               (modelName) => (
                                 <option key={modelName} value={modelName}>
                                   {modelName}

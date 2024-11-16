@@ -71,7 +71,7 @@ class Maintenance(models.Model):
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
     order_number = models.CharField(max_length=100, null=True, blank=True, verbose_name="№ заказ-наряда")
     order_date = models.DateField(null=True, blank=True, verbose_name="Дата заказ-наряда")
-    maintenance_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="ТО компания", null=True, blank=True)
+    maintenance_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Орг-ция ТО", null=True, blank=True)
     service_company = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания", null=True, blank=True)
 
     class Meta:
@@ -79,7 +79,7 @@ class Maintenance(models.Model):
         verbose_name_plural = "ТО"
 
     def __str__(self):
-        return f'{self.equipment} | {self.maintenance_type} | Клиент: {self.equipment.client} | СО: {self.service_company if self.service_company else 'самостоятельно'}'
+        return f'{self.equipment} | {self.maintenance_type} | Клиент: {self.equipment.client} | СО: {self.service_company}' 
     
     def save(self, *args, **kwargs):
         if not self.service_company and self.equipment:
