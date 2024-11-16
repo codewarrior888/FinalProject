@@ -17,15 +17,15 @@ const DetailCardMaintenance: React.FC<DetailCardMaintenanceProps> = ({
   onClick,
 }) => {
   return (
-    <div className={`detail-card-maintenance ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
-      <div className={`detail-card-maintenance__header ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`detail-card ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
+      <div className={`detail-card__header ${isExpanded ? 'expanded' : ''}`}>
         {header}
       </div>
       {isExpanded && (
-        <div className="detail-card-maintenance__details">
+        <div className="detail-card__details">
           {serial && (
             <>
-              <span className="detail-card-maintenance__serial">Зав.№:</span>
+              <span className="detail-card__serial">Зав.№:</span>
               <div>{serial}</div>
             </>
           )}
@@ -34,6 +34,7 @@ const DetailCardMaintenance: React.FC<DetailCardMaintenanceProps> = ({
           {header === "Наработка, м/час" && <div>{model}</div>}
           {header === "№ заказ-наряда" && <div>{model}</div>}
           {header === "Дата заказ-наряда" && <div>{model}</div>}
+          {header === "Орг-ция, проводившая ТО" && <div>{model}</div>}
           {header === "Сервисная компания" && <div>{model}</div>}
         </div>
       )}

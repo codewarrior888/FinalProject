@@ -301,7 +301,7 @@ const Equipment: React.FC = () => {
       {filteredData.length ? (
         <div className="equipment__table-container">
           <div className="equipment__table-scroll">
-            <Table striped bordered hover responsive>
+            <Table bordered hover responsive size="sm">
               <thead>
                 <tr>
                   <th></th>
@@ -794,7 +794,7 @@ const Equipment: React.FC = () => {
                     </tr>
                     {expandedRow === equipment.equipment_serial && (
                       <tr>
-                        <td colSpan={12}>
+                        <td colSpan={13}>
                           <div className="equipment__details-container">
                             <div className="equipment__cards-container">
                               {[

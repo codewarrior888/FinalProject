@@ -47,11 +47,11 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
     if (isEquipmentType) {
       return (
         <>
-          <span className="detail-card-equipment__model">Модель:</span>
+          <span className="detail-card__model">Модель:</span>
           <div>{model}</div>
-          <span className="detail-card-equipment__serial">Зав.№:</span>
+          <span className="detail-card__serial">Зав.№:</span>
           <div>{serial}</div>
-          <span className="detail-card-equipment__description">Описание:</span>
+          <span className="detail-card__description">Описание:</span>
           <div>
             <LineBreaks text={description} />
           </div>
@@ -64,17 +64,17 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
 
   return (
     <div
-      className={`detail-card-equipment ${isExpanded ? "expanded" : ""}`}
+      className={`detail-card ${isExpanded ? "expanded" : ""}`}
       onClick={onClick}
     >
       <div
-        className={`detail-card-equipment__header ${
+        className={`detail-card__header ${
           isExpanded ? "expanded" : ""
         }`}
       >
         {header}
       </div>
-      <div className="detail-card-equipment__details">{renderContent()}</div>
+      <div className="detail-card__details">{renderContent()}</div>
     </div>
   );
 };

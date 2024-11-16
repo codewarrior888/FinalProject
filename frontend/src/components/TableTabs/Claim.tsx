@@ -12,7 +12,7 @@ const Claim: React.FC = () => {
   const { userInfo } = useAuth();
   const [claimData, setClaimData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [expandedCard, setExpandedCard] = useState<any | null>(null);
   const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     failure_node_name: [],
@@ -23,7 +23,7 @@ const Claim: React.FC = () => {
   const [referenceOptions, setReferenceOptions] = useState({
     failure_node_name: [],
     repair_method_name: [],
-  })
+  });
   const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
   const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
   const [showConfirm, setShowConfirm] = useState(false);
@@ -38,14 +38,19 @@ const Claim: React.FC = () => {
       });
       let data = response.data;
 
-      const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
+      const equipmentSerials =
+        JSON.parse(localStorage.getItem("equipmentSerials")) || [];
 
-        // Apply filtering based on the user's role
+      // Apply filtering based on the user's role
       if (userInfo?.role === "cl") {
-        data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
+        data = data.filter((item) =>
+          equipmentSerials.includes(item.equipment_serial)
+        );
       } else if (userInfo?.role === "sc") {
         // Optionally filter for service company if needed
-        data = data.filter((item) => equipmentSerials.includes(item.equipment_serial));
+        data = data.filter((item) =>
+          equipmentSerials.includes(item.equipment_serial)
+        );
       }
 
       setClaimData(data);
@@ -69,7 +74,6 @@ const Claim: React.FC = () => {
 
       const claimIds = data.map((item) => item.id);
       localStorage.setItem("claimIds", JSON.stringify(claimIds));
-
     } catch (error) {
       console.error("Ошибка при получении данных:", error);
     }
@@ -82,20 +86,19 @@ const Claim: React.FC = () => {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-  
+
       const failureNodeOptions = referenceResponse.data
         .filter((item) => item.category === "fn")
         .map((item) => item.name);
-  
+
       const repairMethodOptions = referenceResponse.data
         .filter((item) => item.category === "rm")
         .map((item) => item.name);
-  
+
       setReferenceOptions({
         failure_node_name: failureNodeOptions,
         repair_method_name: repairMethodOptions,
       });
-  
     } catch (error) {
       console.error("Error fetching references:", error);
     }
@@ -130,7 +133,7 @@ const Claim: React.FC = () => {
     );
   };
 
-  const handleCardClick = (claimId: number) => {
+  const handleCardClick = (claimId: any) => {
     setExpandedCard(expandedCard === claimId ? null : claimId);
   };
 
@@ -246,7 +249,7 @@ const Claim: React.FC = () => {
       {filteredData.length ? (
         <div className="claim__table-container">
           <div className="claim__table-scroll">
-            <Table striped bordered hover responsive>
+            <Table bordered hover responsive size="sm">
               <thead>
                 <tr>
                   <th></th>
@@ -456,11 +459,13 @@ const Claim: React.FC = () => {
                               }))
                             }
                           >
-                            {referenceOptions.repair_method_name.map((method) => (
-                              <option key={method} value={method}>
-                                {method}
-                              </option>
-                            ))}
+                            {referenceOptions.repair_method_name.map(
+                              (method) => (
+                                <option key={method} value={method}>
+                                  {method}
+                                </option>
+                              )
+                            )}
                           </select>
                         ) : (
                           claim.repair_method_name
@@ -562,8 +567,15 @@ const Claim: React.FC = () => {
                                     claim[`${type}_model_description`] ||
                                     "Отсутствует"
                                   }
-                                  isExpanded={expandedCard === claim.id}
-                                  onClick={() => handleCardClick(claim.id)}
+                                  isExpanded={
+                                    expandedCard === 
+                                    `${type}-${claim.id}`
+                                  }
+                                  onClick={() => 
+                                    handleCardClick(
+                                      `${type}-${claim.id}`
+                                    )
+                                  }
                                 />
                               ))}
                               {[
@@ -601,8 +613,15 @@ const Claim: React.FC = () => {
                                   model={claim[`${type}`]}
                                   serial={""} // не используется в данном контексте
                                   description={""} // не используется в данном контексте
-                                  isExpanded={expandedCard === claim.id}
-                                  onClick={() => handleCardClick(claim.id)}
+                                  isExpanded={
+                                    expandedCard === 
+                                    `${type}-${claim.id}`
+                                  }
+                                  onClick={() => 
+                                    handleCardClick(
+                                      `${type}-${claim.id}`
+                                    )
+                                  }
                                 />
                               ))}
                             </div>

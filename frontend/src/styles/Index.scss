@@ -35,7 +35,7 @@ html {
   p, li, ul, a {
     font-family: $font-regular;
   }
-
+//---- Buttons ---- //
   .save-button {
     border: none;
     border-radius: 0.5rem;
@@ -109,6 +109,71 @@ html {
       background-color: $main-color-blue;
     }
   }
+
+//---- Detail Cards ---- //
+  .detail-card {
+    display: flex;
+    flex: 0 0 110px; /* Collapsed width */
+    height: auto;
+    width: auto;
+    transition: flex 0.5s ease;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+    text-align: left;
+    background-color: #f8f9fa;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    border-right: $main-color-light-gray solid 0.5rem;
+    cursor: pointer;
+    
+    &.expanded {
+      flex: 0 0 auto;
+      max-width: 300px;
+      border-right: $main-color-light-gray solid 0.1rem;
+      background-color: $main-color-white;
+    }
+
+    &__header {
+      font-size: 1.4rem;
+      color: $main-color-black;
+      margin-bottom: 10px;
+    
+        &.expanded {
+          font-size: 2rem;
+          font-weight: bold;
+        }
+      }
+    
+      &__model, &__serial, &__description {
+        font-weight: bold;
+        color: $main-color-black;
+      }
+    
+    &__details {
+      word-wrap: break-word;
+      hyphens: auto;
+      white-space: pre-wrap;
+
+      p {
+        color: $main-color-gray;
+      }
+    }
+  }
+
+  input {
+    height: auto;
+  }
+
+  textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    padding: 8px;
+  }
+
+
 
   /* For 360x640 (Mobile Devices) */
 @media (min-width: 360px) and (max-width: 640px) {

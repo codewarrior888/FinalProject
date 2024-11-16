@@ -43,11 +43,16 @@
     .table {
         width: 900px;
         height: auto;
-        table-layout: fixed;
+        // table-layout: fixed;
         border-collapse: collapse;
         font-size: 1.6rem;
         margin-bottom: 2rem;
         overflow-x: auto;
+      }
+      
+      
+      th:first-child, td:first-child {
+        width: 100px;
       }
       
       th, td {
@@ -63,11 +68,6 @@
         background-color: #f1f1f1;
         cursor: pointer;
       }
-    
-    /* Row highlighting on selection */
-    .selectedRow {
-        background-color: #6ab4e9 !important;
-    }
     
     /* Detail view styling */
     &__details-container {

@@ -18,15 +18,15 @@ const DetailCardClaim: React.FC<DetailCardClaimProps> = ({
   onClick,
 }) => {
   return (
-    <div className={`detail-card-claim ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
-      <div className={`detail-card-claim__header ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`detail-card ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
+      <div className={`detail-card__header ${isExpanded ? 'expanded' : ''}`}>
         {header}
       </div>
       {isExpanded && (
-        <div className="detail-card-claim__details">
+        <div className="detail-card__details">
           {serial && (
             <>
-              <span className="detail-card-claim__serial">Зав.№:</span>
+              <span className="detail-card__serial">Зав.№:</span>
               <div>{serial}</div>
             </>
           )}

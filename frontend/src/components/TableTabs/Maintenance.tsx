@@ -12,7 +12,7 @@ const Maintenance: React.FC = () => {
   const { userInfo } = useAuth();
   const [maintenanceData, setMaintenanceData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [expandedCard, setExpandedCard] = useState<any | null>(null);
   const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     maintenance_type_name: [],
@@ -128,13 +128,13 @@ const Maintenance: React.FC = () => {
 
   const handleRowClick = (maintenance: any) => {
     setExpandedRow(
-      expandedRow === maintenance.equipment_serial
+      expandedRow === maintenance.id
         ? null
-        : maintenance.equipment_serial
+        : maintenance.id
     );
   };
 
-  const handleCardClick = (maintenanceId: number) => {
+  const handleCardClick = (maintenanceId: any) => {
     setExpandedCard(expandedCard === maintenanceId ? null : maintenanceId);
   };
 
@@ -247,7 +247,7 @@ const Maintenance: React.FC = () => {
       {filteredData.length ? (
         <div className="maintenance__table-container">
           <div className="maintenance__table-scroll">
-            <Table striped bordered hover responsive>
+            <Table bordered hover responsive size="sm">
               <thead>
                 <tr>
                   <th></th>
@@ -526,7 +526,7 @@ const Maintenance: React.FC = () => {
                         )}
                       </td>
                     </tr>
-                    {expandedRow === maintenance.equipment_serial && (
+                    {expandedRow === maintenance.id && (
                       <tr>
                         <td colSpan={12}>
                           <div className="maintenance__details-container">
@@ -541,11 +541,11 @@ const Maintenance: React.FC = () => {
                                   serial={maintenance[`${type}_serial`]}
                                   isExpanded={
                                     expandedCard ===
-                                    maintenance.id
+                                    `${type}-${maintenance.id}`
                                   }
                                   onClick={() =>
                                     handleCardClick(
-                                      maintenance.id
+                                      `${type}-${maintenance.id}`
                                     )
                                   }
                                 />
@@ -572,17 +572,19 @@ const Maintenance: React.FC = () => {
                                       ? "№ заказ-наряда"
                                       : type === "order_date"
                                       ? "Дата заказ-наряда"
+                                      : type === "maintenance_company_name"
+                                      ? "Орг-ция, проводившая ТО"
                                       : "Сервисная компания"
                                   }
                                   model={maintenance[`${type}`]}
                                   serial={""} // не используется в данном случае
                                   isExpanded={
                                     expandedCard ===
-                                    maintenance.id
+                                    `${type}-${maintenance.id}`
                                   }
                                   onClick={() =>
                                     handleCardClick(
-                                      maintenance.id
+                                      `${type}-${maintenance.id}`
                                     )
                                   }
                                 />

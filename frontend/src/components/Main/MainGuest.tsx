@@ -83,7 +83,7 @@ const MainGuest: React.FC = () => {
       <h3>{searchQuery ? 'Результат поиска:' : ''}</h3>
 
       {filteredData.length ? (
-        <Table striped bordered hover responsive>
+        <Table bordered hover responsive size="sm">
           <thead>
             <tr>
               <th></th>
