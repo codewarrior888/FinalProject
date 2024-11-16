@@ -1,5 +1,5 @@
 import React from "react";
-import LineBreaks from "../LineBreaks";
+import LineBreaks from "./LineBreaks";
 import "../../styles/DetailCardEquipment.scss";
 
 interface DetailCardEquipmentProps {
@@ -67,11 +67,7 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
       className={`detail-card ${isExpanded ? "expanded" : ""}`}
       onClick={onClick}
     >
-      <div
-        className={`detail-card__header ${
-          isExpanded ? "expanded" : ""
-        }`}
-      >
+      <div className={`detail-card__header ${isExpanded ? "expanded" : ""}`}>
         {header}
       </div>
       <div className="detail-card__details">{renderContent()}</div>

@@ -50,21 +50,21 @@
         overflow-x: auto;
       }
       
-      
-      th:first-child, td:first-child {
-        width: 100px;
-      }
-      
-      th, td {
+      .table th, td {
         padding: 12px 15px;
         border-bottom: 1px solid #ddd;
         text-align: center;
         overflow: hidden;
-        white-space: normal;  // Allows text to wrap
-        word-break: break-word;  // Breaks long words if needed
+        white-space: normal;
+        word-break: break-word;
+      }
+
+      .table th {
+        background-color: $main-color-light-gray;
+        // text-align: left;
       }
       
-      tr:hover {
+      .table tr:hover {
         background-color: #f1f1f1;
         cursor: pointer;
       }

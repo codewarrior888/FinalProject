@@ -86,19 +86,17 @@ const MainGuest: React.FC = () => {
         <Table bordered hover responsive size="sm">
           <thead>
             <tr>
-              <th></th>
-              <th>Техника</th>
-              <th>Двигатель</th>
-              <th>Трансмиссия</th>
-              <th>Ведущий мост</th>
-              <th>Управляемый мост</th>
+              <th>Техника<br />модель / зав.№</th>
+              <th>Двигатель<br />модель / зав.№</th>
+              <th>Трансмиссия<br />модель / зав.№</th>
+              <th>Ведущий мост<br />модель / зав.№</th>
+              <th>Управляемый мост<br />модель / зав.№</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.map((equipment) => (
               <React.Fragment key={equipment.equipment_serial}>
                 <tr onClick={() => handleRowClick(equipment)}>
-                  <th>Модель<br />Зав.№</th>
                   <td>{equipment.equipment_model_name}<br />{equipment.equipment_serial}</td>
                   <td>{equipment.engine_model_name}<br />{equipment.engine_serial}</td>
                   <td>{equipment.transmission_model_name}<br />{equipment.transmission_serial}</td>

@@ -37,15 +37,17 @@
         align-content: center;
         overflow: hidden;
         word-break: break-word;
-      }
-
-      .table th {
         white-space: nowrap;
         word-break: keep-all;
+        background-color: $main-color-light-gray;
       }
 
       .table td {
-        white-space: wrap;
+        padding: 0.5rem 0.5rem;
+      }
+      
+      .table td:first-child {
+        vertical-align: middle;
       }
       
       .table tr:hover {

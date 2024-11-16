@@ -38,6 +38,7 @@
         text-align: left;
         align-content: center;
         word-break: break-word;
+        background-color: $main-color-light-gray;
       }
 
       .table th {
@@ -46,7 +47,11 @@
       }
 
       .table td {
-        white-space: wrap;
+        padding: 0.5rem 0.5rem;
+      }
+
+      .table td:first-child {
+        vertical-align: middle;
       }
       
       .table tr:hover {

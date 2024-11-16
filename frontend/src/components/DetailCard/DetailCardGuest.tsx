@@ -1,6 +1,6 @@
-import React from 'react';
-import LineBreaks from '../LineBreaks';
-import '../../styles/DetailCardGuest.scss';
+import React from "react";
+import LineBreaks from "./LineBreaks";
+import "../../styles/DetailCardGuest.scss";
 
 interface DetailCardGuestProps {
   header: string;
@@ -20,8 +20,11 @@ const DetailCardGuest: React.FC<DetailCardGuestProps> = ({
   onClick,
 }) => {
   return (
-    <div className={`detail-card ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
-      <div className={`detail-card__header ${isExpanded ? 'expanded' : ''}`}>
+    <div
+      className={`detail-card ${isExpanded ? "expanded" : ""}`}
+      onClick={onClick}
+    >
+      <div className={`detail-card__header ${isExpanded ? "expanded" : ""}`}>
         {header}
       </div>
       {isExpanded && (

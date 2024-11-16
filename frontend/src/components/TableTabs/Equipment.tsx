@@ -305,12 +305,12 @@ const Equipment: React.FC = () => {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Техника<br /><p style={{ fontSize: "14px", fontWeight: "normal" }}>модель / зав.№</p></th>
-                  <th>Двигатель<br /><p style={{ fontSize: "14px", fontWeight: "normal" }}>модель / зав.№</p></th>
-                  <th>Трансмиссия<br /><p style={{ fontSize: "14px", fontWeight: "normal" }}>модель / зав.№</p></th>
-                  <th>Ведущий мост<br /><p style={{ fontSize: "14px", fontWeight: "normal" }}>модель / зав.№</p></th>
-                  <th>Управляемый мост<br /><p style={{ fontSize: "14px", fontWeight: "normal" }}>модель / зав.№</p></th>
-                  <th>Договор поставки<br /><p style={{ fontSize: "14px", fontWeight: "normal" }}> №, дата</p></th>
+                  <th>Техника<br />модель / зав.№</th>
+                  <th>Двигатель<br />модель / зав.№</th>
+                  <th>Трансмиссия<br />модель / зав.№</th>
+                  <th>Ведущий мост<br />модель / зав.№</th>
+                  <th>Управляемый мост<br />модель / зав.№</th>
+                  <th>Договор поставки<br /> №, дата</th>
                   <th>Дата отгрузки</th>
                   <th>Грузополучатель</th>
                   <th>Адрес поставки</th>
@@ -420,7 +420,11 @@ const Equipment: React.FC = () => {
                             />
                           </>
                         ) : (
-                          `${equipment.equipment_model_name} / ${equipment.equipment_serial}`
+                          <>
+                            {equipment.equipment_model_name} /
+                            <br />
+                            {equipment.equipment_serial}
+                          </>
                         )}
                       </td>
                       <td>
@@ -469,7 +473,10 @@ const Equipment: React.FC = () => {
                             />
                           </>
                         ) : (
-                          `${equipment.engine_model_name} / ${equipment.engine_serial}`
+                          <>
+                          {equipment.engine_model_name} / 
+                          <br />
+                          {equipment.engine_serial}</>
                         )}
                       </td>
                       <td>
@@ -519,7 +526,11 @@ const Equipment: React.FC = () => {
                             />
                           </>
                         ) : (
-                          `${equipment.transmission_model_name} / ${equipment.transmission_serial}`
+                          <>
+                          {equipment.transmission_model_name} / 
+                          <br />
+                          {equipment.transmission_serial}
+                          </>
                         )}
                       </td>
                       <td>
@@ -569,7 +580,11 @@ const Equipment: React.FC = () => {
                             />
                           </>
                         ) : (
-                          `${equipment.drive_axle_model_name} / ${equipment.drive_axle_serial}`
+                          <>
+                          {equipment.drive_axle_model_name} /
+                          <br />
+                          {equipment.drive_axle_serial}
+                          </>
                         )}
                       </td>
                       <td>
@@ -619,7 +634,11 @@ const Equipment: React.FC = () => {
                             />
                           </>
                         ) : (
-                          `${equipment.steer_axle_model_name} / ${equipment.steer_axle_serial}`
+                          <>
+                          {equipment.steer_axle_model_name} / 
+                          <br />
+                          {equipment.steer_axle_serial}
+                          </>
                         )}
                       </td>
                       <td>
