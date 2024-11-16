@@ -311,35 +311,7 @@ const Maintenance: React.FC = () => {
                         )}
                       </td>
                       <td>
-                        {editMode[maintenance.id] ? (
-                          <select
-                            value={
-                              editValues[maintenance.id]
-                                ?.equipment_serial ||
-                              maintenance.equipment_serial
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) =>
-                              setEditValues((prev) => ({
-                                ...prev,
-                                [maintenance.id]: {
-                                  ...prev[maintenance.id],
-                                  equipment_serial: e.target.value,
-                                },
-                              }))
-                            }
-                          >
-                            {filterOptions.equipment_serial.map(
-                              (modelName) => (
-                                <option key={modelName} value={modelName}>
-                                  {modelName}
-                                </option>
-                              )
-                            )}
-                          </select>
-                        ) : (
-                          maintenance.equipment_serial
-                        )}
+                        {maintenance.equipment_serial}
                       </td>
                       <td>
                         {editMode[maintenance.id] ? (
@@ -495,35 +467,7 @@ const Maintenance: React.FC = () => {
                         )}
                       </td>
                       <td>
-                        {editMode[maintenance.id] ? (
-                          <select
-                            value={
-                              editValues[maintenance.id]
-                                ?.service_company_name ||
-                              maintenance.service_company_name
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) =>
-                              setEditValues((prev) => ({
-                                ...prev,
-                                [maintenance.id]: {
-                                  ...prev[maintenance.id],
-                                  service_company_name: e.target.value,
-                                },
-                              }))
-                            }
-                          >
-                            {filterOptions.service_company_name.map(
-                              (modelName) => (
-                                <option key={modelName} value={modelName}>
-                                  {modelName}
-                                </option>
-                              )
-                            )}
-                          </select>
-                        ) : (
-                          maintenance.service_company_name
-                        )}
+                        {maintenance.service_company_name}
                       </td>
                     </tr>
                     {expandedRow === maintenance.id && (
@@ -535,10 +479,37 @@ const Maintenance: React.FC = () => {
                                 <DetailCardMaintenance
                                   key={type}
                                   header={
-                                    type === "equipment" ? "Техника" : "Вид ТО"
+                                    type === "equipment" ? "Техника" : ""
                                   }
                                   model={maintenance[`${type}_model_name`]}
                                   serial={maintenance[`${type}_serial`]}
+                                  description={
+                                    maintenance[`${type}_model_description`] ||
+                                    "Отсутствует"
+                                  }
+                                  isExpanded={
+                                    expandedCard ===
+                                    `${type}-${maintenance.id}`
+                                  }
+                                  onClick={() =>
+                                    handleCardClick(
+                                      `${type}-${maintenance.id}`
+                                    )
+                                  }
+                                />
+                              ))}
+                              {["maintenance_type"].map((type) => (
+                                <DetailCardMaintenance
+                                  key={type}
+                                  header={
+                                    type === "maintenance_type_name" ? "Вид ТО" : ""
+                                  }
+                                  model={maintenance[`${type}_name`]}
+                                  serial={""}
+                                  description={
+                                    maintenance[`${type}_description`] ||
+                                    "Отсутствует"
+                                  }
                                   isExpanded={
                                     expandedCard ===
                                     `${type}-${maintenance.id}`
@@ -562,9 +533,7 @@ const Maintenance: React.FC = () => {
                                 <DetailCardMaintenance
                                   key={type}
                                   header={
-                                    type === "maintenance_type_name"
-                                      ? "Вид ТО"
-                                      : type === "maintenance_date"
+                                    type === "maintenance_date"
                                       ? "Дата проведения ТО"
                                       : type === "engine_hours"
                                       ? "Наработка, м/час"
@@ -578,6 +547,7 @@ const Maintenance: React.FC = () => {
                                   }
                                   model={maintenance[`${type}`]}
                                   serial={""} // не используется в данном случае
+                                  description={""}
                                   isExpanded={
                                     expandedCard ===
                                     `${type}-${maintenance.id}`

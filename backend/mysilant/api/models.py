@@ -91,7 +91,7 @@ class Claim(models.Model):
     failure_date = models.DateField(verbose_name="Дата отказа")
     engine_hours = models.IntegerField(verbose_name="Наработка, м/час")
     failure_node = models.ForeignKey(Reference, on_delete=models.CASCADE, related_name='failure_node', limit_choices_to={'category': Reference.FAILURE_NODE}, verbose_name="Узел отказа")
-    failure_description = models.TextField(null=True, blank=True, verbose_name="Описание отказа")
+    failure_node_description = models.TextField(null=True, blank=True, verbose_name="Описание отказа")
     repair_method = models.ForeignKey(Reference, on_delete=models.CASCADE, related_name='repair_method', limit_choices_to={'category': Reference.REPAIR_METHOD}, verbose_name="Способ восстановления")
     spare_parts = models.TextField(null=True, blank=True, verbose_name="Используемые запасные части")
     repair_date = models.DateField(null=True, blank=True, verbose_name="Дата восстановления")

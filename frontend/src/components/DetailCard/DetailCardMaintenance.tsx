@@ -1,10 +1,12 @@
 import React from 'react';
+import LineBreaks from './LineBreaks';
 import '../../styles/DetailCardMaintenance.scss';
 
 interface DetailCardMaintenanceProps {
   header: string;
   model: string;
   serial: string;
+  description: string;
   isExpanded: boolean;
   onClick: () => void;
 }
@@ -13,6 +15,7 @@ const DetailCardMaintenance: React.FC<DetailCardMaintenanceProps> = ({
   header,
   model,
   serial,
+  description,
   isExpanded,
   onClick,
 }) => {
@@ -30,6 +33,14 @@ const DetailCardMaintenance: React.FC<DetailCardMaintenanceProps> = ({
             </>
           )}
           {header === "Вид ТО" && <div>{model}</div>}
+          {description && (
+            <>
+              <span className="detail-card__description">Описание:</span>
+              <div>
+                <LineBreaks text={description} />
+              </div>
+            </>
+          )}
           {header === "Дата проведения ТО" && <div>{model}</div>}
           {header === "Наработка, м/час" && <div>{model}</div>}
           {header === "№ заказ-наряда" && <div>{model}</div>}

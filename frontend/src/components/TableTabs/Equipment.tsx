@@ -323,7 +323,7 @@ const Equipment: React.FC = () => {
                 {filteredData.map((equipment) => (
                   <React.Fragment key={equipment.equipment_serial}>
                     <tr onClick={() => handleRowClick(equipment)}>
-                      <td>
+                      <td className="equipment__fixed column">
                         {editMode[equipment.equipment_serial] ? (
                           <>
                             <button

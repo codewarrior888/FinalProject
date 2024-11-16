@@ -319,32 +319,7 @@ const Claim: React.FC = () => {
                         )}
                       </td>
                       <td>
-                        {editMode[claim.id] ? (
-                          <select
-                            value={
-                              editValues[claim.id]?.equipment_serial ||
-                              claim.equipment_serial
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) =>
-                              setEditValues((prev) => ({
-                                ...prev,
-                                [claim.id]: {
-                                  ...prev[claim.id],
-                                  equipment_serial: e.target.value,
-                                },
-                              }))
-                            }
-                          >
-                            {filterOptions.equipment_serial.map((serial) => (
-                              <option key={serial} value={serial}>
-                                {serial}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <>{claim.equipment_serial}</>
-                        )}
+                        {claim.equipment_serial}
                       </td>
                       <td>
                         {editMode[claim.id] ? (
@@ -423,8 +398,8 @@ const Claim: React.FC = () => {
                         {editMode[claim.id] ? (
                           <input
                             value={
-                              editValues[claim.id]?.failure_description ||
-                              claim.failure_description
+                              editValues[claim.id]?.failure_node_description ||
+                              claim.failure_node_description
                             }
                             onClick={(e) => e.stopPropagation()}
                             onChange={(e) =>
@@ -432,13 +407,13 @@ const Claim: React.FC = () => {
                                 ...prev,
                                 [claim.id]: {
                                   ...prev[claim.id],
-                                  failure_description: e.target.value,
+                                  failure_node_description: e.target.value,
                                 },
                               }))
                             }
                           />
                         ) : (
-                          claim.failure_description
+                          claim.failure_node_description
                         )}
                       </td>
                       <td>
@@ -520,34 +495,7 @@ const Claim: React.FC = () => {
                         {claim.downtime} {/* рассчитывается автоматически */}
                       </td>
                       <td>
-                        {editMode[claim.id] ? (
-                          <select
-                            value={
-                              editValues[claim.id]?.service_company_name ||
-                              claim.service_company_name
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) =>
-                              setEditValues((prev) => ({
-                                ...prev,
-                                [claim.id]: {
-                                  ...prev[claim.id],
-                                  service_company_name: e.target.value,
-                                },
-                              }))
-                            }
-                          >
-                            {filterOptions.service_company_name.map(
-                              (company) => (
-                                <option key={company} value={company}>
-                                  {company}
-                                </option>
-                              )
-                            )}
-                          </select>
-                        ) : (
-                          claim.service_company_name
-                        )}
+                        {claim.service_company_name}
                       </td>
                     </tr>
                     {expandedRow === claim.equipment_serial && (
@@ -582,12 +530,7 @@ const Claim: React.FC = () => {
                                 "failure_date",
                                 "engine_hours",
                                 "failure_node_name",
-                                "failure_description",
-                                "repair_method_name",
-                                "spare_parts",
-                                "repair_date",
-                                "downtime",
-                                "service_company_name",
+                                "failure_node_description",
                               ].map((type) => (
                                 <DetailCardClaim
                                   key={type}
@@ -598,11 +541,59 @@ const Claim: React.FC = () => {
                                       ? "Наработка, м/час"
                                       : type === "failure_node_name"
                                       ? "Узел отказа"
-                                      : type === "failure_description"
-                                      ? "Описание отказа"
-                                      : type === "repair_method_name"
+                                      : "Описание отказа"
+                                  }
+                                  model={claim[`${type}`]}
+                                  serial={""} // не используется в данном контексте
+                                  description={""} // не используется в данном контексте
+                                  isExpanded={
+                                    expandedCard === 
+                                    `${type}-${claim.id}`
+                                  }
+                                  onClick={() => 
+                                    handleCardClick(
+                                      `${type}-${claim.id}`
+                                    )
+                                  }
+                                />
+                              ))}
+                              {[
+                                "repair_method",
+                              ].map((type) => (
+                                <DetailCardClaim
+                                  key={type}
+                                  header={
+                                    type === "repair_method"
                                       ? "Способ восстановления"
-                                      : type === "spare_parts"
+                                      : ""
+                                  }
+                                  model={claim[`${type}_name`]}
+                                  serial={""} // не используется в данном контексте
+                                  description={
+                                    claim[`${type}_description`] ||
+                                    "Отсутствует"
+                                  }
+                                  isExpanded={
+                                    expandedCard === 
+                                    `${type}-${claim.id}`
+                                  }
+                                  onClick={() => 
+                                    handleCardClick(
+                                      `${type}-${claim.id}`
+                                    )
+                                  }
+                                />
+                              ))}
+                              {[
+                                "spare_parts",
+                                "repair_date",
+                                "downtime",
+                                "service_company_name",
+                              ].map((type) => (
+                                <DetailCardClaim
+                                  key={type}
+                                  header={
+                                    type === "spare_parts"
                                       ? "Используемые запчасти"
                                       : type === "repair_date"
                                       ? "Дата восстановления"

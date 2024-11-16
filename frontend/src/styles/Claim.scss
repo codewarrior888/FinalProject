@@ -43,18 +43,23 @@
         background-color: $main-color-light-gray;
       }
 
-      .table td {
-        padding: 0.5rem 0.5rem;
-      }
-
-      .table td:first-child {
-        vertical-align: middle;
-      }
-      
       .table tr:hover {
         background-color: #f1f1f1;
         cursor: pointer;
       }
+
+      .table td:first-child {
+        vertical-align: middle;
+        position: sticky;
+        left: 0;
+        background: none;
+        z-index: 1;
+      }
+
+      .table td {
+        padding: 0.5rem 0.5rem;
+      }
+      
     
     /* Detail view styling */
     &__details-container {
