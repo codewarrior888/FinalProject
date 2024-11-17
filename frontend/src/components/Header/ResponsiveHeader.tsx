@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate,Link } from "react-router-dom";
-import { AuthContext } from "../../components/Authenticate/AuthContext";
-import headerLogo from "../../assets/media/silang-logo-header.svg";
+import { useAuth } from "../Authenticate/useAuth";
+import { AuthContext } from "../Authenticate/AuthContext";
+import LoginModal from "../../components/Authenticate/LoginModal";
+import headerLogo from "../../assets/media/silant-logo-header.svg";
 import "../../styles/ResponsiveHeader.scss";
 
 const ResponsiveHeader = () => {
   const [isActive, setActive] = useState(false);
   const { isAuthenticated, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeLoginModal = () => setIsLoginModalOpen(false);
 
   return (
     <div className={`responsive-button__open ${isActive ? "menu-open" : ""}`}>
@@ -36,7 +40,7 @@ const ResponsiveHeader = () => {
           {isAuthenticated ? (
             <button 
               className="header-auth__logout" 
-              onClick={() => logout()}
+              onClick={logout}
             >
               <Link to="/">
                 Выйти
@@ -45,10 +49,12 @@ const ResponsiveHeader = () => {
           ) : (
             <button 
               className="header-auth__login" 
-              onClick={() => navigate("/login")}>
+              onClick={openLoginModal}
+            >
               Авторизация
             </button>
           )}
+          <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
         </div>
       )}
     </div>

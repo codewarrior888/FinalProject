@@ -5,9 +5,9 @@ import Main from "./components/Main/Main";
 import Footer from "./components/Footer/Footer";
 import "./styles/App.scss";
 import "./styles/fonts.scss";
+import ResponsiveHeader from "./components/Header/ResponsiveHeader";
 
 function App() {
-  // const [tabIndex, setTabIndex] = useState(0);
 
   return (
     <div className="App">
