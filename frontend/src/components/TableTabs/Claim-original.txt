@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { fetchClaimsData, saveClaimsData, deleteClaim } from "../API/apiService";
-import { useReferences } from "../API/ReferenceContext";
+import axios from "axios";
+import { API_URL } from "../API/apiService";
 import { useAuth } from "../Authenticate/useAuth";
 import Table from "react-bootstrap/Table";
 import DetailCardClaim from "../DetailCard/DetailCardClaim";
@@ -10,8 +10,7 @@ import "../../styles/Claim.scss";
 
 const Claim: React.FC = () => {
   const { userInfo } = useAuth();
-  const { equipmentReferenceOptions, userReferenceOptions, fetchReferences } = useReferences();
-  const [claimsData, setClaimsData] = useState([]);
+  const [claimData, setClaimData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [expandedCard, setExpandedCard] = useState<any | null>(null);
   const [filteredData, setFilteredData] = useState([]);
@@ -29,106 +28,92 @@ const Claim: React.FC = () => {
   const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteClaimId, setDeleteClaimId] = useState<number | null>(null);
-  const [originalData, setOriginalData] = useState({});
-
-  const createFilterOptions = (data) => {
-    return {
-      failure_node_name: Array.from(
-        new Set(data.map((item) => item.failure_node_name))
-      ),
-      repair_method_name: Array.from(
-        new Set(data.map((item) => item.repair_method_name))
-      ),
-      service_company_name: Array.from(
-        new Set(data.map((item) => item.service_company_name))
-      ),
-      equipment_serial: Array.from(
-        new Set(data.map((item) => item.equipment_serial))
-      ),
-    };
-  };
-
-  const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
-
-  const filterByRole = (data, userInfo) => {  
-    if (userInfo?.role === "cl") {
-      const filteredData = data.filter(
-        (item) =>
-          equipmentSerials.includes(item.equipment_serial)
-      );
-      return filteredData;
-    } else if (userInfo?.role === "sc") {
-      const filteredData = data.filter(
-        (item) =>
-          equipmentSerials.includes(item.equipment_serial)
-      );
-      return filteredData;
-    }
-    return data;
-  };
-
-  const storeClaimIds = (data) => {
-    const claimIds = data.map((item) => item.id);
-      localStorage.setItem("claimIds", JSON.stringify(claimIds));
-  };
 
   const fetchData = async () => {
     try {
-      const claimsData = await fetchClaimsData();
-      let data = claimsData;
-      console.log('claimsData', data)
+      const response = await axios.get(`${API_URL}/api/claims/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      let data = response.data;
 
-      data = filterByRole(data, userInfo);
+      const equipmentSerials =
+        JSON.parse(localStorage.getItem("equipmentSerials")) || [];
 
-      // // Apply filtering based on the user's role
-      // if (userInfo?.role === "cl") {
-      //   data = data.filter((item) =>
-      //     equipmentSerials.includes(item.equipment_serial)
-      //   );
-      // } else if (userInfo?.role === "sc") {
-      //   // Optionally filter for service company if needed
-      //   data = data.filter((item) =>
-      //     equipmentSerials.includes(item.equipment_serial)
-      //   );
-      // }
+      // Apply filtering based on the user's role
+      if (userInfo?.role === "cl") {
+        data = data.filter((item) =>
+          equipmentSerials.includes(item.equipment_serial)
+        );
+      } else if (userInfo?.role === "sc") {
+        // Optionally filter for service company if needed
+        data = data.filter((item) =>
+          equipmentSerials.includes(item.equipment_serial)
+        );
+      }
 
-      setClaimsData(data);
+      setClaimData(data);
       setFilteredData(data);
 
-      // Store the initial data as a reference for comparisons
-      const initialData = data.reduce((acc, item) => {
-        acc[item.id] = item; // Use serial as the key
-        return acc;
-      }, {});
-      setOriginalData(initialData);
-
       // Calculate unique filter options
-      const options = createFilterOptions(data);
-      setFilterOptions(options);
+      setFilterOptions({
+        failure_node_name: Array.from(
+          new Set(data.map((item) => item.failure_node_name))
+        ),
+        repair_method_name: Array.from(
+          new Set(data.map((item) => item.repair_method_name))
+        ),
+        service_company_name: Array.from(
+          new Set(data.map((item) => item.service_company_name))
+        ),
+        equipment_serial: Array.from(
+          new Set(data.map((item) => item.equipment_serial))
+        ),
+      });
 
-      storeClaimIds(data);
+      const claimIds = data.map((item) => item.id);
+      localStorage.setItem("claimIds", JSON.stringify(claimIds));
     } catch (error) {
       console.error("Ошибка при получении данных:", error);
     }
   };
 
+  const fetchReferences = async () => {
+    try {
+      const referenceResponse = await axios.get(`${API_URL}/api/references/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+
+      const failureNodeOptions = referenceResponse.data
+        .filter((item) => item.category === "fn")
+        .map((item) => item.name);
+
+      const repairMethodOptions = referenceResponse.data
+        .filter((item) => item.category === "rm")
+        .map((item) => item.name);
+
+      setReferenceOptions({
+        failure_node_name: failureNodeOptions,
+        repair_method_name: repairMethodOptions,
+      });
+    } catch (error) {
+      console.error("Error fetching references:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-    if (!equipmentReferenceOptions || !userReferenceOptions) {
-      fetchReferences();
-    }
-  }, [
-    equipmentReferenceOptions,
-    userReferenceOptions,
-    fetchReferences,
-    userInfo,
-  ]);
+    fetchReferences();
+  }, [userInfo]);
 
   // Handle filter changes
   const handleFilterChange = (selectedFilters: {
     [key: string]: string | number | null;
   }) => {
-    let updatedData = claimsData;
+    let updatedData = claimData;
 
     Object.keys(selectedFilters).forEach((filterKey) => {
       const filterValue = selectedFilters[filterKey];
@@ -144,7 +129,7 @@ const Claim: React.FC = () => {
 
   const handleRowClick = (claim: any) => {
     setExpandedRow(
-      expandedRow === claim.id ? null : claim.id
+      expandedRow === claim.equipment_serial ? null : claim.equipment_serial
     );
   };
 
@@ -159,6 +144,9 @@ const Claim: React.FC = () => {
         ...prev,
         [id]: {
           ...selectedItem,
+          repair_method: selectedItem.repair_method,
+          failure_node: selectedItem.failure_node,
+          service_company: selectedItem.service_company,
         },
       }));
       setEditMode((prev) => ({ ...prev, [id]: true }));
@@ -170,77 +158,58 @@ const Claim: React.FC = () => {
     return `${month}/${day}/${year}`;
   };
 
-  const handleClaimRefFields = (
-    editedData,
-    originalData,
-    equipmentReferenceOptions
-  ) => {
-    const claimsUpdates: Record<string, any> = {};
-    const claimRefField = ["repair_method", "failure_node"];
-
-    claimRefField.forEach((field) => {
-      const fieldName = `${field}_name`;
-      const originalValue = originalData[fieldName];
-      const editedValue = editedData[fieldName];
-
-      if (editedValue && editedValue !== originalValue) {
-        const selectedOption =
-          equipmentReferenceOptions[field]?.find(
-            ([, name]) => name === editedValue
-          );
-        if (selectedOption) {
-          claimsUpdates[field] = selectedOption[0]; // Add ID
-          claimsUpdates[fieldName] = editedValue; // Add name
-        }
-      } else {
-        // Keep the original values if unchanged
-        claimsUpdates[field] = originalData[field];
-        claimsUpdates[fieldName] = originalValue;
-      }
-    });
-
-    return claimsUpdates;
-  };
-
-  const handleOtherFields = (editedData, originalData) => {
-    const claimsUpdates: Record<string, any> = {};
-    const otherFields = ["failure_date", "engine_hours", "failure_node_description", "repair_method_description", "spare_parts", "repair_date"];
-
-    otherFields.forEach((field) => {
-      if (field === "failure_date" || field === "repair_date") {
-        claimsUpdates[field] = editedData[field] ? formatDateForAPI(editedData[field])
-        : formatDateForAPI(originalData[field]);
-      } else {
-        claimsUpdates[field] = editedData[field] !== undefined ? editedData[field] : originalData[field];
-      }
-    })
-
-    claimsUpdates["equipment"] = originalData["equipment"];
-    claimsUpdates["downtime"] = originalData["downtime"];
-    claimsUpdates["service_company"] = originalData["service_company"];
-
-    return claimsUpdates;
-  };
-
   const handleSaveClick = async (id: number) => {
     try {
       const editedData = editValues[id];
       if (!editedData) return;
 
-      const original = originalData[id];
-      let claimsUpdates: Record<string, any> = {};
+      const selectedServiceCompanyName = editValues[id].service_company_name;
+      const selectEquipmentSerial = editValues[id].equipment_serial;
+      const selectedRepairMethodName = editValues[id].repair_method_name;
+      const selectedFailureNodeName = editValues[id].failure_node_name;
 
-      claimsUpdates = {
-        ...claimsUpdates,
-        ...handleOtherFields(editedData, original),
+      const service_company = claimData.find(
+        (item) => item.service_company_name === selectedServiceCompanyName
+      )?.service_company;
+
+      const equipment_serial = claimData.find(
+        (item) => item.equipment_serial === selectEquipmentSerial
+      )?.equipment_serial;
+
+      const repair_method = claimData.find(
+        (item) => item.repair_method_name === selectedRepairMethodName
+      )?.repair_method;
+
+      const failure_node = claimData.find(
+        (item) => item.failure_node_name === selectedFailureNodeName
+      )?.failure_node;
+
+      const claimUpdates = {
+        ...editedData,
+        service_company,
+        service_company_name: selectedServiceCompanyName,
+        equipment_serial,
+        repair_method,
+        repair_method_name: selectedRepairMethodName,
+        failure_node,
+        failure_node_name: selectedFailureNodeName,
       };
 
-      claimsUpdates = {
-        ...claimsUpdates,
-        ...handleClaimRefFields(editedData, original, equipmentReferenceOptions),
-      };
+      const failureDate = editValues[id].failure_date;
+      const repairDate = editValues[id].repair_date;
 
-      await saveClaimsData(id, claimsUpdates);
+      if (failureDate) {
+        claimUpdates.failure_date = formatDateForAPI(failureDate);
+      }
+      if (repairDate) {
+        claimUpdates.repair_date = formatDateForAPI(repairDate);
+      }
+
+      await axios.put(`${API_URL}/api/claims/${id}/`, claimUpdates, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
       setEditMode((prev) => ({ ...prev, [id]: false }));
       setEditValues((prev) => ({ ...prev, [id]: null }));
@@ -263,9 +232,12 @@ const Claim: React.FC = () => {
   const confirmDelete = async () => {
     if (deleteClaimId) {
       try {
-        await deleteClaim(deleteClaimId);
-
-        setClaimsData((prev) =>
+        await axios.delete(`${API_URL}/api/claims/${deleteClaimId}/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        setClaimData((prev) =>
           prev.filter((item) => item.id !== deleteClaimId)
         );
         setFilteredData((prev) =>
@@ -425,9 +397,9 @@ const Claim: React.FC = () => {
                               }))
                             }
                           >
-                            {equipmentReferenceOptions.failure_node.map(([id, name]) => (
-                              <option key={id} value={name}>
-                                {name}
+                            {referenceOptions.failure_node_name.map((node) => (
+                              <option key={node} value={node}>
+                                {node}
                               </option>
                             ))}
                           </select>
@@ -475,10 +447,10 @@ const Claim: React.FC = () => {
                               }))
                             }
                           >
-                            {equipmentReferenceOptions.repair_method.map(
-                              ([id, name]) => (
-                                <option key={id} value={name}>
-                                  {name}
+                            {referenceOptions.repair_method_name.map(
+                              (method) => (
+                                <option key={method} value={method}>
+                                  {method}
                                 </option>
                               )
                             )}
@@ -537,7 +509,7 @@ const Claim: React.FC = () => {
                       </td>
                       <td>{claim.service_company_name}</td>
                     </tr>
-                    {expandedRow === claim.id && (
+                    {expandedRow === claim.equipment_serial && (
                       <tr>
                         <td colSpan={12}>
                           <div className="claim__details-container">

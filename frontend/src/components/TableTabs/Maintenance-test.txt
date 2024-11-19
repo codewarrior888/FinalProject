@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { deleteMaintenance, fetchMaintenanceData, saveMaintenanceData } from "../API/apiService";
+import axios from "axios";
+import { API_URL, fetchMaintenanceData, saveMaintenanceData } from "../API/apiService";
 import { useReferences } from "../API/ReferenceContext";
 import { useAuth } from "../Authenticate/useAuth";
 import Table from "react-bootstrap/Table";
@@ -46,21 +47,19 @@ const Maintenance: React.FC = () => {
     };
   };
 
-  const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
-
-  const filterByRole = (data, userInfo) => {  
+  const filterByRole = (data, userInfo) => {
     if (userInfo?.role === "cl") {
-      const filteredData = data.filter(
+      return data.filter(
         (item) =>
-          equipmentSerials.includes(item.equipment_serial)
+          item.client === userInfo.id ||
+          item.client_name === userInfo.company_name
       );
-      return filteredData;
     } else if (userInfo?.role === "sc") {
-      const filteredData = data.filter(
+      return data.filter(
         (item) =>
-          equipmentSerials.includes(item.equipment_serial)
+          item.service_company === userInfo.id ||
+          item.service_company_name === userInfo.company_name
       );
-      return filteredData;
     }
     return data;
   };
@@ -68,25 +67,24 @@ const Maintenance: React.FC = () => {
   const storeMaintenanceIds = (data) => {
     const maintenanceIds = data.map((item) => item.id);
       localStorage.setItem("maintenanceIds", JSON.stringify(maintenanceIds));
-  };
-
-  // const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
+  }
 
   const fetchData = async () => {
     try {
       const maintenanceData = await fetchMaintenanceData();
       let data = maintenanceData;
-      console.log("maintenanceData", maintenanceData);
+
+      const equipmentSerials =
+        JSON.parse(localStorage.getItem("equipmentSerials")) || [];
 
       data = filterByRole(data, userInfo);
-      console.log("data", data);
 
       setMaintenanceData(data);
       setFilteredData(data);
 
       // Store the initial data as a reference for comparisons
       const initialData = data.reduce((acc, item) => {
-        acc[item.id] = item; // Use serial as the key
+        acc[item.equipment_serial] = item; // Use serial as the key
         return acc;
       }, {});
       setOriginalData(initialData);
@@ -103,15 +101,10 @@ const Maintenance: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    if (!equipmentReferenceOptions || !userReferenceOptions) {
+    if (!equipmentReferenceOptions) {
       fetchReferences();
     }
-  }, [
-    equipmentReferenceOptions,
-    userReferenceOptions,
-    fetchReferences,
-    userInfo,
-  ]);
+  }, [equipmentReferenceOptions, fetchReferences, userInfo]);
 
   // Handle filter changes
   const handleFilterChange = (selectedFilters: {
@@ -146,6 +139,8 @@ const Maintenance: React.FC = () => {
         ...prev,
         [id]: {
           ...selectedItem,
+          // maintenance_type: selectedItem.maintenance_type,
+          // service_company: selectedItem.service_company,
         },
       }));
       setEditMode((prev) => ({ ...prev, [id]: true }));
@@ -162,57 +157,78 @@ const Maintenance: React.FC = () => {
   //   return `${year}-${month}-${day}`;
   // }
 
-  const handleMaintenanceTypeField = (
+  const handleUserFields = (editedData, originalData, userReferenceOptions) => {
+    const updates: Record<string, any> = {};
+    const userFields = ["service_company"];
+
+    userFields.forEach((field) => {
+      const fieldName = `${field}_name`;
+      const originalValue = originalData[fieldName];
+      const editedValue = editedData[fieldName];
+
+      if (editedValue && editedValue !== originalValue) {
+        const selectedOption = userReferenceOptions[`${field}_name`]?.find(
+          ([, name]) => name === editedValue
+        );
+        if (selectedOption) {
+          updates[field] = selectedOption[0]; // Add ID
+          updates[fieldName] = editedValue; // Add name
+        }
+      } else {
+        // Keep the original values if unchanged
+        updates[field] = originalData[field];
+        updates[fieldName] = originalValue;
+      }
+    });
+
+    return updates;
+  };
+
+  const handleMaintenanceTypeFields = (
     editedData,
     originalData,
     equipmentReferenceOptions
   ) => {
-    const maintenanceUpdates: Record<string, any> = {};
-    const maintenanceTypeField = ["maintenance_type"];
+    const updates: Record<string, any> = {};
+    const maintenanceTypeFields = ["maintenance_type"];
 
-    maintenanceTypeField.forEach((field) => {
+    maintenanceTypeFields.forEach((field) => {
       const fieldName = `${field}_name`;
       const originalValue = originalData[fieldName];
       const editedValue = editedData[fieldName];
 
       if (editedValue && editedValue !== originalValue) {
         const selectedOption =
-          equipmentReferenceOptions[field]?.find(
+          equipmentReferenceOptions[`${field}_name`]?.find(
             ([, name]) => name === editedValue
           );
         if (selectedOption) {
-          maintenanceUpdates[field] = selectedOption[0]; // Add ID
-          maintenanceUpdates[fieldName] = editedValue; // Add name
-          console.log('maintenanceUpdates', maintenanceUpdates)
+          updates[field] = selectedOption[0]; // Add ID
+          updates[fieldName] = editedValue; // Add name
         }
       } else {
         // Keep the original values if unchanged
-        maintenanceUpdates[field] = originalData[field];
-        maintenanceUpdates[fieldName] = originalValue;
+        updates[field] = originalData[field];
+        updates[fieldName] = originalValue;
       }
     });
 
-    return maintenanceUpdates;
+    return updates;
   };
   
   const handleOtherFields = (editedData, originalData) => {
-    const maintenanceUpdates: Record<string, any> = {};
-    const otherFields = ["maintenance_date", "engine_hours", "order_number", "order_date", "maintenance_company_name"];
+    const updates: Record<string, any> = {};
+    const otherFields = ["equipment_serial", "maintenance_date", "engine_hours", "order_number", "order_date"];
 
     otherFields.forEach((field) => {
       if (field === "maintenance_date" || field === "order_date") {
-        maintenanceUpdates[field] = editedData[field] ? formatDateForAPI(editedData[field])
+        updates[field] = editedData[field] ? formatDateForAPI(editedData[field])
          : formatDateForAPI(originalData[field]);
       } else {
-        maintenanceUpdates[field] = editedData[field] !== undefined ? editedData[field] : originalData[field];
+        updates[field] = editedData[field] !== undefined ? editedData[field] : originalData[field];
       }
     });
-
-    // Include required non-editable fields
-  maintenanceUpdates["equipment"] = originalData["equipment"]; // Always include equipment ID
-  maintenanceUpdates["service_company"] = originalData["service_company"]; // Always include service company ID
-
-    return maintenanceUpdates;
+    return updates;
   };
 
   const handleSaveClick = async (id: number) => {
@@ -221,19 +237,24 @@ const Maintenance: React.FC = () => {
       if (!editedData) return;
 
       const original = originalData[id];
-      let maintenanceUpdates: Record<string, any> = {};
+      let updates: Record<string, any> = {};
 
-      maintenanceUpdates = {
-        ...maintenanceUpdates,
+      updates = {
+        ...updates,
         ...handleOtherFields(editedData, original),
       };
 
-      maintenanceUpdates = {
-        ...maintenanceUpdates,
-        ...handleMaintenanceTypeField(editedData, original, equipmentReferenceOptions),
+      updates = {
+        ...updates,
+        ...handleUserFields(editedData, original, userReferenceOptions),
       };
 
-      await saveMaintenanceData(id, maintenanceUpdates);
+      updates = {
+        ...updates,
+        ...handleMaintenanceTypeFields(editedData, original, equipmentReferenceOptions),
+      };
+
+      await saveMaintenanceData(id, updates);
 
       setEditMode((prev) => ({ ...prev, [id]: false }));
       setEditValues((prev) => ({ ...prev, [id]: null }));
@@ -256,8 +277,14 @@ const Maintenance: React.FC = () => {
   const confirmDelete = async () => {
     if (deleteMaintenanceId) {
       try {
-        await deleteMaintenance(deleteMaintenanceId);
-
+        await axios.delete(
+          `${API_URL}/api/maintenance/${deleteMaintenanceId}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
         setMaintenanceData((prev) =>
           prev.filter((item) => item.id !== deleteMaintenanceId)
         );
@@ -350,9 +377,7 @@ const Maintenance: React.FC = () => {
                           </>
                         )}
                       </td>
-                      <td>
-                        {maintenance.equipment_serial}
-                      </td>
+                      <td>{maintenance.equipment_serial}</td>
                       <td>
                         {editMode[maintenance.id] ? (
                           <select
@@ -479,9 +504,10 @@ const Maintenance: React.FC = () => {
                       </td>
                       <td>
                         {editMode[maintenance.id] ? (
-                          <input
+                          <select
                             value={
-                              editValues[maintenance.id]?.maintenance_company_name ||
+                              editValues[maintenance.id]
+                                ?.maintenance_company_name ||
                               maintenance.maintenance_company_name
                             }
                             onClick={(e) => e.stopPropagation()}
@@ -494,14 +520,20 @@ const Maintenance: React.FC = () => {
                                 },
                               }))
                             }
-                          />
+                          >
+                            {filterOptions.maintenance_company_name.map(
+                              (modelName) => (
+                                <option key={modelName} value={modelName}>
+                                  {modelName}
+                                </option>
+                              )
+                            )}
+                          </select>
                         ) : (
                           maintenance.maintenance_company_name
                         )}
                       </td>
-                      <td>
-                        {maintenance.service_company_name}
-                      </td>
+                      <td>{maintenance.service_company_name}</td>
                     </tr>
                     {expandedRow === maintenance.id && (
                       <tr>
@@ -512,7 +544,7 @@ const Maintenance: React.FC = () => {
                                 <DetailCardMaintenance
                                   key={type}
                                   header={
-                                    type === "equipment" ? "Техника" : ""
+                                    type === "equipment" ? "Техника" : "Вид ТО"
                                   }
                                   model={maintenance[`${type}_model_name`]}
                                   serial={maintenance[`${type}_serial`]}

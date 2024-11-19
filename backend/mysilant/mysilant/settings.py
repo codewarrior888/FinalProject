@@ -176,6 +176,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-DATE_FORMAT = 'd-m-Y'
-DATETIME_FORMAT = 'd-m-Y H:i'
-USE_L10N = False
+# DATE_FORMAT = 'd-m-Y'
+# DATETIME_FORMAT = 'd-m-Y H:i'
+# USE_L10N = False
