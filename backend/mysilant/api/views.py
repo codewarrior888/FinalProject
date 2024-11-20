@@ -1,25 +1,33 @@
 from rest_framework import viewsets, filters
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema_view, extend_schema
 from .models import Reference, Equipment, Maintenance, Claim
 from .serializers import ReferenceSerializer, EquipmentSerializer, MaintenanceSerializer, ClaimSerializer, LimitedEquipmentSerializer
 from .permissions import IsManager, IsServiceCompany, IsClient, IsGuest
 from .filters import EquipmentFilter, MaintenanceFilter, ClaimFilter
 
 from django.core.exceptions import ValidationError
-import logging
-
-logger = logging.getLogger(__name__)
 
 
+@extend_schema(tags=['Справочники'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Список справочников',
+        parameters=[
+            OpenApiParameter(name='category', location=OpenApiParameter.QUERY, type=OpenApiTypes.STR, description='Категория справочника', enum=[choice[0] for choice in Reference.TYPE_CHOICES]),
+        ]
+    ),
+    retrieve=extend_schema(
+        summary='Детальная информация о справочнике',
+    )
+)
 class ReferenceViewSet(viewsets.ModelViewSet):
     queryset = Reference.objects.all()
     serializer_class = ReferenceSerializer
-    permission_classes = [IsAuthenticated]  # You can adjust permissions as needed
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         category = self.request.query_params.get('category', None)
@@ -31,6 +39,19 @@ class ReferenceViewSet(viewsets.ModelViewSet):
         return self.queryset
     
 
+@extend_schema(tags=['Техника'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Список техники',
+        parameters=[
+            OpenApiParameter(name='equipment_serial', location=OpenApiParameter.QUERY, type=OpenApiTypes.STR, description='Заводской номер'),
+            OpenApiParameter(name='equipment_model', location=OpenApiParameter.QUERY, type=OpenApiTypes.STR, description='Модель техники'),
+        ]
+    ),
+    retrieve=extend_schema(
+        summary='Детальная информация о технике',
+    )
+)
 class EquipmentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated | IsGuest | IsClient | IsServiceCompany | IsManager]
     queryset = Equipment.objects.all().order_by('shipment_date')
@@ -43,27 +64,27 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         lookup_value = self.kwargs[self.lookup_field]
         return Equipment.objects.get(equipment_serial=lookup_value)
 
-    # def update(self, request, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        
-    #     # Add logging to inspect validated data
-    #     if serializer.is_valid():
-    #         logger.debug(f"Validated data for update: {serializer.validated_data}")
-    #         self.perform_update(serializer)
-    #         return Response(serializer.data)
-    #     else:
-    #         logger.error(f"Validation errors: {serializer.errors}")
-    #         return Response(serializer.errors, status=400)
-
     @action(detail=False, methods=['get'], permission_classes=[AllowAny], url_path='public')
+    @extend_schema(summary='Публичный список техники')
     def public(self, request):
         queryset = Equipment.objects.all().order_by('equipment_model')
         serializer = LimitedEquipmentSerializer(queryset, many=True)
         return Response(serializer.data)
 
 
+@extend_schema(tags=['Техобслуживание'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Список ТО',
+        parameters=[
+            OpenApiParameter(name='equipment_serial', location=OpenApiParameter.QUERY, type=OpenApiTypes.STR, description='Зав. номер техники'),
+            OpenApiParameter(name='maintenance_type', location=OpenApiParameter.QUERY, type=OpenApiTypes.INT, description='Тип ТО'),
+        ]
+    ),
+    retrieve=extend_schema(
+        summary='Детальная информация о ТО',
+    )
+)
 class MaintenanceViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated | IsClient | IsServiceCompany | IsManager]
     queryset = Maintenance.objects.all().order_by('maintenance_date') #сортировка по умолчанию по дате ТО
@@ -72,6 +93,20 @@ class MaintenanceViewSet(viewsets.ModelViewSet):
     filterset_class = MaintenanceFilter
 
 
+@extend_schema(tags=['Рекламации'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Список рекламаций',
+        parameters=[
+            OpenApiParameter(name='equipment_serial', location=OpenApiParameter.QUERY, type=OpenApiTypes.STR, description='Зав. номер техники'),
+            OpenApiParameter(name='failure_node', location=OpenApiParameter.QUERY, type=OpenApiTypes.INT, description='Узел отказа'),
+            OpenApiParameter(name='repair_method', location=OpenApiParameter.QUERY, type=OpenApiTypes.INT, description='Способ восстановления'),
+        ]
+    ),
+    retrieve=extend_schema(
+        summary='Детальная информация о рекламации',
+    )
+)
 class ClaimViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated | IsClient | IsServiceCompany | IsManager]
     queryset = Claim.objects.all().order_by('failure_date') #сортировка по умолчанию по дате отказа

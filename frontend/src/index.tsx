@@ -7,11 +7,11 @@ import { ReferenceProvider } from './components/API/ReferenceContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <AuthProvider>
-    <ReferenceProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ReferenceProvider>
-  </AuthProvider>
+  <BrowserRouter>
+    <AuthProvider>
+      <ReferenceProvider>
+          <App />
+      </ReferenceProvider>
+    </AuthProvider>
+  </BrowserRouter>
 );

@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Reference, Equipment, Maintenance, Claim
 from accounts.models import User
+from drf_spectacular.utils import extend_schema_field
+from rest_framework.fields import ListField, CharField
 
 
 class ReferenceSerializer(serializers.ModelSerializer):
@@ -41,6 +43,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
             'model_options_preview', 'client', 'client_name', 'service_company', 'service_company_name'
         ]
     
+    @extend_schema_field(ListField(child=CharField()))
     def get_model_options_preview(self, obj):
         if obj.model_options and len(obj.model_options) > 25:
             return f'{obj.model_options[:25]}...'

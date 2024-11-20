@@ -167,7 +167,7 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Silant API',
-    'DESCRIPTION': 'API documentation for Silant',
+    'DESCRIPTION': 'Документация для сервиса "Мой Силант"',
     'VERSION': '1.0.0',
     'SERVER_INCLUDE_SCHEMA': False,
 }

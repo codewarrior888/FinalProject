@@ -14,24 +14,32 @@ from .serializers import UserSerializer, UserLoginSerializer
 from .filters import UserFilter
 
 
-@extend_schema(
-    tags=['Authentication'],
-    summary="User login",
-    methods=("POST",),
-    description="Authenticate user and issue JWT tokens",
-    request=UserLoginSerializer,
-    responses=UserSerializer,
-    examples=[
-        OpenApiExample(
-            "Example 1",
-            value={"username": "user", "password": "password"},
-            request_only=True,
-            response_only=False,
-        ),
-    ],
-)
 class LoginAPIView(APIView):
+    """
+    API для входа пользователя с генерацией JWT токенов.
+    """
     permission_classes = [AllowAny]
+
+    @extend_schema(
+        tags=['Аутентификация'],
+        summary="Вход пользователя",
+        methods=("POST",),
+        description="Аутентификация пользователя и выдача токенов JWT.",
+        request=UserLoginSerializer,
+        responses={
+            200: UserSerializer,
+            401: {"description": "Неверные учетные данные"},
+            400: {"description": "Ошибка валидации данных"},
+        },
+        examples=[
+            OpenApiExample(
+                "Пример запроса",
+                value={"username": "user", "password": "password"},
+                request_only=True,
+                response_only=False,
+            ),
+        ],
+    )
 
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
@@ -41,7 +49,7 @@ class LoginAPIView(APIView):
             
             user = authenticate(username=username, password=password)
             if user is None:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'error': 'Неверные учетные данные'}, status=status.HTTP_401_UNAUTHORIZED)
             
             # Generate only an access token for the user
             access_token = AccessToken.for_user(user)
@@ -51,7 +59,7 @@ class LoginAPIView(APIView):
             
             return Response({
                 'access': str(access_token),
-                'message': 'Logged in successfully',
+                'message': 'Вы успешно вошли в систему',
                 'user': user_data
             }, status=status.HTTP_200_OK)
         
@@ -59,28 +67,46 @@ class LoginAPIView(APIView):
 
 
 @extend_schema(
-    tags=['Authentication'],
-    summary="User logout",
-    methods=("POST",),
-    description="Log out user",
-    examples=[
-        OpenApiExample(
-            "Example 1",
-            value={},  # No request body needed
-            request_only=True,
-            response_only=False,
-        ),
-    ],
+    request=None,
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "message": {"type": "string", "example": "Вы успешно вышли из системы"},
+            },
+        }
+    },
 )
 class LogoutAPIView(APIView):
+    """
+    API для выхода пользователя с аннулированием токенов.
+    """
     permission_classes = [AllowAny]
+
+    @extend_schema(
+        tags=['Аутентификация'],
+        summary="Выход пользователя",
+        methods=("POST",),
+        description="Выход пользователя",
+        examples=[
+            OpenApiExample(
+                "Пример запроса",
+                value={},  # Тело запроса не нужно
+                request_only=True,
+                response_only=False,
+            ),
+        ],
+    )
 
     def post(self, request):
         logout(request)
-        return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Вы успешно вышли из системы'}, status=status.HTTP_200_OK)
 
 
 class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    API для управления пользователями (доступно только для менеджеров).
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (django_filters.DjangoFilterBackend,)
