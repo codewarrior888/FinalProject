@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../Authenticate/AuthContext";
 import LoginModal from "../../components/Authenticate/LoginModal";
 import headerLogo from "../../assets/media/silant-logo-header.svg";
+import headerLogoMobile from "../../assets/media/silant-logo-blue.svg";
 import "../../styles/Header.scss";
 
 const Header = () => {
@@ -20,7 +21,11 @@ const Header = () => {
       {/* Desktop Header */}
       <header className="header">
         <Link to="/">
-          <img className="header-logo" src={headerLogo} alt="logo" />
+          <picture className="header-logo-mobile">
+            <source srcSet={headerLogo} media="(min-width: 850px)" />
+            <source srcSet={headerLogoMobile} media="(max-width: 849px)" />
+            <img className="header-logo" src={headerLogo} alt="logo" />
+          </picture>
         </Link>
         <div className="header-text">
           <p className="header-text__contacts">+7-8352-20-12-09, Telegram</p>

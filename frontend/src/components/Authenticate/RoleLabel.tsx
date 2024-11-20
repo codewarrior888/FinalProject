@@ -12,14 +12,14 @@ const RoleLabel = () => {
 
   return (
     <>
-      <h2 className="role-label">
+      <header className="role-label">
         {isAuthenticated
           ? `${roleLabels[userInfo?.role]}: ${userInfo?.company_name
               ? `${userInfo?.company_name}`
               : `${userInfo?.first_name} ${userInfo?.last_name}` ||
             "Неизвестный пользователь"}`
           : `Добро пожаловать, ${roleLabels.gt}!`}
-      </h2>
+      </header>
     </>
   );
 };

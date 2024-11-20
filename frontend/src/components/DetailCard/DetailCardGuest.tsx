@@ -9,6 +9,7 @@ interface DetailCardGuestProps {
   description: string;
   isExpanded: boolean;
   onClick: () => void;
+  className?: string;
 }
 
 const DetailCardGuest: React.FC<DetailCardGuestProps> = ({
@@ -18,12 +19,10 @@ const DetailCardGuest: React.FC<DetailCardGuestProps> = ({
   description,
   isExpanded,
   onClick,
+  className,
 }) => {
   return (
-    <div
-      className={`detail-card ${isExpanded ? "expanded" : ""}`}
-      onClick={onClick}
-    >
+    <div className={`detail-card ${isExpanded ? "expanded" : ""} ${className || ""}`} onClick={onClick}>
       <div className={`detail-card__header ${isExpanded ? "expanded" : ""}`}>
         {header}
       </div>

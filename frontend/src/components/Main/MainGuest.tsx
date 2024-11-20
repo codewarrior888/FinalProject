@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { API_URL } from "../API/apiService";
 import "../../styles/MainGuest.scss";
@@ -11,9 +11,14 @@ const MainGuest: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null); // Track expanded row
-  const [expandedCard, setExpandedCard] = useState<string | null>(null); // Track expanded card
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [isDimmed, setIsDimmed] = useState(false);
 
+  // Ref to detect clicks outside the expanded details container
+  const detailsRef = useRef<HTMLDivElement | null>(null);
+
+  // Fetch equipment data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -27,6 +32,33 @@ const MainGuest: React.FC = () => {
     fetchData();
   }, []);
 
+  // Handle clicks outside the expanded container
+  const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+    if (
+      detailsRef.current &&
+      !detailsRef.current.contains(event.target as Node)
+    ) {
+      setExpandedRow(null); // Collapse the expanded details
+    }
+  };
+
+  // Add and remove event listeners for mouse and touch
+  useEffect(() => {
+    if (expandedRow) {
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("touchstart", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [expandedRow]);
+
+  // Search logic
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -54,12 +86,14 @@ const MainGuest: React.FC = () => {
     }
   };
 
+  // Row and Card Click Handlers
   const handleRowClick = (equipment: any) => {
-    setExpandedRow(
-      expandedRow === equipment.equipment_serial
-        ? null
-        : equipment.equipment_serial
-    );
+    setExpandedRow((prev) => {
+      const newExpandedRow =
+        prev === equipment.equipment_serial ? null : equipment.equipment_serial;
+      setIsDimmed(newExpandedRow !== null); // Update the dimmed state based on the new row
+      return newExpandedRow;
+    });
   };
 
   const handleCardClick = (equipmentSerial: string) => {
@@ -67,7 +101,7 @@ const MainGuest: React.FC = () => {
   };
 
   return (
-    <div className="main-guest">
+    <div className={`main-guest ${expandedRow ? "dimmed" : ""}`}>
       <RoleLabel />
       <h2>Информация о комплектации и технических характеристиках техники</h2>
 
@@ -152,99 +186,43 @@ const MainGuest: React.FC = () => {
                 {expandedRow === equipment.equipment_serial && (
                   <tr>
                     <td colSpan={6}>
-                      <div className="main-guest__details-container">
+                      <div className="main-guest__details-container" ref={detailsRef}>
                         <h2>Детали</h2>
                         <div className="main-guest__cards-container">
-                          <DetailCardGuest
-                            header="Техника"
-                            model={equipment.equipment_model_name}
-                            serial={equipment.equipment_serial}
-                            description={
-                              equipment.equipment_model_description ||
-                              "Описание отсутствует"
-                            } // Adjust as needed
-                            isExpanded={
-                              expandedCard ===
-                              "equipment-" + equipment.equipment_serial
-                            }
-                            onClick={() =>
-                              handleCardClick(
-                                "equipment-" + equipment.equipment_serial
-                              )
-                            }
-                          />
-                          <DetailCardGuest
-                            header="Двигатель"
-                            model={equipment.engine_model_name}
-                            serial={equipment.engine_serial}
-                            description={
-                              equipment.engine_model_description ||
-                              "Описание отсутствует"
-                            } // Adjust as needed
-                            isExpanded={
-                              expandedCard ===
-                              "engine-" + equipment.equipment_serial
-                            }
-                            onClick={() =>
-                              handleCardClick(
-                                "engine-" + equipment.equipment_serial
-                              )
-                            }
-                          />
-                          <DetailCardGuest
-                            header="Трансмиссия"
-                            model={equipment.transmission_model_name}
-                            serial={equipment.transmission_serial}
-                            description={
-                              equipment.transmission_description ||
-                              "Описание отсутствует"
-                            } // Adjust as needed
-                            isExpanded={
-                              expandedCard ===
-                              "transmission-" + equipment.equipment_serial
-                            }
-                            onClick={() =>
-                              handleCardClick(
-                                "transmission-" + equipment.equipment_serial
-                              )
-                            }
-                          />
-                          <DetailCardGuest
-                            header="Ведущий мост"
-                            model={equipment.drive_axle_model_name}
-                            serial={equipment.drive_axle_serial}
-                            description={
-                              equipment.drive_axle_description ||
-                              "Описание отсутствует"
-                            } // Adjust as needed
-                            isExpanded={
-                              expandedCard ===
-                              "drive-axle-" + equipment.equipment_serial
-                            }
-                            onClick={() =>
-                              handleCardClick(
-                                "drive-axle-" + equipment.equipment_serial
-                              )
-                            }
-                          />
-                          <DetailCardGuest
-                            header="Управляемый мост"
-                            model={equipment.steer_axle_model_name}
-                            serial={equipment.steer_axle_serial}
-                            description={
-                              equipment.steer_axle_description ||
-                              "Описание отсутствует"
-                            } // Adjust as needed
-                            isExpanded={
-                              expandedCard ===
-                              "steer-axle-" + equipment.equipment_serial
-                            }
-                            onClick={() =>
-                              handleCardClick(
-                                "steer-axle-" + equipment.equipment_serial
-                              )
-                            }
-                          />
+                          {["equipment", "engine", "transmission", "drive", "steer"
+
+                          ].map((type) => (
+                            <DetailCardGuest
+                              key={type}
+                              header={
+                                type === "equipment" 
+                                ? "Техника" 
+                                : type === "engine" 
+                                ? "Двигатель" 
+                                : type === "transmission"
+                                ? "Трансмиссия" 
+                                : type === "drive" 
+                                ? "Ведущий мост" 
+                                : "Управляемый мост"
+                              }
+                              model={equipment[`${type}_model_name`]}
+                              serial={equipment[`${type}_serial`]}
+                              description={
+                                equipment[`${type}_model_description`] ||
+                                "Отсутствует"
+                              }
+                              isExpanded={
+                                expandedCard ===
+                                `${type}-${equipment.equipment_serial}`
+                              }
+                              onClick={() =>
+                                handleCardClick(
+                                  `${type}-${equipment.equipment_serial}`
+                                )
+                              }
+                              className={expandedCard === `${type}-${equipment.equipment_serial}` ? "expanded" : ""}
+                            />
+                          ))}
                         </div>
                       </div>
                     </td>

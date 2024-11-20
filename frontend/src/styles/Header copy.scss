@@ -1,5 +1,4 @@
 @import 'colors';
-@import '_mixins';
 
 .header {
   display: flex;
@@ -7,12 +6,13 @@
   align-items: center;
   width: 100%;
   height: auto;
-  padding: 3rem 2.5rem;
+  padding: 2rem 4rem;
   background-color: $main-color-beige;
   color: $main-color-black;
 
   &-logo {
-    width: 15rem;
+    width: 20rem;
+    min-width: 15rem;
   }
 
   &-text {
@@ -55,12 +55,12 @@
   display: none;
 }
 
-@include respond-to('medium') {
+@media all and (max-width: 850px) {
   .responsive-button__open {
     display: flex;
     position: absolute;
-    top: 2.6rem;
-    right: 2.6rem;
+    top: 3rem;
+    right: 3rem;
     background-image: url(../assets/media/responsive-button-open.svg);
     width: 3rem;
     height: 2.5rem;
@@ -70,10 +70,10 @@
 
   .responsive-button__close {
     background-image: url(../assets/media/responsive-button-close.svg);
-    width: 2.8rem;
-    height: 2.8rem;
+    width: 2.7rem;
+    height: 2.7rem;
     margin-top: 1rem;
-    margin-right: 0.5rem;
+    margin-right: 1rem;
     border: none;
     background-color: transparent;
     cursor: pointer;
@@ -106,15 +106,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 4rem;
-    padding-top: 3rem;
+    height: 7rem;
   }
 
   .responsive-logo {
     width: 150px;
     height: 150px;
-    margin-left: 1rem;
-    margin-top: 1rem;
   }
 
   .responsive-nav {
@@ -133,7 +130,6 @@
     border: none;
     font-size: 1.2rem;
     padding: 1rem 2rem;
-    margin: 0 0 1rem;
     width: 20rem;
     cursor: pointer;
 
@@ -150,7 +146,7 @@
   .responsive-header-text {
     display: flex;
     flex-direction: column;
-    margin: 2rem 0 2rem;
+    margin: 0 0 50px;
     text-align: center;
 
     &__contacts {
