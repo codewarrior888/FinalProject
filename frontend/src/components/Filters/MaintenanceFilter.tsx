@@ -17,7 +17,7 @@ const MaintenanceFilter: React.FC<MaintenanceFilterProps> = ({ onFilterChange, f
   };
 
   return (
-    <div className="equipment-filter">
+    <div className="maintenance-filter">
       <label>
         Зав.№ техники:
         <select onChange={(e) => handleFilterSelect(e, 'equipment_serial')}>

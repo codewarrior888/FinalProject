@@ -1,82 +1,224 @@
 @import 'colors';
 @import 'fonts';
+@import '_mixins';
 
 .claim {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+
+  &.dimmed {
+    &::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+  }
+
+  &__top-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+  }
 
-    &__table-container {
-        max-height: auto;
-        overflow-y: auto;
-        overflow-x: auto;
-      }
-      
-    &__table-scroll {
-    max-width: 1000px;
+  &__table-container {
+    width: auto;
+    height: auto;
     overflow-x: auto;
+  }
+    
+  &__table-scroll {
+    display: block;
+    width: 120rem;
+
+    @include respond-to("large") {
+      width: 100rem;
     }
 
-    &__title {
+    @include respond-to("medium") {
+      width: 50rem;
+    }
+
+    @include respond-to("small") {
+      width: 30rem;
+    }
+  }
+
+  &__title{
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    text-align: center;
+    width: 100%;
+
+    @include respond-to("medium") {
       font-size: 2.5rem;
-      margin-bottom: 2.5rem;
+      max-width: 40rem;
+    }
+
+    @include respond-to("small") {
+      font-size: 2rem;
+      max-width: 30rem;
+    }
+  }
+  
+  .table {
+    width: auto;
+    // border-collapse: collapse;
+    max-width: 90rem;
+    height: auto;
+    font-size: 1.6rem;
+    margin: 0 auto 2rem;
+    border: 1px solid $main-color-light-gray;
+    overflow-y: scroll;
+    
+    th {
+      padding: 12px 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      align-content: center;
+      // overflow: hidden;
+      word-break: break-word;
+      white-space: nowrap;
+      word-break: keep-all;
+      background-color: $main-color-light-gray;
+    }
+  
+    td {
+      padding: 0.5rem 0.5rem;
+
+      &:first-child {
+        vertical-align: middle;
+      }
     }
     
-    .table {
-        width: auto;
-        height: auto;
-        table-layout: fixed;
-        border-collapse: collapse;
-        font-size: 1.6rem;
-        margin: 1rem 0 5rem;
-        overflow-x: scroll;
-      }
-      
-      .table th {
-        padding: 12px 20px;
-        border-bottom: 1px solid #ddd;
-        text-align: left;
-        align-content: center;
-        overflow: hidden;
-        word-break: keep-all;
-        background-color: $main-color-light-gray;
-      }
+    tr:hover {
+      cursor: pointer;
+    }
+  }
 
-      .table tr:hover {
-        background-color: #f1f1f1;
-        cursor: pointer;
-      }
+  &__details-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    width: 100%;
+  }
 
-      .table td:first-child {
-        vertical-align: middle;
-        position: sticky;
-        left: 0;
-        background-color: $fixed-column-color;
-        z-index: 1;
-      }
+  &__details-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); // Center it horizontally and vertically
+    width: 60%; // Make it responsive
+    width: 100rem;
+    height: auto;
+    min-height: 30rem;
+    padding: 1rem 2rem;
+    border: 1px solid $main-color-light-gray;
+    border-radius: 8px;
+    background-color: $main-color-white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 1000;
 
-      .table td {
-        padding: 0.5rem 0.5rem;
-      }
-      
+    @include respond-to("medium") {
+      width: 50rem;
+      height: auto;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+
+    @include respond-to("small") {
+      width: 90%;
+      height: 50rem;
+      overflow-y: auto;
+    }
+  }
     
-    /* Detail view styling */
-    &__details-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        padding: 1.5rem;
-        width: 100%;
+  &__cards-container {
+    display: flex;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 10px;
+    width: 100%;
+    min-height: 25rem;
+    height: 100%;
+    padding-bottom: 2rem;
+
+    @include respond-to("medium") {
+      width: 100%;
+      flex-direction: row;
+      padding-right: 1rem;
+    }
+
+    @include respond-to("small") {
+      flex-direction: column;
+    }
+
+    .claim-detail-card {
+      display: flex;
+      flex: 0 0 120px;
+      height: auto;
+      width: auto;
+      transition: flex 0.5s ease;
+      align-items: flex-start;
+      justify-content: flex-start;
+      flex-direction: column;
+      text-align: left;
+      background-color: #f8f9fa;
+      padding: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      border-right: $main-color-light-gray solid 0.5rem;
+      cursor: pointer;
+      
+      &.expanded {
+        flex: 0 0 auto;
+        border-right: $main-color-light-gray solid 0.1rem;
         background-color: $main-color-white;
+        min-height: 25rem;
+        height:fit-content;
+        width: fit-content;
+
+        @include respond-to("small") {
+          width: 100%;
+        }
+      }
+
+      &__header {
+        font-size: 1.4rem;
+        color: $main-color-black;
+        margin-bottom: 10px;
+
+        &.expanded {
+          font-size: 2rem;
+          font-weight: bold;
+        }
+      }
+      
+      &__model, &__serial, &__description {
+        font-weight: bold;
+        color: $main-color-black;
       }
     
-        &__cards-container {
-        display: flex;
-        justify-content: flex-start;
-        overflow-x: auto;
-        gap: 12px;
-        padding: 20px;
-        width: 100%;
+      &__details {
+        word-wrap: break-word;
+        hyphens: auto;
+        white-space: pre-wrap;
+  
+        p {
+          color: $main-color-gray;
         }
+      }
+    }
+  }
 }

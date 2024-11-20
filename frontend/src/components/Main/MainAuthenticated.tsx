@@ -10,14 +10,14 @@ const MainAuthenticated = () => {
     <div className="main-authenticated">
       <div className="main-authenticated__container">
         <Tabs>
-          <div className="tabs-container">
+          <div className="main-authenticated__tabs-container">
             <TabList>
               <Tab>Общая информация</Tab>
               <Tab>ТО</Tab>
               <Tab>Рекламации</Tab>
             </TabList>
 
-            <div className="tab-content">
+            <div className="main-authenticated__tab-content">
               <TabPanel>
                 <RoleLabel />
                 <Equipment />

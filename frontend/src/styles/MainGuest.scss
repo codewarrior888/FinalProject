@@ -5,26 +5,45 @@
 .main-guest {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: center;
   padding: 20px;
   position: relative;
 
   &.dimmed {
     &::after {
       content: '';
-      position: fixed; // Ensures it covers the viewport
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100vw; // Covers the full width of the screen
-      height: 100vh; // Covers the full height of the screen
-      background-color: rgba(0, 0, 0, 0.2); // Semi-transparent background
-      z-index: 1; // Ensure it's above all other content
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
     }
   }
 
-  h2 {
+  &__top-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__title {
     font-size: 2.5rem;
     margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+    width: 100%;
+
+    @include respond-to("medium") {
+      font-size: 2.5rem;
+      max-width: 40rem;
+    }
+
+    @include respond-to("small") {
+      font-size: 2rem;
+      max-width: 30rem;
+    }
   }
 
   &__search {
@@ -34,6 +53,8 @@
     max-width: 32rem;
     gap: 2rem;
     margin-bottom: 2rem;
+    justify-content: center;
+    align-items: center;
 
     input {
       font-size: 1.5rem;
@@ -55,38 +76,40 @@
     }
   }
 
+  .main-guest__table-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+
   .table {
-    width: 900px; // Desktop default
+    width: 100%;
+    max-width: 90rem;
     height: auto;
-    border-collapse: collapse;
     font-size: 1.6rem;
-    margin-bottom: 2rem;
-    overflow-x: auto; // Enable horizontal scrolling for smaller screens
+    margin: 0 auto 2rem;
     border: 1px solid $main-color-light-gray;
 
     th,
     td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #ddd;
       text-align: center;
       overflow: hidden;
-      white-space: nowrap; // Prevent wrapping on smaller screens
+      white-space: nowrap;
     }
 
     th {
+      padding: 12px 15px;
       background-color: $main-color-light-gray;
     }
 
     tr:hover {
-      background-color: #f1f1f1;
       cursor: pointer;
     }
 
     @include respond-to("medium") {
-      display: block;
-      overflow-x: scroll;
-      white-space: nowrap;
-      width: 60rem;
+      width: auto;
+      padding-bottom: 1rem;
+      box-sizing: border-box;
+      margin: 0 1rem;
 
       th,
       td {
@@ -99,7 +122,8 @@
     }
 
     @include respond-to("small") {
-      width: 30rem;
+      width: auto;
+      max-width: 30rem; // Adjust table width for small screens
     }
   }
 }
@@ -108,50 +132,122 @@
 .main-guest {
 
   &__details-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 1.5rem;
-  width: 100%;
-  background-color: $main-color-white;
-  z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%); // Adjust for exact centering
+    width: 80rem;
+    height: auto;
+    min-height: 30rem;
+    padding: 1rem 2rem;
+    border: 1px solid $main-color-light-gray;
+    border-radius: 8px;
+    background-color: $main-color-white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); // Add shadow for emphasis
+    overflow-y: auto;
+    z-index: 100;
+
+    @include respond-to("large") {
+      
+    }
   
     @include respond-to("medium") {
-      position: absolute; // Place it above the table
-      top: 40%; // Adjust the vertical position
-      left: 50%; // Center horizontally
-      transform: translateX(-50%); // Adjust for exact centering
+      top: 40%;
+      left: 50%;
+      width: 50rem;
+      height: auto;
+      z-index: 100;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+
+    @include respond-to("small") {
+      top: 40%;
+      left: 50%;
       width: 90%;
-      height: 50rem; // Limit height for large content
-      background-color: $main-color-white;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); // Add shadow for emphasis
-      z-index: 100; // Ensure it appears above other elements
-      overflow-y: auto; // Allow scrolling if content overflows
-      border: 1px solid $main-color-light-gray;
-      padding: 1.5rem;
-      border-radius: 8px;
+      height: 50rem;
+      overflow-y: auto;
     }
   }
 
   &__cards-container {
     display: flex;
+    justify-content: flex-start;
     overflow-x: auto;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
+    min-height: 25rem;
+    height: 100%;
+    padding-bottom: 2rem;
 
-    .detail-card {
-      &.expanded {
-        height:fit-content;
-        width: 100%;
-      }
-    }
-  
     @include respond-to("medium") {
       width: 100%;
-      height: auto;
-      flex-direction: column;
+      flex-direction: row;
       padding-right: 1rem;
+    }
+
+    @include respond-to("small") {
+      flex-direction: column;
+    }
+
+    .detail-card {
+      display: flex;
+      flex: 0 0 120px;
+      height: auto;
+      width: auto;
+      transition: flex 0.5s ease;
+      align-items: flex-start;
+      justify-content: flex-start;
+      flex-direction: column;
+      text-align: left;
+      background-color: #f8f9fa;
+      padding: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      border-right: $main-color-light-gray solid 0.5rem;
+      cursor: pointer;
+      
+      &.expanded {
+        flex: 0 0 auto;
+        border-right: $main-color-light-gray solid 0.1rem;
+        background-color: $main-color-white;
+        min-height: 25rem;
+        height:fit-content;
+        width: fit-content;
+
+        @include respond-to("small") {
+          width: 100%;
+        }
+      }
+
+      &__header {
+        font-size: 1.4rem;
+        color: $main-color-black;
+        margin-bottom: 10px;
+      
+          &.expanded {
+            font-size: 2rem;
+            font-weight: bold;
+          }
+        }
+      
+        &__model, &__serial, &__description {
+          font-weight: bold;
+          color: $main-color-black;
+        }
+      
+        &__details {
+          word-wrap: break-word;
+          hyphens: auto;
+          white-space: pre-wrap;
+    
+          p {
+            color: $main-color-gray;
+          }
+        }
     }
   }
 }

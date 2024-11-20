@@ -102,139 +102,143 @@ const MainGuest: React.FC = () => {
 
   return (
     <div className={`main-guest ${expandedRow ? "dimmed" : ""}`}>
-      <RoleLabel />
-      <h2>Информация о комплектации и технических характеристиках техники</h2>
-
-      <div className="main-guest__search">
-        <Form.Control
-          type="text"
-          placeholder="Заводской номер"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          className="main-guest__search-field"
-        />
-        <button onClick={handleSearch} className="main-guest__search-button">
-          Поиск
-        </button>
+      <div className="main-guest__top-section">
+        <RoleLabel />
+        <h2 className="main-guest__title">Информация о комплектации и технических характеристиках техники</h2>
+        
+        <div className="main-guest__search">
+          <Form.Control
+            type="text"
+            placeholder="Заводской номер"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            className="main-guest__search-field"
+          />
+          <button onClick={handleSearch} className="main-guest__search-button">
+            Поиск
+          </button>
+        </div>
       </div>
 
       <h3>{searchQuery ? "Результат поиска:" : ""}</h3>
 
-      {filteredData.length ? (
-        <Table bordered hover responsive size="sm">
-          <thead>
-            <tr>
-              <th>
-                Техника
-                <br />
-                модель / зав.№
-              </th>
-              <th>
-                Двигатель
-                <br />
-                модель / зав.№
-              </th>
-              <th>
-                Трансмиссия
-                <br />
-                модель / зав.№
-              </th>
-              <th>
-                Ведущий мост
-                <br />
-                модель / зав.№
-              </th>
-              <th>
-                Управляемый мост
-                <br />
-                модель / зав.№
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((equipment) => (
-              <React.Fragment key={equipment.equipment_serial}>
-                <tr onClick={() => handleRowClick(equipment)}>
-                  <td>
-                    {equipment.equipment_model_name}
-                    <br />
-                    {equipment.equipment_serial}
-                  </td>
-                  <td>
-                    {equipment.engine_model_name}
-                    <br />
-                    {equipment.engine_serial}
-                  </td>
-                  <td>
-                    {equipment.transmission_model_name}
-                    <br />
-                    {equipment.transmission_serial}
-                  </td>
-                  <td>
-                    {equipment.drive_axle_model_name}
-                    <br />
-                    {equipment.drive_axle_serial}
-                  </td>
-                  <td>
-                    {equipment.steer_axle_model_name}
-                    <br />
-                    {equipment.steer_axle_serial}
-                  </td>
-                </tr>
-                {expandedRow === equipment.equipment_serial && (
-                  <tr>
-                    <td colSpan={6}>
-                      <div className="main-guest__details-container" ref={detailsRef}>
-                        <h2>Детали</h2>
-                        <div className="main-guest__cards-container">
-                          {["equipment", "engine", "transmission", "drive", "steer"
-
-                          ].map((type) => (
-                            <DetailCardGuest
-                              key={type}
-                              header={
-                                type === "equipment" 
-                                ? "Техника" 
-                                : type === "engine" 
-                                ? "Двигатель" 
-                                : type === "transmission"
-                                ? "Трансмиссия" 
-                                : type === "drive" 
-                                ? "Ведущий мост" 
-                                : "Управляемый мост"
-                              }
-                              model={equipment[`${type}_model_name`]}
-                              serial={equipment[`${type}_serial`]}
-                              description={
-                                equipment[`${type}_model_description`] ||
-                                "Отсутствует"
-                              }
-                              isExpanded={
-                                expandedCard ===
-                                `${type}-${equipment.equipment_serial}`
-                              }
-                              onClick={() =>
-                                handleCardClick(
-                                  `${type}-${equipment.equipment_serial}`
-                                )
-                              }
-                              className={expandedCard === `${type}-${equipment.equipment_serial}` ? "expanded" : ""}
-                            />
-                          ))}
-                        </div>
-                      </div>
+      <div className="main-guest__table-container">
+        {filteredData.length ? (
+          <Table bordered hover responsive size="sm">
+            <thead>
+              <tr>
+                <th>
+                  Техника
+                  <br />
+                  модель / зав.№
+                </th>
+                <th>
+                  Двигатель
+                  <br />
+                  модель / зав.№
+                </th>
+                <th>
+                  Трансмиссия
+                  <br />
+                  модель / зав.№
+                </th>
+                <th>
+                  Ведущий мост
+                  <br />
+                  модель / зав.№
+                </th>
+                <th>
+                  Управляемый мост
+                  <br />
+                  модель / зав.№
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((equipment) => (
+                <React.Fragment key={equipment.equipment_serial}>
+                  <tr onClick={() => handleRowClick(equipment)}>
+                    <td>
+                      {equipment.equipment_model_name}
+                      <br />
+                      {equipment.equipment_serial}
+                    </td>
+                    <td>
+                      {equipment.engine_model_name}
+                      <br />
+                      {equipment.engine_serial}
+                    </td>
+                    <td>
+                      {equipment.transmission_model_name}
+                      <br />
+                      {equipment.transmission_serial}
+                    </td>
+                    <td>
+                      {equipment.drive_axle_model_name}
+                      <br />
+                      {equipment.drive_axle_serial}
+                    </td>
+                    <td>
+                      {equipment.steer_axle_model_name}
+                      <br />
+                      {equipment.steer_axle_serial}
                     </td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </Table>
-      ) : (
-        <p>No equipment found.</p>
-      )}
+                  {expandedRow === equipment.equipment_serial && (
+                    <tr>
+                      <td colSpan={6}>
+                        <div className="main-guest__details-container" ref={detailsRef}>
+                          <h2 className="main-guest__title">Детали</h2>
+                          <div className="main-guest__cards-container">
+                            {["equipment", "engine", "transmission", "drive", "steer"
+
+                            ].map((type) => (
+                              <DetailCardGuest
+                                key={type}
+                                header={
+                                  type === "equipment" 
+                                  ? "Техника" 
+                                  : type === "engine" 
+                                  ? "Двигатель" 
+                                  : type === "transmission"
+                                  ? "Трансмиссия" 
+                                  : type === "drive" 
+                                  ? "Ведущий мост" 
+                                  : "Управляемый мост"
+                                }
+                                model={equipment[`${type}_model_name`]}
+                                serial={equipment[`${type}_serial`]}
+                                description={
+                                  equipment[`${type}_model_description`] ||
+                                  "Отсутствует"
+                                }
+                                isExpanded={
+                                  expandedCard ===
+                                  `${type}-${equipment.equipment_serial}`
+                                }
+                                onClick={() =>
+                                  handleCardClick(
+                                    `${type}-${equipment.equipment_serial}`
+                                  )
+                                }
+                                className={expandedCard === `${type}-${equipment.equipment_serial}` ? "expanded" : ""}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <p>База данных пуста.</p>
+        )}
+      </div>
     </div>
   );
 };

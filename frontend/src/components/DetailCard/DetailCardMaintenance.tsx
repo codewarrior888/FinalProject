@@ -9,6 +9,7 @@ interface DetailCardMaintenanceProps {
   description: string;
   isExpanded: boolean;
   onClick: () => void;
+  className?: string;
 }
 
 const DetailCardMaintenance: React.FC<DetailCardMaintenanceProps> = ({
@@ -18,24 +19,25 @@ const DetailCardMaintenance: React.FC<DetailCardMaintenanceProps> = ({
   description,
   isExpanded,
   onClick,
+  className
 }) => {
   return (
-    <div className={`detail-card ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
-      <div className={`detail-card__header ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`maintenance-detail-card ${isExpanded ? "expanded" : ""} ${className || ""}`} onClick={onClick}>
+      <div className={`maintenance-detail-card__header ${isExpanded ? 'expanded' : ''}`}>
         {header}
       </div>
       {isExpanded && (
-        <div className="detail-card__details">
+        <div className="maintenance-detail-card__details">
           {serial && (
             <>
-              <span className="detail-card__serial">Зав.№:</span>
+              <span className="maintenance-detail-card__serial">Зав.№:</span>
               <div>{serial}</div>
             </>
           )}
           {header === "Вид ТО" && <div>{model}</div>}
           {description && (
             <>
-              <span className="detail-card__description">Описание:</span>
+              <span className="maintenance-detail-card__description">Описание:</span>
               <div>
                 <LineBreaks text={description} />
               </div>

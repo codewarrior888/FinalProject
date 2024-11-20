@@ -9,6 +9,7 @@ interface DetailCardClaimProps {
   description: string;
   isExpanded: boolean;
   onClick: () => void;
+  className?: string;
 }
 
 const DetailCardClaim: React.FC<DetailCardClaimProps> = ({
@@ -18,17 +19,18 @@ const DetailCardClaim: React.FC<DetailCardClaimProps> = ({
   description,
   isExpanded,
   onClick,
+  className
 }) => {
   return (
-    <div className={`detail-card ${isExpanded ? 'expanded' : ''}`} onClick={onClick}>
-      <div className={`detail-card__header ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`claim-detail-card ${isExpanded ? "expanded" : ""} ${className || ""}`} onClick={onClick}>
+      <div className={`claim-detail-card__header ${isExpanded ? 'expanded' : ''}`}>
         {header}
       </div>
       {isExpanded && (
-        <div className="detail-card__details">
+        <div className="claim-detail-card__details">
           {serial && (
             <>
-              <span className="detail-card__serial">Зав.№:</span>
+              <span className="claim-detail-card__serial">Зав.№:</span>
               <div>{serial}</div>
             </>
           )}
@@ -39,7 +41,7 @@ const DetailCardClaim: React.FC<DetailCardClaimProps> = ({
           {header === "Способ восстановления" && <div>{model}</div>}
           {description && (
             <>
-              <span className="detail-card__description">Описание:</span>
+              <span className="claim-detail-card__description">Описание:</span>
               <div>
                 <LineBreaks text={description} />
               </div>

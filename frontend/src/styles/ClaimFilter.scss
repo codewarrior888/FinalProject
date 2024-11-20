@@ -1,7 +1,7 @@
 @import 'colors';
 @import '_mixins';
 
-.maintenance-filter{
+.claim-filter{
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -16,8 +16,8 @@
     }
 
     @include respond-to("small") {
-        width: 30rem;
         flex-wrap: wrap;
+        justify-content: space-around;
     }
 
     label {
@@ -33,6 +33,7 @@
         @include respond-to("medium") {
             width: 100%;
         }
+
         @include respond-to("small") {
             width: 100%;
         }

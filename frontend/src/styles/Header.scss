@@ -12,11 +12,20 @@
   color: $main-color-black;
 
   &-logo {
-    width: 15rem;
+    width: 25rem;
+
+    @include respond-to('large') {
+      width: 20rem;
+    }
+
+    @include respond-to('medium') {
+      width: 15rem;
+    }
   }
 
   &-text {
     display: flex;
+    text-align: center;
     flex-direction: column;
     line-height: 1.5;
 

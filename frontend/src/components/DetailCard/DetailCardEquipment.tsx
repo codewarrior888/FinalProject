@@ -9,6 +9,7 @@ interface DetailCardEquipmentProps {
   description: string;
   isExpanded: boolean;
   onClick: () => void;
+  className?: string;
 }
 
 // Configuration object for card types
@@ -38,6 +39,7 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
   description,
   isExpanded,
   onClick,
+  className,
 }) => {
   const isEquipmentType = CARD_CONFIGS.EQUIPMENT_TYPE.includes(header);
 
@@ -47,11 +49,11 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
     if (isEquipmentType) {
       return (
         <>
-          <span className="detail-card__model">Модель:</span>
+          <span className="equipment-detail-card__model">Модель:</span>
           <div>{model}</div>
-          <span className="detail-card__serial">Зав.№:</span>
+          <span className="equipment-detail-card__serial">Зав.№:</span>
           <div>{serial}</div>
-          <span className="detail-card__description">Описание:</span>
+          <span className="equipment-detail-card__description">Описание:</span>
           <div>
             <LineBreaks text={description} />
           </div>
@@ -63,14 +65,11 @@ const DetailCardEquipment: React.FC<DetailCardEquipmentProps> = ({
   };
 
   return (
-    <div
-      className={`detail-card ${isExpanded ? "expanded" : ""}`}
-      onClick={onClick}
-    >
-      <div className={`detail-card__header ${isExpanded ? "expanded" : ""}`}>
+    <div className={`equipment-detail-card ${isExpanded ? "expanded" : ""} ${className || ""}`} onClick={onClick}>
+      <div className={`equipment-detail-card__header ${isExpanded ? "expanded" : ""}`}>
         {header}
       </div>
-      <div className="detail-card__details">{renderContent()}</div>
+      <div className="equipment-detail-card__details">{renderContent()}</div>
     </div>
   );
 };

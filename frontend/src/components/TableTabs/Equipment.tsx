@@ -1,5 +1,5 @@
 import "../../styles/Equipment.scss";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { fetchEquipmentData, saveEquipmentData, deleteEquipment } from "../API/apiService";
 import { useAuth } from "../Authenticate/useAuth";
 import Table from "react-bootstrap/Table";
@@ -30,6 +30,10 @@ const Equipment: React.FC = () => {
     client_name: [],
     service_company_name: [],
   });
+  const [isDimmed, setIsDimmed] = useState(false);
+
+  // Ref to detect clicks outside the expanded details container
+  const detailsRef = useRef<HTMLDivElement | null>(null);
 
   const createFilterOptions = (data) => {
     return {
@@ -149,12 +153,39 @@ const Equipment: React.FC = () => {
     setFilteredData(updatedData);
   };
 
+  // Handle clicks outside the expanded container
+  const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+    if (
+      detailsRef.current &&
+      !detailsRef.current.contains(event.target as Node)
+    ) {
+      setExpandedRow(null);
+    }
+  };
+
+  // Add and remove event listeners for mouse and touch
+  useEffect(() => {
+    if (expandedRow) {
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("touchstart", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [expandedRow]);
+
   const handleRowClick = (equipment: any) => {
-    setExpandedRow(
-      expandedRow === equipment.equipment_serial
-        ? null
-        : equipment.equipment_serial
-    );
+    setExpandedRow((prev) => {
+      const newExpandedRow =
+        prev === equipment.equipment_serial ? null : equipment.equipment_serial;
+      setIsDimmed(newExpandedRow !== null);
+      return newExpandedRow;
+    });
   };
 
   const handleCardClick = (equipmentSerial: string) => {
@@ -358,20 +389,20 @@ const Equipment: React.FC = () => {
   };
 
   return (
-    <div className="equipment">
-      <h2 className="equipment__title">
-        Информация о комплектации и технических характеристиках Вашей техники
-      </h2>
-
-      <EquipmentFilter
-        onFilterChange={handleFilterChange}
-        filterOptions={filterOptions}
-      />
+    <div className={`equipment ${expandedRow ? "dimmed" : ""}`}>
+      <div className="equipment__top-section">
+        <h2 className="equipment__title">
+          Информация о комплектации и технических характеристиках Вашей техники
+        </h2>
+        <div className="equipment__filter-container">
+          <EquipmentFilter onFilterChange={handleFilterChange} filterOptions={filterOptions} />
+        </div>
+      </div>
 
       {filteredData.length ? (
         <div className="equipment__table-container">
           <div className="equipment__table-scroll">
-            <Table bordered hover responsive size="sm">
+            <Table bordered hover size="sm">
               <thead>
                 <tr>
                   <th></th>
@@ -416,9 +447,9 @@ const Equipment: React.FC = () => {
                 {filteredData.map((equipment) => (
                   <React.Fragment key={equipment.equipment_serial}>
                     <tr onClick={() => handleRowClick(equipment)}>
-                      <td className="equipment__fixed column">
+                      <td className="equipment__fixed-column">
                         {editMode[equipment.equipment_serial] ? (
-                          <>
+                          <div className="button-container">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -446,9 +477,9 @@ const Equipment: React.FC = () => {
                             >
                               Cancel
                             </button>
-                          </>
+                          </div>
                         ) : (
-                          <>
+                          <div className="button-container">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -475,7 +506,7 @@ const Equipment: React.FC = () => {
                             >
                               Delete
                             </button>
-                          </>
+                          </div>
                         )}
                       </td>
                       <td>
@@ -921,7 +952,8 @@ const Equipment: React.FC = () => {
                     {expandedRow === equipment.equipment_serial && (
                       <tr>
                         <td colSpan={13}>
-                          <div className="equipment__details-container">
+                          <div className="equipment__details-container" ref={detailsRef}>
+                            <h2 className="equipment__details-title">Детали</h2>
                             <div className="equipment__cards-container">
                               {[
                                 "equipment",
@@ -958,6 +990,7 @@ const Equipment: React.FC = () => {
                                       `${type}-${equipment.equipment_serial}`
                                     )
                                   }
+                                  className={expandedCard === `${type}-${equipment.equipment_serial}` ? "expanded" : ""}
                                 />
                               ))}
                               {[
@@ -998,6 +1031,7 @@ const Equipment: React.FC = () => {
                                       `${type}-${equipment.equipment_serial}`
                                     )
                                   }
+                                  className={expandedCard === `${type}-${equipment.equipment_serial}` ? "expanded" : ""}
                                 />
                               ))}
                             </div>
@@ -1020,9 +1054,9 @@ const Equipment: React.FC = () => {
             )}
           </div>
         </div>
-      ) : (
-        <p>База данных пуста</p>
-      )}
+        ) : (
+          <p>База данных пуста.</p>
+        )}
     </div>
   );
 };

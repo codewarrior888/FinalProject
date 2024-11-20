@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { fetchClaimsData, saveClaimsData, deleteClaim } from "../API/apiService";
 import { useReferences } from "../API/ReferenceContext";
 import { useAuth } from "../Authenticate/useAuth";
@@ -30,6 +30,10 @@ const Claim: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteClaimId, setDeleteClaimId] = useState<number | null>(null);
   const [originalData, setOriginalData] = useState({});
+  const [isDimmed, setIsDimmed] = useState(false);
+
+  // Ref to detect clicks outside the expanded details container
+  const detailsRef = useRef<HTMLDivElement | null>(null);
 
   const createFilterOptions = (data) => {
     return {
@@ -79,18 +83,6 @@ const Claim: React.FC = () => {
       console.log('claimsData', data)
 
       data = filterByRole(data, userInfo);
-
-      // // Apply filtering based on the user's role
-      // if (userInfo?.role === "cl") {
-      //   data = data.filter((item) =>
-      //     equipmentSerials.includes(item.equipment_serial)
-      //   );
-      // } else if (userInfo?.role === "sc") {
-      //   // Optionally filter for service company if needed
-      //   data = data.filter((item) =>
-      //     equipmentSerials.includes(item.equipment_serial)
-      //   );
-      // }
 
       setClaimsData(data);
       setFilteredData(data);
@@ -142,10 +134,38 @@ const Claim: React.FC = () => {
     setFilteredData(updatedData);
   };
 
+  const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+    if (
+      detailsRef.current &&
+      !detailsRef.current.contains(event.target as Node)
+    ) {
+      setExpandedRow(null);
+    }
+  };
+
+  // Add and remove event listeners for mouse and touch
+  useEffect(() => {
+    if (expandedRow) {
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("touchstart", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [expandedRow]);
+
   const handleRowClick = (claim: any) => {
-    setExpandedRow(
-      expandedRow === claim.id ? null : claim.id
-    );
+    setExpandedRow((prev) => {
+      const newExpandedRow =
+        prev === claim.id ? null : claim.id;
+      setIsDimmed(newExpandedRow !== null);
+      return newExpandedRow;
+    });
   };
 
   const handleCardClick = (claimId: any) => {
@@ -281,18 +301,18 @@ const Claim: React.FC = () => {
   };
 
   return (
-    <div className="claim">
-      <h2 className="claim__title">Информация о рекламациях Вашей техники</h2>
-
-      <ClaimFilter
-        onFilterChange={handleFilterChange}
-        filterOptions={filterOptions}
-      />
+    <div className={`claim ${expandedRow ? "dimmed" : ""}`}>
+      <div className="claim__top-section">
+        <h2 className="claim__title">Информация о рекламациях Вашей техники</h2>
+      </div>
+      <div className="maintenance__filter-container">
+        <ClaimFilter onFilterChange={handleFilterChange} filterOptions={filterOptions} />
+      </div>
 
       {filteredData.length ? (
         <div className="claim__table-container">
           <div className="claim__table-scroll">
-            <Table bordered hover responsive size="sm">
+            <Table bordered hover size="sm">
               <thead>
                 <tr>
                   <th></th>
@@ -540,7 +560,7 @@ const Claim: React.FC = () => {
                     {expandedRow === claim.id && (
                       <tr>
                         <td colSpan={12}>
-                          <div className="claim__details-container">
+                          <div className="claim__details-container" ref={detailsRef}>
                             <div className="claim__cards-container">
                               {["equipment"].map((type) => (
                                 <DetailCardClaim
@@ -560,6 +580,7 @@ const Claim: React.FC = () => {
                                   onClick={() =>
                                     handleCardClick(`${type}-${claim.id}`)
                                   }
+                                  className={expandedCard === `${type}-${claim.id}` ? "expanded" : ""}
                                 />
                               ))}
                               {[
@@ -588,6 +609,7 @@ const Claim: React.FC = () => {
                                   onClick={() =>
                                     handleCardClick(`${type}-${claim.id}`)
                                   }
+                                  className={expandedCard === `${type}-${claim.id}` ? "expanded" : ""}
                                 />
                               ))}
                               {["repair_method"].map((type) => (
@@ -610,6 +632,7 @@ const Claim: React.FC = () => {
                                   onClick={() =>
                                     handleCardClick(`${type}-${claim.id}`)
                                   }
+                                  className={expandedCard === `${type}-${claim.id}` ? "expanded" : ""}
                                 />
                               ))}
                               {[
@@ -638,6 +661,7 @@ const Claim: React.FC = () => {
                                   onClick={() =>
                                     handleCardClick(`${type}-${claim.id}`)
                                   }
+                                  className={expandedCard === `${type}-${claim.id}` ? "expanded" : ""}
                                 />
                               ))}
                             </div>

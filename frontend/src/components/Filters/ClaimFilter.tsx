@@ -1,8 +1,8 @@
 import React from 'react';
 
-import '../../styles/MaintenanceFilter.scss';
+import '../../styles/ClaimFilter.scss';
 
-interface MaintenanceFilterProps {
+interface ClaimFilterProps {
   onFilterChange: (selectedFilters: { [key: string]: string | number | null }) => void;
   filterOptions: {
     failure_node_name: string[];
@@ -11,13 +11,13 @@ interface MaintenanceFilterProps {
   };
 }
 
-const MaintenanceFilter: React.FC<MaintenanceFilterProps> = ({ onFilterChange, filterOptions }) => {
+const ClaimFilter: React.FC<ClaimFilterProps> = ({ onFilterChange, filterOptions }) => {
   const handleFilterSelect = (event: React.ChangeEvent<HTMLSelectElement>, filterKey: string) => {
     onFilterChange({ [filterKey]: event.target.value === 'all' ? null : event.target.value });
   };
 
   return (
-    <div className="equipment-filter">
+    <div className="claim-filter">
       <label>
         Узел отказа:
         <select onChange={(e) => handleFilterSelect(e, 'failure_node_name')}>
@@ -51,4 +51,4 @@ const MaintenanceFilter: React.FC<MaintenanceFilterProps> = ({ onFilterChange, f
   );
 };
 
-export default MaintenanceFilter;
+export default ClaimFilter;
