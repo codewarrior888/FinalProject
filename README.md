@@ -34,6 +34,19 @@
 Серверная часть доступна по ссылке [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 Доступ в админ панель [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).
 
+Данные пользователей (username/password):
+- admin/admin;
+- client1/tusroN-nysfyq-5hibni
+- client2/qygxiz-peXqa8-difceh
+- client3/Byfmub-hypme2-codjot
+- client4/jybcox-pivcyg-6doNwi
+- client5/godzu6-cuzhew-Hornux
+- client6/joBnoz-5wommo-rawbud
+- client7/rikdon-ryNdi8-boxboj
+- service_company1/nosfet-hUtka2-fejgym
+- service_company2/dapdeq-3sejwo-vedtyB
+- service_company3/qisker-0nevxa-kIwbos
+
 Клиентская часть доступна по ссылке [http://localhost:3000](http://localhost:3000).
 API документация доступна для авторизованных пользователей по ссылке [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/).
 
