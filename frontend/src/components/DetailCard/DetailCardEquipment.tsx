@@ -12,7 +12,6 @@ interface DetailCardEquipmentProps {
   className?: string;
 }
 
-// Configuration object for card types
 const CARD_CONFIGS = {
   EQUIPMENT_TYPE: [
     "Техника",

@@ -26,9 +26,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
     try {
       await login(username, password);
-      onClose(); // Close modal on successful login
+      onClose();
     } catch (err) {
-      setError("Неправильное имя пользователя или пароль"); // Set error message on failure
+      setError("Неправильное имя пользователя или пароль");
     }
   };
 

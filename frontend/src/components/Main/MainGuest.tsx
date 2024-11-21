@@ -10,15 +10,13 @@ import RoleLabel from "../Authenticate/RoleLabel";
 const MainGuest: React.FC = () => {
   const [equipmentData, setEquipmentData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState([]);
+  // Реф для обнаружения кликов за пределами контейнера
+  const detailsRef = useRef<HTMLDivElement | null>(null);
   const [isDimmed, setIsDimmed] = useState(false);
 
-  // Ref to detect clicks outside the expanded details container
-  const detailsRef = useRef<HTMLDivElement | null>(null);
-
-  // Fetch equipment data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +30,7 @@ const MainGuest: React.FC = () => {
     fetchData();
   }, []);
 
-  // Handle clicks outside the expanded container
+  // Обработчик кликов за пределами контейнера
   const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
     if (
       detailsRef.current &&
@@ -42,7 +40,7 @@ const MainGuest: React.FC = () => {
     }
   };
 
-  // Add and remove event listeners for mouse and touch
+  // Добавить и удалить EventListener при изменении expandedRow
   useEffect(() => {
     if (expandedRow) {
       document.addEventListener("mousedown", handleOutsideClick);
@@ -58,7 +56,7 @@ const MainGuest: React.FC = () => {
     };
   }, [expandedRow]);
 
-  // Search logic
+  // Обработчик изменения поискового запроса
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -74,6 +72,7 @@ const MainGuest: React.FC = () => {
     }
   };
 
+  // Обработчик нажатия Enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -86,16 +85,17 @@ const MainGuest: React.FC = () => {
     }
   };
 
-  // Row and Card Click Handlers
+  // Обработчик клика по строке
   const handleRowClick = (equipment: any) => {
     setExpandedRow((prev) => {
       const newExpandedRow =
         prev === equipment.equipment_serial ? null : equipment.equipment_serial;
-      setIsDimmed(newExpandedRow !== null); // Update the dimmed state based on the new row
+      setIsDimmed(newExpandedRow !== null);
       return newExpandedRow;
     });
   };
 
+  // Обработчик клика по карточке
   const handleCardClick = (equipmentSerial: string) => {
     setExpandedCard(expandedCard === equipmentSerial ? null : equipmentSerial);
   };

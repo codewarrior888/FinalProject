@@ -36,7 +36,8 @@ html {
   p, li, ul, a {
     font-family: $font-regular;
   }
-  //---- Buttons ---- //
+
+  //---- Кнопки ---- //
   .save-button {
     border: none;
     border-radius: 0.5rem;
@@ -111,8 +112,10 @@ html {
     }
   }
 
+  // ---- Поля ввода ---- //
   input {
     height: auto;
+    width: fit-content;
   }
 
   textarea {

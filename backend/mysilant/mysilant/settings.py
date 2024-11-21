@@ -41,9 +41,9 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework_simplejwt',
-    'corsheaders',
     'drf_spectacular',
     'django_filters',
+    'corsheaders',
 
     'accounts',
     'api',
@@ -92,7 +92,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -149,7 +148,7 @@ CORS_ORIGIN_WHITELIST = ["http://localhost:3000", "http://127.0.0.1:8000"]
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_PERMISSION_CLASSES': ["rest_framework.permissions.IsAuthenticated",],
+    'DEFAULT_PERMISSION_CLASSES': ["rest_framework.permissions.IsAuthenticated",],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -175,7 +174,3 @@ SPECTACULAR_SETTINGS = {
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-# DATE_FORMAT = 'd-m-Y'
-# DATETIME_FORMAT = 'd-m-Y H:i'
-# USE_L10N = False

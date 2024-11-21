@@ -6,7 +6,7 @@ class IsGuest(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return (
-            request.user.is_anonymous or request.user.role == 'gt'
+            request.user.is_anonymous or request.user.role == 'gt' # Ограниченный доступ (только чтение страница гостя)
         ) and view.basename == 'equipment' and request.method in permissions.SAFE_METHODS
 
 class IsClient(permissions.BasePermission):
@@ -18,9 +18,9 @@ class IsClient(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.role == 'cl':
             if view.basename in ['equipment', 'claims']:
-                return request.method in permissions.SAFE_METHODS  # Read-only access
+                return request.method in permissions.SAFE_METHODS  # Ограниченный доступ (только чтение)
             elif view.basename == 'maintenance':
-                return True  # Full access (read and write)
+                return True  # Полный доступ (чтение и запись)
         return False
 
 class IsServiceCompany(permissions.BasePermission):
@@ -32,9 +32,9 @@ class IsServiceCompany(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.role == 'sc':
             if view.basename == 'equipment':
-                return request.method in permissions.SAFE_METHODS  # Read-only access
+                return request.method in permissions.SAFE_METHODS  # Ограниченный доступ (только чтение)
             elif view.basename in ['maintenance', 'claims']:
-                return True  # Full access (read and write)
+                return True  # Полный доступ (чтение и запись)
         return False
 
 class IsManager(permissions.BasePermission):
@@ -43,4 +43,5 @@ class IsManager(permissions.BasePermission):
     - Просмотр и редактирование любой информации в Технике, ТО и Рекламациях
     """
     def has_permission(self, request, view):
-        return request.user.is_superuser or request.user.role == 'mn'
+        return request.user.is_superuser or request.user.role == 'mn' # Полный доступ
+    

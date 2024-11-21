@@ -2,6 +2,7 @@
 @import 'fonts';
 @import '_mixins';
 
+// Общие стили
 .claim {
   display: flex;
   flex-direction: column;
@@ -17,7 +18,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: $box-shadow;
       z-index: 1;
     }
   }
@@ -67,34 +68,35 @@
       max-width: 30rem;
     }
   }
-  
+
+  // Стили таблицы
   .table {
     width: auto;
-    // border-collapse: collapse;
     max-width: 90rem;
     height: auto;
     font-size: 1.6rem;
     margin: 0 auto 2rem;
     border: 1px solid $main-color-light-gray;
+    border-collapse: collapse;
     overflow-y: scroll;
+
+    table-layout: auto;
     
     th {
-      padding: 12px 20px;
-      border-bottom: 1px solid #ddd;
+      padding: 1.2rem 2rem;
       text-align: left;
       align-content: center;
-      // overflow: hidden;
       word-break: break-word;
-      white-space: nowrap;
       word-break: keep-all;
       background-color: $main-color-light-gray;
     }
   
     td {
-      padding: 0.5rem 0.5rem;
+      padding: 1rem 2rem;
 
       &:first-child {
         vertical-align: middle;
+        padding: 1rem 1rem;
       }
     }
     
@@ -103,6 +105,7 @@
     }
   }
 
+  // Стили карточки
   &__details-title {
     font-size: 2rem;
     margin-bottom: 1rem;
@@ -117,8 +120,8 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); // Center it horizontally and vertically
-    width: 60%; // Make it responsive
+    transform: translate(-50%, -50%);
+    width: 60%;
     width: 100rem;
     height: auto;
     min-height: 30rem;
@@ -126,7 +129,7 @@
     border: 1px solid $main-color-light-gray;
     border-radius: 8px;
     background-color: $main-color-white;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: $box-shadow;
     overflow-y: auto;
     z-index: 1000;
 

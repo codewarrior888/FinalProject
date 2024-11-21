@@ -13,8 +13,8 @@ const getAuthorizationHeader = () => ({
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching equipment data:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при получении данных Техники:", error);
+      throw error;
     }
   };
   
@@ -25,8 +25,8 @@ const getAuthorizationHeader = () => ({
       });
       return response.data;
     } catch (error) {
-      console.error("Error saving equipment data:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при сохранении Техники:", error);
+      throw error;
     }
   };
   
@@ -36,8 +36,8 @@ const getAuthorizationHeader = () => ({
         headers: getAuthorizationHeader(),
       });
     } catch (error) {
-      console.error("Error deleting equipment:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при удалении Техники:", error);
+      throw error;
     }
   };
 
@@ -48,8 +48,8 @@ const getAuthorizationHeader = () => ({
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching maintenance data:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при получении данных ТО:", error);
+      throw error;
     }
   };
 
@@ -60,8 +60,8 @@ const getAuthorizationHeader = () => ({
       });
       return response.data;
     } catch (error) {
-      console.error("Error saving maintenance data:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при сохранении ТО:", error);
+      throw error;
     }
   };
 
@@ -71,8 +71,8 @@ const getAuthorizationHeader = () => ({
         headers: getAuthorizationHeader(),
       });
     } catch (error) {
-      console.error("Error deleting maintenance:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при удалении ТО:", error);
+      throw error;
     }
   };
 
@@ -83,8 +83,8 @@ const getAuthorizationHeader = () => ({
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching claim data:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при получении данных Рекламации:", error);
+      throw error;
     }
   };
 
@@ -95,8 +95,8 @@ const getAuthorizationHeader = () => ({
       });
       return response.data;
     } catch (error) {
-      console.error("Error saving claim data:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при сохранении Рекламации:", error);
+      throw error;
     }
   };
 
@@ -106,7 +106,7 @@ const getAuthorizationHeader = () => ({
         headers: getAuthorizationHeader(),
       });
     } catch (error) {
-      console.error("Error deleting claim:", error);
-      throw error; // Propagate the error
+      console.error("Ошибка при удалении Рекламации:", error);
+      throw error;
     }
   };

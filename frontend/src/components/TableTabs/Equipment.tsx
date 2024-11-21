@@ -1,12 +1,12 @@
-import "../../styles/Equipment.scss";
 import React, { useState, useEffect, useRef } from "react";
 import { fetchEquipmentData, saveEquipmentData, deleteEquipment } from "../API/apiService";
+import { useReferences } from "../API/ReferenceContext";
 import { useAuth } from "../Authenticate/useAuth";
 import Table from "react-bootstrap/Table";
-import DetailCardEquipment from "../DetailCard/DetailCardEquipment";
 import EquipmentFilter from "../Filters/EquipmentFilter";
+import DetailCardEquipment from "../DetailCard/DetailCardEquipment";
 import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
-import { useReferences } from "../API/ReferenceContext";
+import "../../styles/Equipment.scss";
 
 const Equipment: React.FC = () => {
   const { userInfo } = useAuth();
@@ -30,11 +30,11 @@ const Equipment: React.FC = () => {
     client_name: [],
     service_company_name: [],
   });
+  // Реф для обнаружения кликов за пределами контейнера
+  const detailsRef = useRef<HTMLDivElement | null>(null);
   const [isDimmed, setIsDimmed] = useState(false);
 
-  // Ref to detect clicks outside the expanded details container
-  const detailsRef = useRef<HTMLDivElement | null>(null);
-
+  // Функция для создания опций фильтра
   const createFilterOptions = (data) => {
     return {
       equipment_model_name: Array.from(
@@ -71,6 +71,7 @@ const Equipment: React.FC = () => {
     };
   };
 
+  // Функция для применения фильтров по роли
   const filterByRole = (data, userInfo) => {
     if (userInfo?.role === "cl") {
       return data.filter(
@@ -88,6 +89,7 @@ const Equipment: React.FC = () => {
     return data;
   };
 
+  // Сохранить equipment_serial в localStorage
   const storeEquipmentSerials = (data) => {
     const equipmentSerials = data.map((item) => item.equipment_serial);
     localStorage.setItem("equipmentSerials", JSON.stringify(equipmentSerials));
@@ -96,27 +98,23 @@ const Equipment: React.FC = () => {
   const fetchData = async () => {
     try {
       const equipmentData = await fetchEquipmentData();
-
       let data = equipmentData;
 
-      // Apply role-based filtering
       data = filterByRole(data, userInfo);
 
       setEquipmentData(data);
       setFilteredData(data);
 
-      // Store the initial data as a reference for comparisons
+      // Сохранить исходные данные для сравнения
       const initialData = data.reduce((acc, item) => {
-        acc[item.equipment_serial] = item; // Use serial as the key
+        acc[item.equipment_serial] = item; // Использовать equipment_serial как ключ
         return acc;
       }, {});
       setOriginalData(initialData);
 
-      // Setup unique filter options
       const options = createFilterOptions(data);
       setFilterOptions(options);
 
-      // Store equipment_serial values in localStorage
       storeEquipmentSerials(data);
     } catch (error) {
       console.error("Ошибка при получении данных:", error);
@@ -135,7 +133,7 @@ const Equipment: React.FC = () => {
     userInfo,
   ]);
 
-  // Handle filter changes
+  // Обработчик изменения фильтров
   const handleFilterChange = (selectedFilters: {
     [key: string]: string | number | null;
   }) => {
@@ -149,11 +147,10 @@ const Equipment: React.FC = () => {
         );
       }
     });
-
     setFilteredData(updatedData);
   };
 
-  // Handle clicks outside the expanded container
+  // Обработчик кликов за пределами контейнера
   const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
     if (
       detailsRef.current &&
@@ -163,7 +160,7 @@ const Equipment: React.FC = () => {
     }
   };
 
-  // Add and remove event listeners for mouse and touch
+  // Добавить и удалить EventListener при изменении expandedRow
   useEffect(() => {
     if (expandedRow) {
       document.addEventListener("mousedown", handleOutsideClick);
@@ -179,6 +176,7 @@ const Equipment: React.FC = () => {
     };
   }, [expandedRow]);
 
+  // Обработчик клика по строке
   const handleRowClick = (equipment: any) => {
     setExpandedRow((prev) => {
       const newExpandedRow =
@@ -188,11 +186,12 @@ const Equipment: React.FC = () => {
     });
   };
 
+  // Обработчик клика по карточке
   const handleCardClick = (equipmentSerial: string) => {
     setExpandedCard(expandedCard === equipmentSerial ? null : equipmentSerial);
   };
 
-  // Handle edit actions
+  // Обработчик клика на кнопку "Редактировать"
   const handleEditClick = (serial: string) => {
     const selectedItem = filteredData.find(
       (item) => item.equipment_serial === serial
@@ -213,6 +212,7 @@ const Equipment: React.FC = () => {
     }
   };
 
+  // Функция для форматирования даты
   const formatDateForAPI = (dateString: string) => {
     const [year, month, day] = dateString.split("-");
     return `${month}/${day}/${year}`;
@@ -228,6 +228,7 @@ const Equipment: React.FC = () => {
     steer_axle_model_name?: string;
   }
 
+  // Обработчик изменений в модельных полях (исходные справочные данные для выпадющих списков)
   const handleModelFields = (
     editedData,
     originalData,
@@ -252,19 +253,19 @@ const Equipment: React.FC = () => {
           ([, name]) => name === editedValue
         );
         if (selectedOption) {
-          equipmentUpdates[field] = selectedOption[0]; // Add ID
-          equipmentUpdates[`${field}_name`] = editedValue; // Add name
+          equipmentUpdates[field] = selectedOption[0]; // Добавить ID
+          equipmentUpdates[`${field}_name`] = editedValue; // Добавить название
         }
       } else {
-        // Keep the original values if unchanged
+        // Оставить исходные значения если они не изменились
         equipmentUpdates[field] = originalData[field];
         equipmentUpdates[`${field}_name`] = originalValue;
       }
     });
-
     return equipmentUpdates;
   };
 
+  // Обработчик изменений в пользовательских полях
   const handleUserFields = (editedData, originalData, userReferenceOptions) => {
     const equipmentUpdates: Record<string, any> = {};
     const userFields = ["client", "service_company"];
@@ -279,19 +280,18 @@ const Equipment: React.FC = () => {
           ([, name]) => name === editedValue
         );
         if (selectedOption) {
-          equipmentUpdates[field] = selectedOption[0]; // Add ID
-          equipmentUpdates[fieldName] = editedValue; // Add name
+          equipmentUpdates[field] = selectedOption[0];
+          equipmentUpdates[fieldName] = editedValue;
         }
       } else {
-        // Keep the original values if unchanged
         equipmentUpdates[field] = originalData[field];
         equipmentUpdates[fieldName] = originalValue;
       }
     });
-
     return equipmentUpdates;
   };
 
+  // Обработчик изменений в остальных полях (справочник не используется)
   const handleOtherFields = (editedData, originalData) => {
     const equipmentUpdates: Record<string, any> = {};
     const otherFields = [
@@ -310,19 +310,19 @@ const Equipment: React.FC = () => {
     otherFields.forEach((field) => {
       if (field === "shipment_date") {
         equipmentUpdates[field] = editedData[field]
-          ? formatDateForAPI(editedData[field]) // Format new date
-          : formatDateForAPI(originalData[field]); // Format unchanged date
+          ? formatDateForAPI(editedData[field])
+          : formatDateForAPI(originalData[field]);
       } else {
         equipmentUpdates[field] =
           editedData[field] !== undefined
-            ? editedData[field] // New value
-            : originalData[field]; // Original value
+            ? editedData[field]
+            : originalData[field];
       }
     });
-
     return equipmentUpdates;
   };
 
+  // Обработчик сохранения изменений
   const handleSaveClick = async (serial: string) => {
     try {
       const editedData: EditedData = editValues[serial];
@@ -346,10 +346,10 @@ const Equipment: React.FC = () => {
         ...handleOtherFields(editedData, original),
       };
 
-      // Make the PUT request
+      // Отправить PUT-запрос с обновленными данными
       await saveEquipmentData(serial, equipmentUpdates);
 
-      // Update states and refresh data
+      // Обновить состояние и перезагрузить данные
       setEditMode((prev) => ({ ...prev, [serial]: false }));
       setEditValues((prev) => ({ ...prev, [serial]: null }));
       fetchData();
@@ -358,16 +358,19 @@ const Equipment: React.FC = () => {
     }
   };
 
+  // Обработчик отмены изменений
   const handleCancelClick = (serial: string) => {
     setEditMode((prev) => ({ ...prev, [serial]: false }));
     setEditValues((prev) => ({ ...prev, [serial]: null }));
   };
 
+  // Обработчик удаления
   const handleDeleteClick = (equipmentSerial: string) => {
     setDeleteSerial(equipmentSerial);
     setShowConfirm(true);
   };
 
+  // Обработчик подтверждения удаления
   const confirmDelete = async () => {
     if (deleteSerial) {
       try {

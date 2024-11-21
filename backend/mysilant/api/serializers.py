@@ -10,6 +10,7 @@ class ReferenceSerializer(serializers.ModelSerializer):
         model = Reference
         fields = [ 'id', 'category', 'name', 'description']
 
+
 class EquipmentSerializer(serializers.ModelSerializer):
     equipment_model = serializers.PrimaryKeyRelatedField(queryset=Reference.objects.filter(category=Reference.EQUIPMENT))
     equipment_model_name = serializers.CharField(source='equipment_model.name', read_only=True)
@@ -31,6 +32,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
     service_company = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=User.SERVICE_COMPANY))
     service_company_name = serializers.CharField(source='service_company.company_name', read_only=True)
     model_options_preview = serializers.SerializerMethodField()
+
     class Meta:
         model = Equipment
         fields = [
@@ -81,7 +83,6 @@ class MaintenanceSerializer(serializers.ModelSerializer):
     service_company = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=User.SERVICE_COMPANY))
     service_company_name = serializers.CharField(source='service_company.company_name', read_only=True)
 
-
     class Meta:
         model = Maintenance
         fields = [
@@ -89,6 +90,7 @@ class MaintenanceSerializer(serializers.ModelSerializer):
              'maintenance_date', 'engine_hours', 'order_number', 'order_date','maintenance_company_name', 'service_company', 
              'service_company_name'
         ]
+
 
 class ClaimSerializer(serializers.ModelSerializer):
     equipment_serial = serializers.CharField(source='equipment.equipment_serial', read_only=True)
@@ -100,10 +102,10 @@ class ClaimSerializer(serializers.ModelSerializer):
     repair_method_name = serializers.CharField(source='repair_method.name', read_only=True)
     repair_method_description = serializers.CharField(source='repair_method.description', read_only=True)
     
-
     class Meta:
         model = Claim
         fields = [
             'id', 'equipment', 'equipment_serial', 'failure_date', 'engine_hours', 'failure_node', 'failure_node_name', 
             'failure_node_description', 'repair_method', 'repair_method_name', 'repair_method_description', 'spare_parts', 'repair_date', 'downtime', 'service_company', 'service_company_name'
         ]
+        

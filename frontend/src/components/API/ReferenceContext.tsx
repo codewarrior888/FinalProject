@@ -23,11 +23,11 @@ export const ReferenceProvider: React.FC<{ children: React.ReactNode }> = ({
     any
   > | null>(null);
 
-  const { userInfo } = useAuth(); // Move the hook call here
+  const { userInfo } = useAuth();
 
+  // Функция для получения опций справочников
   const fetchReferences = async () => {
     try {
-      // Fetch Equipment References
       const equipmentResponse = await axios.get(`${API_URL}/api/references/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -79,6 +79,7 @@ export const ReferenceProvider: React.FC<{ children: React.ReactNode }> = ({
         repair_method: repairMethodOptions,
       });
 
+      // Для справочных данных пользователей проверить роль
       if (userInfo?.role !== "mn" && userInfo?.role !== "superuser") {
         console.log("User role not authorized to fetch user references.");
         setUserReferenceOptions({
@@ -88,13 +89,11 @@ export const ReferenceProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      // Fetch User References
       const userResponse = await axios.get(`${API_URL}/api/users/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-
       let userData = userResponse.data;
 
       const clientOptions = userData
@@ -110,7 +109,7 @@ export const ReferenceProvider: React.FC<{ children: React.ReactNode }> = ({
         service_company_name: serviceCompanyOptions,
       });
     } catch (error) {
-      console.error("Error fetching references:", error);
+      console.error("Ошибка при получении справочников:", error);
     }
   };
 

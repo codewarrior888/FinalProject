@@ -22,3 +22,4 @@ class User(AbstractUser):
             return self.company_name
         full_name = f"{self.first_name or ''} {self.last_name or ''}".strip()
         return full_name or "Неизвестный пользователь"
+    

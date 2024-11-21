@@ -51,10 +51,8 @@ class LoginAPIView(APIView):
             if user is None:
                 return Response({'error': 'Неверные учетные данные'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            # Generate only an access token for the user
             access_token = AccessToken.for_user(user)
 
-            # Serialize the user
             user_data = UserSerializer(user).data
             
             return Response({
@@ -112,3 +110,4 @@ class UserViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     filter_backends = (django_filters.DjangoFilterBackend,)
     filterset_class = UserFilter
     permission_classes = [IsManager]
+    

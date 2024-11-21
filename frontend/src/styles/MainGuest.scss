@@ -17,7 +17,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: $background-overlay;
       z-index: 1;
     }
   }
@@ -123,12 +123,11 @@
 
     @include respond-to("small") {
       width: auto;
-      max-width: 30rem; // Adjust table width for small screens
+      max-width: 30rem;
     }
   }
 }
 
-/* Details Card view styling */
 .main-guest {
 
   &__details-container {
@@ -138,7 +137,7 @@
     position: absolute;
     top: 40%;
     left: 50%;
-    transform: translateX(-50%); // Adjust for exact centering
+    transform: translateX(-50%);
     width: 80rem;
     height: auto;
     min-height: 30rem;
@@ -146,7 +145,7 @@
     border: 1px solid $main-color-light-gray;
     border-radius: 8px;
     background-color: $main-color-white;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); // Add shadow for emphasis
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
     z-index: 100;
 

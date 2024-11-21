@@ -3,8 +3,8 @@ import { deleteMaintenance, fetchMaintenanceData, saveMaintenanceData } from "..
 import { useReferences } from "../API/ReferenceContext";
 import { useAuth } from "../Authenticate/useAuth";
 import Table from "react-bootstrap/Table";
-import DetailCardMaintenance from "../DetailCard/DetailCardMaintenance";
 import MaintenanceFilter from "../Filters/MaintenanceFilter";
+import DetailCardMaintenance from "../DetailCard/DetailCardMaintenance";
 import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import "../../styles/Maintenance.scss";
 
@@ -14,6 +14,11 @@ const Maintenance: React.FC = () => {
   const [maintenanceData, setMaintenanceData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [expandedCard, setExpandedCard] = useState<any | null>(null);
+  const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
+  const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteMaintenanceId, setDeleteMaintenanceId] = useState<number | null>(null);
+  const [ originalData, setOriginalData ] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     maintenance_type_name: [],
@@ -21,16 +26,11 @@ const Maintenance: React.FC = () => {
     maintenance_company_name: [],
     equipment_serial: [],
   });
-  const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
-  const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [deleteMaintenanceId, setDeleteMaintenanceId] = useState<number | null>(null);
-  const [ originalData, setOriginalData ] = useState([]);
+  // Реф для обнаружения кликов за пределами контейнера
+  const detailsRef = useRef<HTMLDivElement | null>(null);
   const [isDimmed, setIsDimmed] = useState(false);
 
-  // Ref to detect clicks outside the expanded details container
-  const detailsRef = useRef<HTMLDivElement | null>(null);
-
+  // Функция для создания опций фильтра
   const createFilterOptions = (data) => {
     return {
       equipment_serial: Array.from(
@@ -48,8 +48,10 @@ const Maintenance: React.FC = () => {
     };
   };
 
+  // Функция для получения equipment_serial из localStorage
   const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
 
+  // Функция для применения фильтров по роли
   const filterByRole = (data, userInfo) => {  
     if (userInfo?.role === "cl") {
       const filteredData = data.filter(
@@ -67,12 +69,11 @@ const Maintenance: React.FC = () => {
     return data;
   };
 
+  // Сохранить maintenance_ids в localStorage
   const storeMaintenanceIds = (data) => {
     const maintenanceIds = data.map((item) => item.id);
       localStorage.setItem("maintenanceIds", JSON.stringify(maintenanceIds));
   };
-
-  // const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
 
   const fetchData = async () => {
     try {
@@ -86,14 +87,13 @@ const Maintenance: React.FC = () => {
       setMaintenanceData(data);
       setFilteredData(data);
 
-      // Store the initial data as a reference for comparisons
+      // Сохранить исходные данные для сравнения
       const initialData = data.reduce((acc, item) => {
-        acc[item.id] = item; // Use serial as the key
+        acc[item.id] = item; // Использовать id как ключ
         return acc;
       }, {});
       setOriginalData(initialData);
 
-      // Calculate unique filter options
       const options = createFilterOptions(data);
       setFilterOptions(options);
 
@@ -115,7 +115,7 @@ const Maintenance: React.FC = () => {
     userInfo,
   ]);
 
-  // Handle filter changes
+  // Обработчик изменения фильтров
   const handleFilterChange = (selectedFilters: {
     [key: string]: string | number | null;
   }) => {
@@ -129,10 +129,10 @@ const Maintenance: React.FC = () => {
         );
       }
     });
-
     setFilteredData(updatedData);
   };
 
+  // Обработчик кликов за пределами контейнера
   const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
     if (
       detailsRef.current &&
@@ -142,7 +142,7 @@ const Maintenance: React.FC = () => {
     }
   };
 
-  // Add and remove event listeners for mouse and touch
+  // Добавить и удалить EventListener при изменении expandedRow
   useEffect(() => {
     if (expandedRow) {
       document.addEventListener("mousedown", handleOutsideClick);
@@ -158,6 +158,7 @@ const Maintenance: React.FC = () => {
     };
   }, [expandedRow]);
 
+  // Обработчик клика по строке
   const handleRowClick = (maintenance: any) => {
     setExpandedRow((prev) => {
       const newExpandedRow =
@@ -167,10 +168,12 @@ const Maintenance: React.FC = () => {
     });
   };
 
+  // Обработчик клика по карточке
   const handleCardClick = (maintenanceId: any) => {
     setExpandedCard(expandedCard === maintenanceId ? null : maintenanceId);
   };
 
+  // Обработчик клика на кнопку "Редактировать"
   const handleEditClick = (id: number) => {
     const selectedItem = filteredData.find((item) => item.id === id);
     if (selectedItem) {
@@ -184,6 +187,7 @@ const Maintenance: React.FC = () => {
     }
   };
 
+  // Функция для форматирования даты
   const formatDateForAPI = (dateString: string) => {
     const [year, month, day] = dateString.split("-");
     return `${month}/${day}/${year}`;
@@ -194,6 +198,7 @@ const Maintenance: React.FC = () => {
   //   return `${year}-${month}-${day}`;
   // }
 
+  // Обработчик изменений в поле "maintenance_type" (исходные справочные данные для выпадющих списков)
   const handleMaintenanceTypeField = (
     editedData,
     originalData,
@@ -213,12 +218,11 @@ const Maintenance: React.FC = () => {
             ([, name]) => name === editedValue
           );
         if (selectedOption) {
-          maintenanceUpdates[field] = selectedOption[0]; // Add ID
-          maintenanceUpdates[fieldName] = editedValue; // Add name
-          console.log('maintenanceUpdates', maintenanceUpdates)
+          maintenanceUpdates[field] = selectedOption[0]; // Добавить ID
+          maintenanceUpdates[fieldName] = editedValue; // Добавить название
         }
       } else {
-        // Keep the original values if unchanged
+        // Оставить исходные значения если они не изменились
         maintenanceUpdates[field] = originalData[field];
         maintenanceUpdates[fieldName] = originalValue;
       }
@@ -227,6 +231,7 @@ const Maintenance: React.FC = () => {
     return maintenanceUpdates;
   };
   
+  // Обработчик изменений в остальных полях (справочник не используется)
   const handleOtherFields = (editedData, originalData) => {
     const maintenanceUpdates: Record<string, any> = {};
     const otherFields = ["maintenance_date", "engine_hours", "order_number", "order_date", "maintenance_company_name"];
@@ -240,13 +245,14 @@ const Maintenance: React.FC = () => {
       }
     });
 
-    // Include required non-editable fields
-  maintenanceUpdates["equipment"] = originalData["equipment"]; // Always include equipment ID
-  maintenanceUpdates["service_company"] = originalData["service_company"]; // Always include service company ID
+    // Добавить неизменяемые обязательные поля equipment и service_company
+    maintenanceUpdates["equipment"] = originalData["equipment"];
+    maintenanceUpdates["service_company"] = originalData["service_company"];
 
     return maintenanceUpdates;
   };
 
+  // Обработчик сохранения изменений
   const handleSaveClick = async (id: number) => {
     try {
       const editedData = editValues[id];
@@ -265,8 +271,10 @@ const Maintenance: React.FC = () => {
         ...handleMaintenanceTypeField(editedData, original, equipmentReferenceOptions),
       };
 
+      // Отправить PUT-запрос с обновленными данными
       await saveMaintenanceData(id, maintenanceUpdates);
 
+      // Обновить состояние и перезагрузить данные
       setEditMode((prev) => ({ ...prev, [id]: false }));
       setEditValues((prev) => ({ ...prev, [id]: null }));
       fetchData();
@@ -275,16 +283,19 @@ const Maintenance: React.FC = () => {
     }
   };
 
+  // Обработчик отмены изменений
   const handleCancelClick = (id: number) => {
     setEditMode((prev) => ({ ...prev, [id]: false }));
     setEditValues((prev) => ({ ...prev, [id]: null }));
   };
 
+  // Обработчик удаления
   const handleDeleteClick = (id: number) => {
     setDeleteMaintenanceId(id);
     setShowConfirm(true);
   };
 
+  // Обработчик подтверждения удаления
   const confirmDelete = async () => {
     if (deleteMaintenanceId) {
       try {

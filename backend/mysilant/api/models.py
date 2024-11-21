@@ -54,8 +54,8 @@ class Equipment(models.Model):
     service_company = models.ForeignKey(User, on_delete=models.RESTRICT, related_name='equipment_service_company', limit_choices_to={'role': User.SERVICE_COMPANY}, verbose_name="Сервисная компания")
 
     class Meta:
-        verbose_name = "Машина"
-        verbose_name_plural = "Машины"
+        verbose_name = "Техника"
+        verbose_name_plural = "Техника"
 
     def __str__(self):
         if self.model_options and len(self.model_options) > 25:

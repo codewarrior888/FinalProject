@@ -3,8 +3,8 @@ import { fetchClaimsData, saveClaimsData, deleteClaim } from "../API/apiService"
 import { useReferences } from "../API/ReferenceContext";
 import { useAuth } from "../Authenticate/useAuth";
 import Table from "react-bootstrap/Table";
-import DetailCardClaim from "../DetailCard/DetailCardClaim";
 import ClaimFilter from "../Filters/ClaimFilter";
+import DetailCardClaim from "../DetailCard/DetailCardClaim";
 import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import "../../styles/Claim.scss";
 
@@ -14,6 +14,11 @@ const Claim: React.FC = () => {
   const [claimsData, setClaimsData] = useState([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [expandedCard, setExpandedCard] = useState<any | null>(null);
+  const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
+  const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteClaimId, setDeleteClaimId] = useState<number | null>(null);
+  const [originalData, setOriginalData] = useState({});
   const [filteredData, setFilteredData] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     failure_node_name: [],
@@ -21,20 +26,11 @@ const Claim: React.FC = () => {
     service_company_name: [],
     equipment_serial: [],
   });
-  const [referenceOptions, setReferenceOptions] = useState({
-    failure_node_name: [],
-    repair_method_name: [],
-  });
-  const [editMode, setEditMode] = useState<{ [id: number]: boolean }>({});
-  const [editValues, setEditValues] = useState<{ [id: number]: any }>({});
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [deleteClaimId, setDeleteClaimId] = useState<number | null>(null);
-  const [originalData, setOriginalData] = useState({});
+  // Реф для обнаружения кликов за пределами контейнера
+  const detailsRef = useRef<HTMLDivElement | null>(null);
   const [isDimmed, setIsDimmed] = useState(false);
 
-  // Ref to detect clicks outside the expanded details container
-  const detailsRef = useRef<HTMLDivElement | null>(null);
-
+  // Функция для создания опций фильтра
   const createFilterOptions = (data) => {
     return {
       failure_node_name: Array.from(
@@ -51,9 +47,10 @@ const Claim: React.FC = () => {
       ),
     };
   };
-
+  // Функция для получения equipment_serial из localStorage
   const equipmentSerials = JSON.parse(localStorage.getItem("equipmentSerials")) || [];
 
+  // Функция для применения фильтров по роли
   const filterByRole = (data, userInfo) => {  
     if (userInfo?.role === "cl") {
       const filteredData = data.filter(
@@ -71,6 +68,7 @@ const Claim: React.FC = () => {
     return data;
   };
 
+  // Сохранить claim_ids в localStorage
   const storeClaimIds = (data) => {
     const claimIds = data.map((item) => item.id);
       localStorage.setItem("claimIds", JSON.stringify(claimIds));
@@ -87,14 +85,13 @@ const Claim: React.FC = () => {
       setClaimsData(data);
       setFilteredData(data);
 
-      // Store the initial data as a reference for comparisons
+      // Сохранить исходные данные для сравнения
       const initialData = data.reduce((acc, item) => {
-        acc[item.id] = item; // Use serial as the key
+        acc[item.id] = item; // Использовать id как ключ
         return acc;
       }, {});
       setOriginalData(initialData);
 
-      // Calculate unique filter options
       const options = createFilterOptions(data);
       setFilterOptions(options);
 
@@ -116,7 +113,7 @@ const Claim: React.FC = () => {
     userInfo,
   ]);
 
-  // Handle filter changes
+  // Обработчик изменения фильтров
   const handleFilterChange = (selectedFilters: {
     [key: string]: string | number | null;
   }) => {
@@ -130,10 +127,10 @@ const Claim: React.FC = () => {
         );
       }
     });
-
     setFilteredData(updatedData);
   };
 
+  // Обработчик кликов за пределами контейнера
   const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
     if (
       detailsRef.current &&
@@ -143,7 +140,7 @@ const Claim: React.FC = () => {
     }
   };
 
-  // Add and remove event listeners for mouse and touch
+  // Добавить и удалить EventListener при изменении expandedRow
   useEffect(() => {
     if (expandedRow) {
       document.addEventListener("mousedown", handleOutsideClick);
@@ -159,6 +156,7 @@ const Claim: React.FC = () => {
     };
   }, [expandedRow]);
 
+  // Обработчик клика по строке
   const handleRowClick = (claim: any) => {
     setExpandedRow((prev) => {
       const newExpandedRow =
@@ -168,10 +166,12 @@ const Claim: React.FC = () => {
     });
   };
 
+  // Обработчик клика по карточке
   const handleCardClick = (claimId: any) => {
     setExpandedCard(expandedCard === claimId ? null : claimId);
   };
 
+  // Обработчик клика на кнопку "Редактировать"
   const handleEditClick = (id: number) => {
     const selectedItem = filteredData.find((item) => item.id === id);
     if (selectedItem) {
@@ -185,11 +185,13 @@ const Claim: React.FC = () => {
     }
   };
 
+  // Функция для форматирования даты
   const formatDateForAPI = (dateString: string) => {
     const [year, month, day] = dateString.split("-");
     return `${month}/${day}/${year}`;
   };
 
+  // Обработчик изменений в полях repair_method и failure_node (исходные справочные данные для выпадющих списков)
   const handleClaimRefFields = (
     editedData,
     originalData,
@@ -209,11 +211,11 @@ const Claim: React.FC = () => {
             ([, name]) => name === editedValue
           );
         if (selectedOption) {
-          claimsUpdates[field] = selectedOption[0]; // Add ID
-          claimsUpdates[fieldName] = editedValue; // Add name
+          claimsUpdates[field] = selectedOption[0]; // Добавить ID
+          claimsUpdates[fieldName] = editedValue; // Добавить название
         }
       } else {
-        // Keep the original values if unchanged
+        // Оставить исходные значения если они не изменились
         claimsUpdates[field] = originalData[field];
         claimsUpdates[fieldName] = originalValue;
       }
@@ -222,6 +224,7 @@ const Claim: React.FC = () => {
     return claimsUpdates;
   };
 
+  // Обработчик изменений в остальных полях (справочник не используется)
   const handleOtherFields = (editedData, originalData) => {
     const claimsUpdates: Record<string, any> = {};
     const otherFields = ["failure_date", "engine_hours", "failure_node_description", "repair_method_description", "spare_parts", "repair_date"];
@@ -235,6 +238,7 @@ const Claim: React.FC = () => {
       }
     })
 
+    // Добавить неизменяемые обязательные поля equipment, downtime и service_company
     claimsUpdates["equipment"] = originalData["equipment"];
     claimsUpdates["downtime"] = originalData["downtime"];
     claimsUpdates["service_company"] = originalData["service_company"];
@@ -242,6 +246,7 @@ const Claim: React.FC = () => {
     return claimsUpdates;
   };
 
+  // Обработчик сохранения изменений
   const handleSaveClick = async (id: number) => {
     try {
       const editedData = editValues[id];
@@ -260,6 +265,7 @@ const Claim: React.FC = () => {
         ...handleClaimRefFields(editedData, original, equipmentReferenceOptions),
       };
 
+      // Отправить PUT-запрос с обновленными данными
       await saveClaimsData(id, claimsUpdates);
 
       setEditMode((prev) => ({ ...prev, [id]: false }));
@@ -270,16 +276,19 @@ const Claim: React.FC = () => {
     }
   };
 
+  // Обработчик отмены изменений
   const handleCancelClick = (id: number) => {
     setEditMode((prev) => ({ ...prev, [id]: false }));
     setEditValues((prev) => ({ ...prev, [id]: null }));
   };
 
+  // Обработчик удаления
   const handleDeleteClick = (id: number) => {
     setDeleteClaimId(id);
     setShowConfirm(true);
   };
 
+  // Обработчик подтверждения удаления
   const confirmDelete = async () => {
     if (deleteClaimId) {
       try {

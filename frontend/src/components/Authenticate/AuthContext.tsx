@@ -3,25 +3,22 @@ import { useJwt } from "react-jwt";
 import axios from "axios";
 import { API_URL } from "../API/apiService";
 
-// Define User interface with all necessary properties
 interface User {
   id: number;
   username: string;
   first_name: string;
   last_name: string;
-  role: string; // Adjust this if you have an enum or constants for roles
+  role: string;
   company_name: string | null;
   display_name: string;
 }
 
-// Define DecodedToken interface based on the token structure
 interface DecodedToken {
-  user_id: number; // Change this to match your token structure
+  user_id: number;
   username: string;
-  exp: number; // Expiration timestamp
+  exp: number;
 }
 
-// Define the context type
 interface AuthContextType {
   isAuthenticated: boolean;
   userInfo: User | null;
@@ -29,7 +26,6 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// Create the AuthContext
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
@@ -38,7 +34,6 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// AuthProvider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     !!localStorage.getItem("accessToken")
@@ -46,11 +41,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const token = localStorage.getItem("accessToken");
 
-  // Using useJwt to decode the token
   const { decodedToken, isExpired } = useJwt<DecodedToken>(token || "");
 
   useEffect(() => {
-    // Check localStorage for existing user info on page load
     const storedUserInfo = localStorage.getItem("userInfo");
     if (storedUserInfo) {
       setUserInfo(JSON.parse(storedUserInfo));
@@ -66,7 +59,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       const { access, user } = response.data;
 
-      // Check if the access token is correctly obtained
       if (access) {
         localStorage.setItem("accessToken", access);
         localStorage.setItem("userInfo", JSON.stringify(user));

@@ -8,7 +8,6 @@ class CustomUserAdmin(UserAdmin):
     model = User
     list_display = ['username', 'role', 'company_name', 'first_name', 'last_name', 'is_active',]
     
-    # Add user
     add_fieldsets = (
         *UserAdmin.add_fieldsets,
         (
@@ -19,7 +18,6 @@ class CustomUserAdmin(UserAdmin):
         )
     )
     
-    # Edit user
     fieldsets = (
         *UserAdmin.fieldsets,
         (
