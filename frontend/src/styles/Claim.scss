@@ -37,10 +37,10 @@
     
   &__table-scroll {
     display: block;
-    width: 120rem;
+    width: 100rem;
 
     @include respond-to("large") {
-      width: 100rem;
+      width: 80rem;
     }
 
     @include respond-to("medium") {

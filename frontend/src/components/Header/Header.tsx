@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../Authenticate/AuthContext";
 import LoginModal from "../../components/Authenticate/LoginModal";
@@ -7,6 +7,7 @@ import headerLogoMobile from "../../assets/media/silant-logo-blue.svg";
 import "../../styles/Header.scss";
 
 const Header = () => {
+  const navigate = useNavigate();
   const { isAuthenticated, logout } = useContext(AuthContext);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMenuActive, setIsMenuActive] = useState(false);
@@ -82,7 +83,7 @@ const Header = () => {
         )}
       </div>
 
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} onLoginSuccess={() => navigate("/")}  />
     </>
   );
 };

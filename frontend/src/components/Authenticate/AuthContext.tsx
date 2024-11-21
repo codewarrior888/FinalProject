@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { useJwt } from "react-jwt";
 import axios from "axios";
-import { API_URL } from "../API/apiService";
+import { API_URL } from "../API/axiosInstance";
 
 interface User {
   id: number;

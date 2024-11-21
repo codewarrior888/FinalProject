@@ -28,14 +28,29 @@
     text-align: center;
     flex-direction: column;
     line-height: 1.5;
+    margin-right: 20rem;
+
+    @include respond-to('large') {
+      margin-right: 10rem;
+    }
 
     &__contacts {
       font-size: 1.4rem;
     }
 
     &__title {
-      font-size: 2.5rem;
+      font-size: 3.0rem;
       font-weight: bold;
+
+      @include respond-to('xlarge') {
+        font-size: 2.5rem;
+        width: 100%;
+      }
+
+      @include respond-to('large') {
+        font-size: 2rem;
+        width: 20rem;
+      }
     }
   }
 

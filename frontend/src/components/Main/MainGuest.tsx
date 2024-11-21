@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { API_URL } from "../API/apiService";
+import { API_URL } from "../API/axiosInstance";
 import "../../styles/MainGuest.scss";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
@@ -104,8 +104,10 @@ const MainGuest: React.FC = () => {
     <div className={`main-guest ${expandedRow ? "dimmed" : ""}`}>
       <div className="main-guest__top-section">
         <RoleLabel />
-        <h2 className="main-guest__title">Информация о комплектации и технических характеристиках техники</h2>
-        
+        <h2 className="main-guest__title">
+          Информация о комплектации и технических характеристиках техники
+        </h2>
+
         <div className="main-guest__search">
           <Form.Control
             type="text"
@@ -189,24 +191,31 @@ const MainGuest: React.FC = () => {
                   {expandedRow === equipment.equipment_serial && (
                     <tr>
                       <td colSpan={6}>
-                        <div className="main-guest__details-container" ref={detailsRef}>
+                        <div
+                          className="main-guest__details-container"
+                          ref={detailsRef}
+                        >
                           <h2 className="main-guest__title">Детали</h2>
                           <div className="main-guest__cards-container">
-                            {["equipment", "engine", "transmission", "drive", "steer"
-
+                            {[
+                              "equipment",
+                              "engine",
+                              "transmission",
+                              "drive",
+                              "steer",
                             ].map((type) => (
                               <DetailCardGuest
                                 key={type}
                                 header={
-                                  type === "equipment" 
-                                  ? "Техника" 
-                                  : type === "engine" 
-                                  ? "Двигатель" 
-                                  : type === "transmission"
-                                  ? "Трансмиссия" 
-                                  : type === "drive" 
-                                  ? "Ведущий мост" 
-                                  : "Управляемый мост"
+                                  type === "equipment"
+                                    ? "Техника"
+                                    : type === "engine"
+                                    ? "Двигатель"
+                                    : type === "transmission"
+                                    ? "Трансмиссия"
+                                    : type === "drive"
+                                    ? "Ведущий мост"
+                                    : "Управляемый мост"
                                 }
                                 model={equipment[`${type}_model_name`]}
                                 serial={equipment[`${type}_serial`]}
@@ -223,7 +232,12 @@ const MainGuest: React.FC = () => {
                                     `${type}-${equipment.equipment_serial}`
                                   )
                                 }
-                                className={expandedCard === `${type}-${equipment.equipment_serial}` ? "expanded" : ""}
+                                className={
+                                  expandedCard ===
+                                  `${type}-${equipment.equipment_serial}`
+                                    ? "expanded"
+                                    : ""
+                                }
                               />
                             ))}
                           </div>

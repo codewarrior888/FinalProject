@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
 import axios from "axios";
-import { API_URL } from "./apiService";
+import { API_URL } from "./axiosInstance";
 import { useAuth } from "../Authenticate/useAuth";
 
 interface ReferenceContextProps {
