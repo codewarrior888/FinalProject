@@ -9,7 +9,7 @@ const Main = () => {
 
   // Загрузить разное меню в зависимости от состояния аутентификации
   return (
-    <div className="client-info">
+    <div className="main-content">
       {isAuthenticated ? <MainAuthenticated /> : <MainGuest />}
     </div>
   );
