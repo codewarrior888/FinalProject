@@ -1,31 +1,3 @@
-# Python
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
 .env
 .venv
-
-# Django
-*.log
-db.sqlite3
-/media/
-staticfiles/
-
-# Node.js
 node_modules/
-npm-debug.log
-yarn-error.log
-.pnp.*
-.pnp.js
-
-# React
-build/
-coverage/
-dist/
-
-# MacOS
-.DS_Store
-
-# VS Code
-.vscode/

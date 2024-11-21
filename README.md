@@ -15,6 +15,7 @@
 3. Перейти в папку и установить все зависимости:
 ### `cd backend/mysilant/`
 ### `pip install -r requirements.txt`
+### `python3 manage.py migrate`
 
 4. Запустить сервер:
 ### `python manage.py runserver`
