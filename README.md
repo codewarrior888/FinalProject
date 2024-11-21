@@ -2,7 +2,7 @@
 
 1. Установить проект по ссылке GitHub SSH:
 
-### `git@github.com:codewarrior888/FinalProject.git`
+### `git clone git@github.com:codewarrior888/FinalProject.git`
 
 или скачать по ссылке:
 ### `https://github.com/codewarrior888/FinalProject.git`
